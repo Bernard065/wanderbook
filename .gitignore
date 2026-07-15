@@ -50,3 +50,9 @@ Thumbs.db
 .nx/migrate-runs
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+apps/api/.env
+apps/api/.venv
+apps/api/dist
+__pycache__/
+*.pyc
