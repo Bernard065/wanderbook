@@ -13,7 +13,7 @@ from api.config import settings
 
 engine = create_async_engine(settings.database_url, echo=True)
 
-AsyncSessionLocal = async_sessionmaker(
+ASYNC_SESSION_LOCAL = async_sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
 
@@ -21,10 +21,8 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     """Base class for all ORM models."""
 
-    pass
-
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency that yields a database session."""
-    async with AsyncSessionLocal() as session:
+    async with ASYNC_SESSION_LOCAL() as session:
         yield session

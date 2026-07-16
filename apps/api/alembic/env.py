@@ -9,7 +9,6 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-
 from api.config import settings
 from api.database import Base
 from api.models import PlaceModel  # noqa: F401
