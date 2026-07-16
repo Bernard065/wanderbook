@@ -15,14 +15,16 @@ router = APIRouter(prefix="/places", tags=["places"])
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 
-@router.get("", response_model=list[PlaceRead])
+@router.get("", response_model=list[PlaceRead], response_model_by_alias=True)
 async def list_places(db: DbSession):
     """List all places."""
     result = await db.execute(select(PlaceModel))
     return result.scalars().all()
 
 
-@router.get("/{place_id}", response_model=PlaceRead)
+@router.get(
+    "/{place_id}", response_model=PlaceRead, response_model_by_alias=True
+)
 async def get_place(place_id: str, db: DbSession):
     """Get a single place by ID."""
     place = await db.get(PlaceModel, place_id)
@@ -31,7 +33,9 @@ async def get_place(place_id: str, db: DbSession):
     return place
 
 
-@router.post("", response_model=PlaceRead, status_code=201)
+@router.post(
+    "", response_model=PlaceRead, status_code=201, response_model_by_alias=True
+)
 async def create_place(payload: PlaceCreate, db: DbSession):
     """Create a new place."""
     place = PlaceModel(**payload.model_dump())

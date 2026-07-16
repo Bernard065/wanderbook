@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
 
 PlaceCategory = Literal[
     "mountain",
@@ -37,7 +38,17 @@ PlaceCategory = Literal[
 ]
 
 
-class PlaceCreate(BaseModel):
+class CamelModel(BaseModel):
+    """Base schema that serializes fields as camelCase for the frontend."""
+
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        from_attributes=True,
+    )
+
+
+class PlaceCreate(CamelModel):
     """Schema for creating a new place."""
 
     name: str
@@ -51,10 +62,8 @@ class PlaceCreate(BaseModel):
     rating: float | None = None
 
 
-class PlaceRead(BaseModel):
+class PlaceRead(CamelModel):
     """Schema for reading a place."""
-
-    model_config = ConfigDict(from_attributes=True)
 
     id: str
     name: str
