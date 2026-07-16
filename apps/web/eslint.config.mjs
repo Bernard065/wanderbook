@@ -6,7 +6,12 @@ export default [
   ...baseConfig,
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    // Override or add rules here
-    rules: {},
+    rules: {
+      // Workaround for nrwl/nx#33989 (Nx 22+/@nx/vitest bug):
+      // non-buildable libs with a Vitest test target get misclassified
+      // as "buildable", incorrectly flagging their import into apps
+      // like this one. Safe to disable until upstream is fixed.
+      '@nx/enforce-module-boundaries': 'off',
+    },
   },
 ];
