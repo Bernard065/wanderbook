@@ -1,3 +1,7 @@
+"""Alembic environment configuration for async migrations."""
+
+# pylint: disable=no-member,unused-import
+
 import asyncio
 from logging.config import fileConfig
 
@@ -8,7 +12,7 @@ from alembic import context
 
 from api.config import settings
 from api.database import Base
-from api.models import PlaceModel  # noqa: F401  (import registers the model)
+from api.models import PlaceModel  # noqa: F401
 
 config = context.config
 
@@ -21,6 +25,7 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 
 
 def run_migrations_offline() -> None:
+    """Run migrations without a live database connection."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -33,12 +38,14 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection):
+    """Run migrations using the given sync connection."""
     context.configure(connection=connection, target_metadata=target_metadata)
     with context.begin_transaction():
         context.run_migrations()
 
 
 async def run_migrations_online() -> None:
+    """Run migrations using an async engine."""
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
