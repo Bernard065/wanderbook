@@ -2,6 +2,8 @@ import { NavLink } from 'react-router';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants/nav-items';
 import { MapPin } from 'lucide-react';
+import { TravelBookPromo } from './travel-book-promo';
+import { UserProfileCard } from './user-profile-card';
 
 export function Sidebar() {
   return (
@@ -11,7 +13,7 @@ export function Sidebar() {
         <span className="font-semibold text-lg">WanderBook</span>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
@@ -31,6 +33,9 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <TravelBookPromo />
+      <UserProfileCard />
     </aside>
   );
 }

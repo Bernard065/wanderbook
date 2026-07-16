@@ -7,6 +7,10 @@ import {
   Clock,
   Image,
   Wallet,
+  FileText,
+  Bookmark,
+  Trophy,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -26,4 +30,8 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/timeline', label: 'Timeline', icon: Clock },
   { to: '/gallery', label: 'Gallery', icon: Image },
   { to: '/expenses', label: 'Expenses', icon: Wallet },
+  { to: '/documents', label: 'Documents', icon: FileText },
+  { to: '/bucket-list', label: 'Bucket List', icon: Bookmark },
+  { to: '/achievements', label: 'Achievements', icon: Trophy },
+  { to: '/friends', label: 'Friends', icon: Users },
 ];
