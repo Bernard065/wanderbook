@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import type { Place } from '@org/types';
 import { PlaceCard } from '@/components/place-card';
+import { onPlaceCreated } from '@/lib/places-events';
 
 export function PlacesPage() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function fetchPlaces() {
+    setLoading(true);
     fetch('/api/places')
       .then((res) => {
         if (!res.ok) throw new Error(`Request failed: ${res.status}`);
@@ -16,6 +18,11 @@ export function PlacesPage() {
       .then((data: Place[]) => setPlaces(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    fetchPlaces();
+    return onPlaceCreated(fetchPlaces);
   }, []);
 
   return (
