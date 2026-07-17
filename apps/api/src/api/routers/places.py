@@ -22,9 +22,7 @@ async def list_places(db: DbSession):
     return result.scalars().all()
 
 
-@router.get(
-    "/{place_id}", response_model=PlaceRead, response_model_by_alias=True
-)
+@router.get("/{place_id}", response_model=PlaceRead, response_model_by_alias=True)
 async def get_place(place_id: str, db: DbSession):
     """Get a single place by ID."""
     place = await db.get(PlaceModel, place_id)
