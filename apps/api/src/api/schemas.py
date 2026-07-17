@@ -78,3 +78,35 @@ class PlaceRead(CamelModel):
     visit_count: int
     created_at: datetime
     updated_at: datetime
+
+
+class UserCreate(CamelModel):
+    """Schema for registering a new user."""
+
+    email: str
+    password: str
+    full_name: str | None = None
+
+
+class UserLogin(CamelModel):
+    """Schema for logging in."""
+
+    email: str
+    password: str
+
+
+class UserRead(CamelModel):
+    """Schema for reading a user (never includes the password hash)."""
+
+    id: str
+    email: str
+    full_name: str | None
+    created_at: datetime
+
+
+class TokenResponse(CamelModel):
+    """Schema for a successful login/register response."""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: UserRead

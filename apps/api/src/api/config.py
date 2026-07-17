@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     """App settings loaded from environment variables / .env file."""
 
     database_url: str
+    secret_key: str
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
