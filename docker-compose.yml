@@ -11,6 +11,36 @@ services:
       - '5432:5432'
     volumes:
       - wanderbook-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U wanderbook -d wanderbook']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: wanderbook-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://wanderbook:wanderbook_dev_password@postgres:5432/wanderbook
+    ports:
+      - '8000:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: wanderbook-web
+    restart: unless-stopped
+    ports:
+      - '4200:80'
+    depends_on:
+      - api
 
 volumes:
   wanderbook-db-data:

@@ -1,0 +1,8 @@
+node_modules
+apps/api/.venv
+apps/web/dist
+libs/types/dist
+dist
+.git
+.nx
+coverage
