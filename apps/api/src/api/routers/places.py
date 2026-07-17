@@ -1,32 +1,29 @@
 """Routes for the Places module."""
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.database import get_db
+from api.deps import CurrentUser, DbSession
 from api.models import PlaceModel
 from api.schemas import PlaceCreate, PlaceRead
 
 router = APIRouter(prefix="/places", tags=["places"])
 
-DbSession = Annotated[AsyncSession, Depends(get_db)]
-
 
 @router.get("", response_model=list[PlaceRead], response_model_by_alias=True)
-async def list_places(db: DbSession):
-    """List all places."""
-    result = await db.execute(select(PlaceModel))
+async def list_places(db: DbSession, current_user: CurrentUser):
+    """List all places belonging to the current user."""
+    result = await db.execute(
+        select(PlaceModel).where(PlaceModel.user_id == current_user.id)
+    )
     return result.scalars().all()
 
 
 @router.get("/{place_id}", response_model=PlaceRead, response_model_by_alias=True)
-async def get_place(place_id: str, db: DbSession):
-    """Get a single place by ID."""
+async def get_place(place_id: str, db: DbSession, current_user: CurrentUser):
+    """Get a single place by ID, if it belongs to the current user."""
     place = await db.get(PlaceModel, place_id)
-    if place is None:
+    if place is None or place.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Place not found")
     return place
 
@@ -34,9 +31,9 @@ async def get_place(place_id: str, db: DbSession):
 @router.post(
     "", response_model=PlaceRead, status_code=201, response_model_by_alias=True
 )
-async def create_place(payload: PlaceCreate, db: DbSession):
-    """Create a new place."""
-    place = PlaceModel(**payload.model_dump())
+async def create_place(payload: PlaceCreate, db: DbSession, current_user: CurrentUser):
+    """Create a new place owned by the current user."""
+    place = PlaceModel(**payload.model_dump(), user_id=current_user.id)
     db.add(place)
     await db.commit()
     await db.refresh(place)
