@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "radix-ui": "^1.6.2"
+    "@hookform/resolvers": "^5.4.0",
+    "radix-ui": "^1.6.2",
+    "react-hook-form": "^7.81.0",
+    "zod": "^4.4.3"
   }
 }
