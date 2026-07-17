@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
-import { emitPlaceCreated } from '@/lib/places-events';
+import { useCreatePlace } from '@/hooks/use-places';
 
 interface AddPlaceDialogProps {
   children: React.ReactNode;
@@ -39,43 +39,32 @@ const initialFormState = {
 export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(initialFormState);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate, isPending, error } = useCreatePlace();
 
   function updateField(field: keyof typeof initialFormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setError(null);
 
-    try {
-      const res = await fetch('/api/places', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          country: form.country,
-          region: form.region || null,
-          city: form.city || null,
-          category: form.category,
-          gpsLat: form.gpsLat ? parseFloat(form.gpsLat) : null,
-          gpsLng: form.gpsLng ? parseFloat(form.gpsLng) : null,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-      emitPlaceCreated();
-      setForm(initialFormState);
-      setOpen(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setSubmitting(false);
-    }
+    mutate(
+      {
+        name: form.name,
+        country: form.country,
+        region: form.region || null,
+        city: form.city || null,
+        category: form.category,
+        gpsLat: form.gpsLat ? parseFloat(form.gpsLat) : null,
+        gpsLng: form.gpsLng ? parseFloat(form.gpsLng) : null,
+      },
+      {
+        onSuccess: () => {
+          setForm(initialFormState);
+          setOpen(false);
+        },
+      },
+    );
   }
 
   return (
@@ -182,7 +171,7 @@ export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-              {error}
+              {error.message}
             </p>
           )}
 
@@ -192,8 +181,8 @@ export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Saving...' : 'Save Place'}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Saving...' : 'Save Place'}
             </Button>
           </DialogFooter>
         </form>

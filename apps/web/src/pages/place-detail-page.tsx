@@ -1,27 +1,13 @@
-import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
-import type { Place } from '@org/types';
 import { ArrowLeft, MapPin, Star } from 'lucide-react';
+import { usePlace } from '@/hooks/use-places';
 
 export function PlaceDetailPage() {
   const { id } = useParams();
-  const [place, setPlace] = useState<Place | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: place, isLoading, error } = usePlace(id);
 
-  useEffect(() => {
-    fetch(`/api/places/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        return res.json();
-      })
-      .then((data: Place) => setPlace(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-600">Error: {error}</p>;
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-600">Error: {error.message}</p>;
   if (!place) return <p>Place not found.</p>;
 
   return (
