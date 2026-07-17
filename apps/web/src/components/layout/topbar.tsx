@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Search, Plus, Bell, ChevronDown, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
+import { useAuthStore } from '@/stores/auth-store';
+import { getInitials } from '@/lib/get-initials';
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -17,6 +20,16 @@ interface TopbarProps {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const navigate = useNavigate();
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const user = useAuthStore((s) => s.user);
+
+  const initials = user ? getInitials(user.fullName, user.email) : '?';
+
+  function handleLogout() {
+    clearAuth();
+    navigate('/login');
+  }
 
   if (mobileSearchOpen) {
     return (
@@ -99,7 +112,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             <button className="flex items-center gap-1">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-blue-600 text-white font-medium">
-                  B
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <ChevronDown className="h-4 w-4 text-gray-400 hidden sm:block" />
@@ -108,7 +121,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
