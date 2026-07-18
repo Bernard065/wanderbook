@@ -1,10 +1,12 @@
 """SQLAlchemy ORM models."""
 
+# pylint: disable=unsubscriptable-object
+
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from api.database import Base
 
@@ -34,7 +36,9 @@ class PlaceModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        String, ForeignKey("users.id"), nullable=False
+    )
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     country: Mapped[str] = mapped_column(String, nullable=False)
@@ -48,4 +52,43 @@ class PlaceModel(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class TripModel(Base):
+    """Database model for a Trip."""
+
+    __tablename__ = "trips"
+
+    id: Mapped[str] = mapped_column(
+        String, primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Mapped[str] = mapped_column(
+        String, ForeignKey("users.id"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+    start_date: Mapped[date | None] = mapped_column(nullable=True)
+    end_date: Mapped[date | None] = mapped_column(nullable=True)
+    status: Mapped[str] = mapped_column(String, default="planning")
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    places: Mapped[list["PlaceModel"]] = relationship(
+        secondary="trip_places", backref="trips"
+    )
+
+
+class TripPlaceModel(Base):
+    """Join table linking Trips and Places (many-to-many)."""
+
+    __tablename__ = "trip_places"
+
+    trip_id: Mapped[str] = mapped_column(
+        String, ForeignKey("trips.id"), primary_key=True
+    )
+    place_id: Mapped[str] = mapped_column(
+        String, ForeignKey("places.id"), primary_key=True
     )
