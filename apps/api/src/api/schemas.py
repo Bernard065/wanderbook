@@ -1,6 +1,6 @@
 """Pydantic schemas for request/response validation."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -36,6 +36,8 @@ PlaceCategory = Literal[
     "landmark",
     "custom",
 ]
+
+TripStatusLiteral = Literal["planning", "ongoing", "completed", "cancelled"]
 
 
 class CamelModel(BaseModel):
@@ -110,3 +112,39 @@ class TokenResponse(CamelModel):
     access_token: str
     token_type: str = "bearer"
     user: UserRead
+
+
+class TripCreate(CamelModel):
+    """Schema for creating a new trip."""
+
+    name: str
+    description: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    status: TripStatusLiteral = "planning"
+    place_ids: list[str] = []
+
+
+class TripUpdate(CamelModel):
+    """Schema for updating an existing trip."""
+
+    name: str | None = None
+    description: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    status: TripStatusLiteral | None = None
+    place_ids: list[str] | None = None
+
+
+class TripRead(CamelModel):
+    """Schema for reading a trip."""
+
+    id: str
+    name: str
+    description: str | None
+    start_date: date | None
+    end_date: date | None
+    status: str
+    places: list[PlaceRead]
+    created_at: datetime
+    updated_at: datetime
