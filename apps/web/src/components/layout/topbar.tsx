@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
+import { AddTripDialog } from '@/components/add-trip-dialog';
 import { useAuthStore } from '@/stores/auth-store';
 import { getInitials } from '@/lib/get-initials';
 
@@ -94,7 +95,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 Add Place
               </DropdownMenuItem>
             </AddPlaceDialog>
-            <DropdownMenuItem>Add Trip</DropdownMenuItem>
+            <AddTripDialog>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                Add Trip
+              </DropdownMenuItem>
+            </AddTripDialog>
             <DropdownMenuItem>Write Journal Entry</DropdownMenuItem>
             <DropdownMenuItem>Add Expense</DropdownMenuItem>
           </DropdownMenuContent>
