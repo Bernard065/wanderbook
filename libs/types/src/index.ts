@@ -1,2 +1,2 @@
-export * from './lib/types.js';
 export * from './lib/place.js';
+export * from './lib/trip.js';
