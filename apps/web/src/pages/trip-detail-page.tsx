@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useTrip } from '@/hooks/use-trips';
+import { TripExpenses } from '@/components/trip-expenses';
 import type { Trip } from '@org/types';
 
 const statusStyles: Record<Trip['status'], string> = {
@@ -74,6 +75,8 @@ export function TripDetailPage() {
           ))}
         </div>
       )}
+
+      <TripExpenses tripId={trip.id} />
     </div>
   );
 }
