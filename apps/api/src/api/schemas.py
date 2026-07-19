@@ -49,6 +49,18 @@ class PlaceRead(CamelModel):
     created_at: datetime
     updated_at: datetime
 
+class PlaceUpdate(CamelModel):
+    """Schema for updating an existing place."""
+
+    name: str | None = None
+    description: str | None = None
+    country: str | None = None
+    region: str | None = None
+    city: str | None = None
+    category: PlaceCategory | None = None
+    gps_lat: float | None = None
+    gps_lng: float | None = None
+    rating: float | None = None
 
 class UserCreate(CamelModel):
     """Schema for registering a new user."""
