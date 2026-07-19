@@ -148,3 +148,34 @@ class TripRead(CamelModel):
     places: list[PlaceRead]
     created_at: datetime
     updated_at: datetime
+
+class JournalEntryCreate(CamelModel):
+    """Schema for creating a new journal entry."""
+
+    place_id: str
+    title: str
+    content: str
+    mood: str | None = None
+    is_private: bool = True
+
+
+class JournalEntryUpdate(CamelModel):
+    """Schema for updating an existing journal entry."""
+
+    title: str | None = None
+    content: str | None = None
+    mood: str | None = None
+    is_private: bool | None = None
+
+
+class JournalEntryRead(CamelModel):
+    """Schema for reading a journal entry."""
+
+    id: str
+    place_id: str
+    title: str
+    content: str
+    mood: str | None
+    is_private: bool
+    created_at: datetime
+    updated_at: datetime

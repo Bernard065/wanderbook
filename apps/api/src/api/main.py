@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import auth, places, trips
+from api.routers import auth, journal, places, trips
 
 app = FastAPI(title="WanderBook API")
 
@@ -18,6 +18,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(places.router)
 app.include_router(trips.router)
+app.include_router(journal.router)
 
 
 @app.get("/")
