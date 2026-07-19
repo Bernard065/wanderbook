@@ -1,43 +1,11 @@
 """Pydantic schemas for request/response validation."""
 
 from datetime import date, datetime
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-PlaceCategory = Literal[
-    "mountain",
-    "beach",
-    "museum",
-    "restaurant",
-    "park",
-    "national_park",
-    "hotel",
-    "church",
-    "mosque",
-    "temple",
-    "waterfall",
-    "lake",
-    "river",
-    "forest",
-    "island",
-    "village",
-    "market",
-    "bridge",
-    "monument",
-    "zoo",
-    "stadium",
-    "airport",
-    "cafe",
-    "university",
-    "shopping_mall",
-    "historic_site",
-    "landmark",
-    "custom",
-]
-
-TripStatusLiteral = Literal["planning", "ongoing", "completed", "cancelled"]
+from api.constants import ExpenseCategory, PlaceCategory, TripStatusLiteral
 
 
 class CamelModel(BaseModel):
@@ -149,6 +117,7 @@ class TripRead(CamelModel):
     created_at: datetime
     updated_at: datetime
 
+
 class JournalEntryCreate(CamelModel):
     """Schema for creating a new journal entry."""
 
@@ -179,9 +148,50 @@ class JournalEntryRead(CamelModel):
     is_private: bool
     created_at: datetime
     updated_at: datetime
+
+
 class SearchResults(CamelModel):
     """Schema for aggregated search results."""
 
     places: list[PlaceRead]
     trips: list[TripRead]
     journal_entries: list[JournalEntryRead]
+
+
+class ExpenseCreate(CamelModel):
+    """Schema for creating a new expense."""
+
+    place_id: str | None = None
+    trip_id: str | None = None
+    amount: float
+    currency: str = "USD"
+    category: ExpenseCategory
+    notes: str | None = None
+    expense_date: date
+
+
+class ExpenseUpdate(CamelModel):
+    """Schema for updating an existing expense."""
+
+    place_id: str | None = None
+    trip_id: str | None = None
+    amount: float | None = None
+    currency: str | None = None
+    category: ExpenseCategory | None = None
+    notes: str | None = None
+    expense_date: date | None = None
+
+
+class ExpenseRead(CamelModel):
+    """Schema for reading an expense."""
+
+    id: str
+    place_id: str | None
+    trip_id: str | None
+    amount: float
+    currency: str
+    category: str
+    notes: str | None
+    expense_date: date
+    created_at: datetime
+    updated_at: datetime
