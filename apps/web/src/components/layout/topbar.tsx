@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, Plus, Bell, ChevronDown, Menu, X } from 'lucide-react';
+import { Plus, Bell, ChevronDown, Menu, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
 import { AddTripDialog } from '@/components/add-trip-dialog';
+import { SearchDropdown } from '@/components/layout/search-dropdown';
 import { useAuthStore } from '@/stores/auth-store';
 import { getInitials } from '@/lib/get-initials';
 
@@ -35,15 +36,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   if (mobileSearchOpen) {
     return (
       <header className="h-16 border-b bg-white flex items-center px-3 gap-2 md:hidden">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            autoFocus
-            type="text"
-            placeholder="Search places, countries, journal..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <SearchDropdown
+          className="flex-1"
+          autoFocus
+          onNavigate={() => setMobileSearchOpen(false)}
+        />
         <button
           onClick={() => setMobileSearchOpen(false)}
           className="p-2 shrink-0"
@@ -61,18 +58,9 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <Menu className="h-5 w-5 text-gray-600" />
         </button>
 
-        {/* Full search bar: tablet and up */}
-        <div className="relative hidden md:block md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search places, countries, journal..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <SearchDropdown className="hidden md:block md:w-64 lg:w-80" />
       </div>
 
-      {/* Search icon only: mobile */}
       <button
         onClick={() => setMobileSearchOpen(true)}
         className="md:hidden p-2 shrink-0"

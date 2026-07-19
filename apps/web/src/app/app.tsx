@@ -7,6 +7,7 @@ import { PlacesPage } from '@/pages/places-page';
 import { PlaceDetailPage } from '@/pages/place-detail-page';
 import { TripsPage } from '@/pages/trips-page';
 import { TripDetailPage } from '@/pages/trip-detail-page';
+import { SearchPage } from '@/pages/search-page';
 import { LoginPage } from '@/pages/login-page';
 import { RegisterPage } from '@/pages/register-page';
 
@@ -25,6 +26,7 @@ export function App() {
           <Route path="/places/:id" element={<PlaceDetailPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/trips/:id" element={<TripDetailPage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Route>
       </Route>
     </Routes>
