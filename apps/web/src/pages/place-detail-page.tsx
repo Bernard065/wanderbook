@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router';
 import { ArrowLeft, MapPin, Star } from 'lucide-react';
 import { usePlace } from '@/hooks/use-places';
 import { PlaceJournal } from '@/components/place-journal';
+import { PlaceExpenses } from '@/components/place-expenses';
 
 export function PlaceDetailPage() {
   const { id } = useParams();
@@ -55,6 +56,7 @@ export function PlaceDetailPage() {
       )}
 
       <PlaceJournal placeId={place.id} />
+      <PlaceExpenses placeId={place.id} />
     </div>
   );
 }
