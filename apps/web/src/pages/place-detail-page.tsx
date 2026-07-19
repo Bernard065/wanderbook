@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router';
 import { ArrowLeft, MapPin, Star } from 'lucide-react';
 import { usePlace } from '@/hooks/use-places';
+import { PlaceJournal } from '@/components/place-journal';
 
 export function PlaceDetailPage() {
   const { id } = useParams();
@@ -52,6 +53,8 @@ export function PlaceDetailPage() {
           GPS: {place.gpsLat}, {place.gpsLng}
         </p>
       )}
+
+      <PlaceJournal placeId={place.id} />
     </div>
   );
 }
