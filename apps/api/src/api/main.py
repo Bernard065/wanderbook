@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import auth, journal, places, trips
+from api.routers import auth, journal, places, search, trips
 
 app = FastAPI(title="WanderBook API")
 
@@ -19,7 +19,7 @@ app.include_router(auth.router)
 app.include_router(places.router)
 app.include_router(trips.router)
 app.include_router(journal.router)
-
+app.include_router(search.router)
 
 @app.get("/")
 def read_root():

@@ -179,3 +179,9 @@ class JournalEntryRead(CamelModel):
     is_private: bool
     created_at: datetime
     updated_at: datetime
+class SearchResults(CamelModel):
+    """Schema for aggregated search results."""
+
+    places: list[PlaceRead]
+    trips: list[TripRead]
+    journal_entries: list[JournalEntryRead]
