@@ -68,7 +68,8 @@ export function useDeleteTrip() {
   return useMutation({
     mutationFn: (id: string) =>
       apiRequest<void>(`/trips/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: ['trips', id] });
       queryClient.invalidateQueries({ queryKey: TRIPS_KEY });
     },
   });

@@ -79,7 +79,8 @@ export function useDeletePlace() {
   return useMutation({
     mutationFn: (id: string) =>
       apiRequest<void>(`/places/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: ['places', id] });
       queryClient.invalidateQueries({ queryKey: PLACES_KEY });
     },
   });

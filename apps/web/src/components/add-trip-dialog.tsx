@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -32,14 +32,18 @@ import {
 } from '@/components/ui/select';
 import { TRIP_STATUSES } from '@/constants/trip-statuses';
 import { usePlaces } from '@/hooks/use-places';
-import { useCreateTrip } from '@/hooks/use-trips';
+import { useCreateTrip, useUpdateTrip } from '@/hooks/use-trips';
 import { tripSchema, type TripFormValues } from '@/schemas/trip-schemas';
+import type { Trip } from '@org/types';
 
 interface AddTripDialogProps {
   children: React.ReactNode;
+  trip?: Trip;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const defaultValues: TripFormValues = {
+const emptyValues: TripFormValues = {
   name: '',
   description: '',
   startDate: '',
@@ -48,33 +52,71 @@ const defaultValues: TripFormValues = {
   placeIds: [],
 };
 
-export function AddTripDialog({ children }: AddTripDialogProps) {
-  const [open, setOpen] = useState(false);
+function tripToFormValues(trip: Trip): TripFormValues {
+  return {
+    name: trip.name,
+    description: trip.description ?? '',
+    startDate: trip.startDate ?? '',
+    endDate: trip.endDate ?? '',
+    status: trip.status,
+    placeIds: trip.places.map((p) => p.id),
+  };
+}
+
+export function AddTripDialog({
+  children,
+  trip,
+  open: controlledOpen,
+  onOpenChange,
+}: AddTripDialogProps) {
+  const isEditMode = !!trip;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = onOpenChange ?? setUncontrolledOpen;
+
   const { data: places } = usePlaces();
-  const { mutate, isPending, error } = useCreateTrip();
+  const { mutate: createTrip, isPending: isCreating, error: createError } =
+    useCreateTrip();
+  const { mutate: updateTrip, isPending: isUpdating, error: updateError } =
+    useUpdateTrip();
+
+  const isPending = isEditMode ? isUpdating : isCreating;
+  const error = isEditMode ? updateError : createError;
 
   const form = useForm<TripFormValues>({
     resolver: zodResolver(tripSchema),
-    defaultValues,
+    defaultValues: trip ? tripToFormValues(trip) : emptyValues,
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(trip ? tripToFormValues(trip) : emptyValues);
+    }
+  }, [open, trip, form]);
+
   function onSubmit(values: TripFormValues) {
-    mutate(
-      {
-        name: values.name,
-        description: values.description || undefined,
-        startDate: values.startDate || undefined,
-        endDate: values.endDate || undefined,
-        status: values.status,
-        placeIds: values.placeIds,
-      },
-      {
+    const payload = {
+      name: values.name,
+      description: values.description || undefined,
+      startDate: values.startDate || undefined,
+      endDate: values.endDate || undefined,
+      status: values.status,
+      placeIds: values.placeIds,
+    };
+
+    if (isEditMode) {
+      updateTrip(
+        { id: trip.id, ...payload },
+        { onSuccess: () => setOpen(false) },
+      );
+    } else {
+      createTrip(payload, {
         onSuccess: () => {
-          form.reset(defaultValues);
+          form.reset(emptyValues);
           setOpen(false);
         },
-      },
-    );
+      });
+    }
   }
 
   return (
@@ -82,9 +124,11 @@ export function AddTripDialog({ children }: AddTripDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add a Trip</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Trip' : 'Add a Trip'}</DialogTitle>
           <DialogDescription>
-            Plan a new trip and attach places you'll visit.
+            {isEditMode
+              ? 'Update the details for this trip.'
+              : "Plan a new trip and attach places you'll visit."}
           </DialogDescription>
         </DialogHeader>
 
@@ -231,7 +275,11 @@ export function AddTripDialog({ children }: AddTripDialogProps) {
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isPending}>
-                {isPending ? 'Saving...' : 'Save Trip'}
+                {isPending
+                  ? 'Saving...'
+                  : isEditMode
+                    ? 'Save Changes'
+                    : 'Save Trip'}
               </Button>
             </DialogFooter>
           </form>

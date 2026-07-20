@@ -10,6 +10,11 @@ export function PlacesPage() {
 
       {isLoading && <p>Loading places...</p>}
       {error && <p className="text-red-600">Error: {error.message}</p>}
+      {places?.length === 0 && (
+        <p className="text-gray-500">
+          No places yet. Use "Add New" to add your first one.
+        </p>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {places?.map((place) => (

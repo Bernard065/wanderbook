@@ -22,15 +22,18 @@ export function PlaceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: place, isLoading, error } = usePlace(id);
-  const { mutate: deletePlace, isPending: isDeleting } = useDeletePlace();
+  const { mutateAsync: deletePlace, isPending: isDeleting } =
+    useDeletePlace();
   const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p className="text-red-600">Error: {error.message}</p>;
   if (!place) return <p>Place not found.</p>;
 
-  function handleDelete() {
-    deletePlace(place.id, { onSuccess: () => navigate('/places') });
+  async function handleDelete() {
+    if (!place) return;
+    await deletePlace(place.id);
+    navigate('/places');
   }
 
   return (
@@ -50,7 +53,11 @@ export function PlaceDetailPage() {
             open={editOpen}
             onOpenChange={setEditOpen}
           >
-            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditOpen(true)}
+            >
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </Button>

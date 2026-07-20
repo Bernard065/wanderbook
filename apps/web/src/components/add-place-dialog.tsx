@@ -45,7 +45,7 @@ const emptyValues: PlaceFormValues = {
   country: '',
   region: '',
   city: '',
-  category: undefined as never,
+  category: '' as PlaceFormValues['category'],
   gpsLat: '',
   gpsLng: '',
 };
