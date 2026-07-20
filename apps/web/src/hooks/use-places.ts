@@ -43,3 +43,44 @@ export function useCreatePlace() {
     },
   });
 }
+
+export interface UpdatePlaceInput {
+  id: string;
+  name?: string;
+  description?: string;
+  country?: string;
+  region?: string | null;
+  city?: string | null;
+  category?: string;
+  gpsLat?: number | null;
+  gpsLng?: number | null;
+  rating?: number | null;
+}
+
+export function useUpdatePlace() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...input }: UpdatePlaceInput) =>
+      apiRequest<Place>(`/places/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
+      queryClient.invalidateQueries({ queryKey: ['places', variables.id] });
+    },
+  });
+}
+
+export function useDeletePlace() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiRequest<void>(`/places/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
+    },
+  });
+}

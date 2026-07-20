@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -29,14 +29,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
-import { useCreatePlace } from '@/hooks/use-places';
+import { useCreatePlace, useUpdatePlace } from '@/hooks/use-places';
 import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
+import type { Place } from '@org/types';
 
 interface AddPlaceDialogProps {
   children: React.ReactNode;
+  place?: Place;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const defaultValues: PlaceFormValues = {
+const emptyValues: PlaceFormValues = {
   name: '',
   country: '',
   region: '',
@@ -46,33 +50,72 @@ const defaultValues: PlaceFormValues = {
   gpsLng: '',
 };
 
-export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
-  const [open, setOpen] = useState(false);
-  const { mutate, isPending, error } = useCreatePlace();
+function placeToFormValues(place: Place): PlaceFormValues {
+  return {
+    name: place.name,
+    country: place.country,
+    region: place.region ?? '',
+    city: place.city ?? '',
+    category: place.category,
+    gpsLat: place.gpsLat != null ? String(place.gpsLat) : '',
+    gpsLng: place.gpsLng != null ? String(place.gpsLng) : '',
+  };
+}
+
+export function AddPlaceDialog({
+  children,
+  place,
+  open: controlledOpen,
+  onOpenChange,
+}: AddPlaceDialogProps) {
+  const isEditMode = !!place;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = onOpenChange ?? setUncontrolledOpen;
+
+  const { mutate: createPlace, isPending: isCreating, error: createError } =
+    useCreatePlace();
+  const { mutate: updatePlace, isPending: isUpdating, error: updateError } =
+    useUpdatePlace();
+
+  const isPending = isEditMode ? isUpdating : isCreating;
+  const error = isEditMode ? updateError : createError;
 
   const form = useForm<PlaceFormValues>({
     resolver: zodResolver(placeSchema),
-    defaultValues,
+    defaultValues: place ? placeToFormValues(place) : emptyValues,
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(place ? placeToFormValues(place) : emptyValues);
+    }
+  }, [open, place, form]);
+
   function onSubmit(values: PlaceFormValues) {
-    mutate(
-      {
-        name: values.name,
-        country: values.country,
-        region: values.region || null,
-        city: values.city || null,
-        category: values.category,
-        gpsLat: values.gpsLat ? parseFloat(values.gpsLat) : null,
-        gpsLng: values.gpsLng ? parseFloat(values.gpsLng) : null,
-      },
-      {
+    const payload = {
+      name: values.name,
+      country: values.country,
+      region: values.region || null,
+      city: values.city || null,
+      category: values.category,
+      gpsLat: values.gpsLat ? parseFloat(values.gpsLat) : null,
+      gpsLng: values.gpsLng ? parseFloat(values.gpsLng) : null,
+    };
+
+    if (isEditMode) {
+      updatePlace(
+        { id: place.id, ...payload },
+        { onSuccess: () => setOpen(false) },
+      );
+    } else {
+      createPlace(payload, {
         onSuccess: () => {
-          form.reset(defaultValues);
+          form.reset(emptyValues);
           setOpen(false);
         },
-      },
-    );
+      });
+    }
   }
 
   return (
@@ -80,10 +123,11 @@ export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add a Place</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Place' : 'Add a Place'}</DialogTitle>
           <DialogDescription>
-            Add a new place to your WanderBook. You can fill in more details
-            later.
+            {isEditMode
+              ? 'Update the details for this place.'
+              : "Add a new place to your WanderBook. You can fill in more details later."}
           </DialogDescription>
         </DialogHeader>
 
@@ -221,7 +265,11 @@ export function AddPlaceDialog({ children }: AddPlaceDialogProps) {
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isPending}>
-                {isPending ? 'Saving...' : 'Save Place'}
+                {isPending
+                  ? 'Saving...'
+                  : isEditMode
+                    ? 'Save Changes'
+                    : 'Save Place'}
               </Button>
             </DialogFooter>
           </form>

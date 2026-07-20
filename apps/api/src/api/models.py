@@ -87,11 +87,12 @@ class TripPlaceModel(Base):
     __tablename__ = "trip_places"
 
     trip_id: Mapped[str] = mapped_column(
-        String, ForeignKey("trips.id"), primary_key=True
+        String, ForeignKey("trips.id", ondelete="CASCADE"), primary_key=True
     )
     place_id: Mapped[str] = mapped_column(
-        String, ForeignKey("places.id"), primary_key=True
+        String, ForeignKey("places.id", ondelete="CASCADE"), primary_key=True
     )
+
 
 class JournalEntryModel(Base):
     """Database model for a Journal Entry, belonging to a Place."""
@@ -105,7 +106,7 @@ class JournalEntryModel(Base):
         String, ForeignKey("users.id"), nullable=False
     )
     place_id: Mapped[str] = mapped_column(
-        String, ForeignKey("places.id"), nullable=False
+        String, ForeignKey("places.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
@@ -115,6 +116,7 @@ class JournalEntryModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow, onupdate=datetime.utcnow
     )
+
 
 class ExpenseModel(Base):
     """Database model for an Expense."""
@@ -128,10 +130,10 @@ class ExpenseModel(Base):
         String, ForeignKey("users.id"), nullable=False
     )
     place_id: Mapped[str | None] = mapped_column(
-        String, ForeignKey("places.id"), nullable=True
+        String, ForeignKey("places.id", ondelete="CASCADE"), nullable=True
     )
     trip_id: Mapped[str | None] = mapped_column(
-        String, ForeignKey("trips.id"), nullable=True
+        String, ForeignKey("trips.id", ondelete="CASCADE"), nullable=True
     )
     amount: Mapped[float] = mapped_column(nullable=False)
     currency: Mapped[str] = mapped_column(String, default="USD")

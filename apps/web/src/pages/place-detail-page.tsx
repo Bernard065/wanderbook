@@ -1,26 +1,90 @@
-import { useParams, Link } from 'react-router';
-import { ArrowLeft, MapPin, Star } from 'lucide-react';
-import { usePlace } from '@/hooks/use-places';
+import { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router';
+import { ArrowLeft, MapPin, Star, Pencil, Trash2 } from 'lucide-react';
+import { usePlace, useDeletePlace } from '@/hooks/use-places';
 import { PlaceJournal } from '@/components/place-journal';
 import { PlaceExpenses } from '@/components/place-expenses';
+import { AddPlaceDialog } from '@/components/add-place-dialog';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export function PlaceDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: place, isLoading, error } = usePlace(id);
+  const { mutate: deletePlace, isPending: isDeleting } = useDeletePlace();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p className="text-red-600">Error: {error.message}</p>;
   if (!place) return <p>Place not found.</p>;
 
+  function handleDelete() {
+    deletePlace(place.id, { onSuccess: () => navigate('/places') });
+  }
+
   return (
     <div>
-      <Link
-        to="/places"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Places
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link
+          to="/places"
+          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Places
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <AddPlaceDialog
+            place={place}
+            open={editOpen}
+            onOpenChange={setEditOpen}
+          >
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-3.5 w-3.5" />
+              Edit
+            </Button>
+          </AddPlaceDialog>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this place?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete "{place.name}" and cannot be
+                  undone. Journal entries and expenses linked to it will
+                  also be affected.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
 
       <h1 className="text-3xl font-bold">{place.name}</h1>
 
