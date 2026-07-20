@@ -143,7 +143,7 @@ class ExpenseModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    
+
 class BucketListItemModel(Base):
     """Database model for a Bucket List item."""
 

@@ -5,7 +5,13 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-from api.constants import ExpenseCategory, PlaceCategory, TripStatusLiteral
+from api.constants import (
+    BucketListCategory,
+    BucketListStatus,
+    ExpenseCategory,
+    PlaceCategory,
+    TripStatusLiteral,
+)
 
 
 class CamelModel(BaseModel):
@@ -32,6 +38,20 @@ class PlaceCreate(CamelModel):
     rating: float | None = None
 
 
+class PlaceUpdate(CamelModel):
+    """Schema for updating an existing place."""
+
+    name: str | None = None
+    description: str | None = None
+    country: str | None = None
+    region: str | None = None
+    city: str | None = None
+    category: PlaceCategory | None = None
+    gps_lat: float | None = None
+    gps_lng: float | None = None
+    rating: float | None = None
+
+
 class PlaceRead(CamelModel):
     """Schema for reading a place."""
 
@@ -49,18 +69,6 @@ class PlaceRead(CamelModel):
     created_at: datetime
     updated_at: datetime
 
-class PlaceUpdate(CamelModel):
-    """Schema for updating an existing place."""
-
-    name: str | None = None
-    description: str | None = None
-    country: str | None = None
-    region: str | None = None
-    city: str | None = None
-    category: PlaceCategory | None = None
-    gps_lat: float | None = None
-    gps_lng: float | None = None
-    rating: float | None = None
 
 class UserCreate(CamelModel):
     """Schema for registering a new user."""
@@ -205,5 +213,38 @@ class ExpenseRead(CamelModel):
     category: str
     notes: str | None
     expense_date: date
+    created_at: datetime
+    updated_at: datetime
+
+
+class BucketListItemCreate(CamelModel):
+    """Schema for creating a new bucket list item."""
+
+    name: str
+    category: BucketListCategory
+    status: BucketListStatus = "dreaming"
+    notes: str | None = None
+    place_id: str | None = None
+
+
+class BucketListItemUpdate(CamelModel):
+    """Schema for updating an existing bucket list item."""
+
+    name: str | None = None
+    category: BucketListCategory | None = None
+    status: BucketListStatus | None = None
+    notes: str | None = None
+    place_id: str | None = None
+
+
+class BucketListItemRead(CamelModel):
+    """Schema for reading a bucket list item."""
+
+    id: str
+    name: str
+    category: str
+    status: str
+    notes: str | None
+    place_id: str | None
     created_at: datetime
     updated_at: datetime
