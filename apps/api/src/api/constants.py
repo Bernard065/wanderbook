@@ -49,3 +49,23 @@ ExpenseCategory = Literal[
     "equipment",
     "other",
 ]
+
+BucketListCategory = Literal[
+    "country",
+    "city",
+    "landmark",
+    "restaurant",
+    "museum",
+    "national_park",
+    "road_trip",
+    "festival",
+    "custom",
+]
+
+BucketListStatus = Literal[
+    "dreaming",
+    "planning",
+    "booked",
+    "visited",
+    "cancelled",
+]

@@ -117,7 +117,6 @@ class JournalEntryModel(Base):
         default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-
 class ExpenseModel(Base):
     """Database model for an Expense."""
 
@@ -140,6 +139,29 @@ class ExpenseModel(Base):
     category: Mapped[str] = mapped_column(String, nullable=False)
     notes: Mapped[str | None] = mapped_column(String, nullable=True)
     expense_date: Mapped[date] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    
+class BucketListItemModel(Base):
+    """Database model for a Bucket List item."""
+
+    __tablename__ = "bucket_list_items"
+
+    id: Mapped[str] = mapped_column(
+        String, primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Mapped[str] = mapped_column(
+        String, ForeignKey("users.id"), nullable=False
+    )
+    place_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("places.id", ondelete="SET NULL"), nullable=True
+    )
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    category: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, default="dreaming")
+    notes: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow, onupdate=datetime.utcnow
