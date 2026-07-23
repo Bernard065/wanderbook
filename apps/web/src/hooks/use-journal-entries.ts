@@ -29,6 +29,13 @@ export function useJournalEntries(placeId: string | undefined) {
   });
 }
 
+export function useAllJournalEntries() {
+  return useQuery({
+    queryKey: ['journal-entries', 'all'],
+    queryFn: () => apiRequest<JournalEntry[]>('/journal-entries'),
+  });
+}
+
 export function useCreateJournalEntry() {
   const queryClient = useQueryClient();
 

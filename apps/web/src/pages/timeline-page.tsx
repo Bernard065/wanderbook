@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { Luggage } from 'lucide-react';
+import { Luggage, BookOpen } from 'lucide-react';
 import { useTimeline } from '@/hooks/use-timeline';
 
 export function TimelinePage() {
@@ -15,8 +15,7 @@ export function TimelinePage() {
 
       {!isLoading && years.length === 0 && (
         <p className="text-gray-500">
-          No trips with dates yet. Add a trip with a start date to see it
-          here.
+          No trips or journal entries yet. Add one to see it here.
         </p>
       )}
 
@@ -25,33 +24,36 @@ export function TimelinePage() {
           <div key={year}>
             <h2 className="text-xl font-bold text-gray-300 mb-4">{year}</h2>
             <div className="space-y-3 border-l-2 border-gray-100 pl-6 ml-2">
-              {eventsByYear[year].map((event) => (
-                <Link
-                  key={event.id}
-                  to={event.path}
-                  className="block relative"
-                >
-                  <span className="absolute -left-[1.85rem] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-600" />
-                  <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-2">
-                      <Luggage className="h-4 w-4 text-gray-400 shrink-0" />
-                      <p className="font-medium">{event.title}</p>
-                    </div>
-                    {event.subtitle && (
-                      <p className="text-sm text-gray-500 mt-1 truncate">
-                        {event.subtitle}
+              {eventsByYear[year].map((event) => {
+                const Icon = event.type === 'trip' ? Luggage : BookOpen;
+                return (
+                  <Link
+                    key={event.id}
+                    to={event.path}
+                    className="block relative"
+                  >
+                    <span className="absolute -left-[1.85rem] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-600" />
+                    <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-gray-400 shrink-0" />
+                        <p className="font-medium">{event.title}</p>
+                      </div>
+                      {event.subtitle && (
+                        <p className="text-sm text-gray-500 mt-1 truncate">
+                          {event.subtitle}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(event.date).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
                       </p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(event.date).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         ))}
