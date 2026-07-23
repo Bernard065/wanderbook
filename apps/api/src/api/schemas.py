@@ -248,3 +248,12 @@ class BucketListItemRead(CamelModel):
     place_id: str | None
     created_at: datetime
     updated_at: datetime
+
+class PhotoRead(CamelModel):
+    """Schema for reading a photo."""
+
+    id: str
+    place_id: str | None
+    caption: str | None
+    url: str
+    created_at: datetime
