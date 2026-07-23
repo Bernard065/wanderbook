@@ -5,11 +5,12 @@ export async function apiRequest<T>(
   options?: RequestInit,
 ): Promise<T> {
   const token = useAuthStore.getState().token;
+  const isFormData = options?.body instanceof FormData;
 
   const res = await fetch(`/api${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },

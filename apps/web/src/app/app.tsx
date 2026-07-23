@@ -12,6 +12,7 @@ import { BucketListPage } from '@/pages/bucket-list-page';
 import { TimelinePage } from '@/pages/timeline-page';
 import { LoginPage } from '@/pages/login-page';
 import { RegisterPage } from '@/pages/register-page';
+import { GalleryPage } from '@/pages/gallery-page';
 
 export function App() {
   return (
@@ -31,6 +32,7 @@ export function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/bucket-list" element={<BucketListPage />} />
           <Route path="/timeline" element={<TimelinePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
         </Route>
       </Route>
     </Routes>

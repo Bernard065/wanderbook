@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { ArrowLeft, MapPin, Star, Pencil, Trash2 } from 'lucide-react';
 import { usePlace, useDeletePlace } from '@/hooks/use-places';
+import { PlaceGallery } from '@/components/place-gallery';
 import { PlaceJournal } from '@/components/place-journal';
 import { PlaceExpenses } from '@/components/place-expenses';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
@@ -75,8 +76,8 @@ export function PlaceDetailPage() {
                 <AlertDialogTitle>Delete this place?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete "{place.name}" and cannot be
-                  undone. Journal entries and expenses linked to it will
-                  also be affected.
+                  undone. Journal entries, expenses, and photos linked to
+                  it will also be affected.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -126,6 +127,7 @@ export function PlaceDetailPage() {
         </p>
       )}
 
+      <PlaceGallery placeId={place.id} />
       <PlaceJournal placeId={place.id} />
       <PlaceExpenses placeId={place.id} />
     </div>
