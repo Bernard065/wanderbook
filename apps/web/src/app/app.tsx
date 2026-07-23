@@ -10,6 +10,7 @@ import { TripDetailPage } from '@/pages/trip-detail-page';
 import { SearchPage } from '@/pages/search-page';
 import { LoginPage } from '@/pages/login-page';
 import { RegisterPage } from '@/pages/register-page';
+import { BucketListPage } from '@/pages/bucket-list-page';
 
 export function App() {
   return (
@@ -27,6 +28,7 @@ export function App() {
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/trips/:id" element={<TripDetailPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/bucket-list" element={<BucketListPage />} />
         </Route>
       </Route>
     </Routes>
