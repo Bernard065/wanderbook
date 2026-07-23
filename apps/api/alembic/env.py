@@ -15,6 +15,7 @@ from api.models import (  # noqa: F401
     BucketListItemModel,
     ExpenseModel,
     JournalEntryModel,
+    PhotoModel,
     PlaceModel,
     TripModel,
     TripPlaceModel,

@@ -17,6 +17,25 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    container_name: wanderbook-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: wanderbook
+      MINIO_ROOT_PASSWORD: wanderbook_dev_password
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - wanderbook-minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: ./apps/api
@@ -26,10 +45,16 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://wanderbook:wanderbook_dev_password@postgres:5432/wanderbook
       SECRET_KEY: <PASTE_YOUR_GENERATED_SECRET_KEY_HERE>
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY: wanderbook
+      S3_SECRET_KEY: wanderbook_dev_password
+      S3_BUCKET_NAME: wanderbook-media
     ports:
       - '8000:8000'
     depends_on:
       postgres:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   web:
@@ -45,3 +70,4 @@ services:
 
 volumes:
   wanderbook-db-data:
+  wanderbook-minio-data:
