@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
-import { ArrowLeft, Calendar, MapPin, Pencil, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Pencil,
+  Trash2,
+  Users,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTrip, useDeleteTrip } from '@/hooks/use-trips';
 import { AddTripDialog } from '@/components/add-trip-dialog';
+import { ShareTripDialog } from '@/components/share-trip-dialog';
 import { TripExpenses } from '@/components/trip-expenses';
 import type { Trip } from '@org/types';
 
@@ -55,6 +63,13 @@ export function TripDetailPage() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <ShareTripDialog tripId={trip.id}>
+            <Button variant="outline" size="sm">
+              <Users className="h-3.5 w-3.5" />
+              Share
+            </Button>
+          </ShareTripDialog>
+
           <AddTripDialog
             trip={trip}
             open={editOpen}
