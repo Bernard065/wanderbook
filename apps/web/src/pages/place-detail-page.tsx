@@ -5,6 +5,7 @@ import { usePlace, useDeletePlace } from '@/hooks/use-places';
 import { PlaceGallery } from '@/components/place-gallery';
 import { PlaceJournal } from '@/components/place-journal';
 import { PlaceExpenses } from '@/components/place-expenses';
+import { PlaceDocuments } from '@/components/place-documents';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -130,6 +131,7 @@ export function PlaceDetailPage() {
       <PlaceGallery placeId={place.id} />
       <PlaceJournal placeId={place.id} />
       <PlaceExpenses placeId={place.id} />
+      <PlaceDocuments placeId={place.id} />
     </div>
   );
 }
