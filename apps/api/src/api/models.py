@@ -292,3 +292,62 @@ class DocumentModel(Base):
         default=utc_now,
         nullable=False,
     )
+class FriendshipModel(Base):
+    """Database model for a friendship/connection between two users."""
+
+    __tablename__ = "friendships"
+
+    id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    requester_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+    addressee_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(
+        String,
+        default="pending",
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        onupdate=utc_now,
+        nullable=False,
+    )
+
+class TripShareModel(Base):
+    """Database model for sharing a Trip with a friend (read-only access)."""
+
+    __tablename__ = "trip_shares"
+
+    trip_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("trips.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    shared_with_user_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("users.id"),
+        primary_key=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
+    )

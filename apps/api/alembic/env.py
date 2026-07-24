@@ -15,11 +15,13 @@ from api.models import (  # noqa: F401
     BucketListItemModel,
     DocumentModel,
     ExpenseModel,
+    FriendshipModel,
     JournalEntryModel,
     PhotoModel,
     PlaceModel,
     TripModel,
     TripPlaceModel,
+    TripShareModel,
     UserModel,
 )
 

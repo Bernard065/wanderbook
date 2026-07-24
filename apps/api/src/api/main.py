@@ -8,6 +8,7 @@ from api.routers import (
     bucket_list,
     documents,
     expenses,
+    friends,
     journal,
     photos,
     places,
@@ -34,6 +35,7 @@ app.include_router(expenses.router)
 app.include_router(bucket_list.router)
 app.include_router(photos.router)
 app.include_router(documents.router)
+app.include_router(friends.router)
 
 
 @app.get("/")

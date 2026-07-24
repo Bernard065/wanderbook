@@ -9,6 +9,7 @@ from api.constants import (
     BucketListCategory,
     BucketListStatus,
     ExpenseCategory,
+    FriendshipStatus,
     PlaceCategory,
     TripStatusLiteral,
 )
@@ -267,4 +268,33 @@ class DocumentRead(CamelModel):
     file_name: str
     document_type: str
     url: str
+    created_at: datetime
+
+class FriendRequestCreate(CamelModel):
+    """Schema for sending a friend request."""
+
+    email: str
+
+
+class FriendshipRead(CamelModel):
+    """Schema for reading a friendship."""
+
+    id: str
+    requester_id: str
+    addressee_id: str
+    status: FriendshipStatus
+    friend: UserRead
+    created_at: datetime
+
+class TripShareCreate(CamelModel):
+    """Schema for sharing a trip with a friend."""
+
+    user_id: str
+
+
+class TripShareRead(CamelModel):
+    """Schema for reading who a trip is shared with."""
+
+    shared_with_user_id: str
+    shared_with: UserRead
     created_at: datetime

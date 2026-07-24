@@ -81,3 +81,5 @@ DocumentType = Literal[
     "rental_agreement",
     "other",
 ]
+
+FriendshipStatus = Literal["pending", "accepted", "rejected"]
