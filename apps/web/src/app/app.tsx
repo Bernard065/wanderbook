@@ -16,6 +16,7 @@ import { GalleryPage } from '@/pages/gallery-page';
 import { DocumentsPage } from '@/pages/documents-page';
 import { MapPage } from '@/pages/map-page';
 import { AchievementsPage } from '@/pages/achievements-page';
+import { FriendsPage } from '@/pages/friends-page';
 
 export function App() {
   return (
@@ -39,6 +40,7 @@ export function App() {
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
+          <Route path="/friends" element={<FriendsPage />} />
         </Route>
       </Route>
     </Routes>
