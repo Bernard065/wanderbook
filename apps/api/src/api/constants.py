@@ -69,3 +69,15 @@ BucketListStatus = Literal[
     "visited",
     "cancelled",
 ]
+
+DocumentType = Literal[
+    "passport",
+    "visa",
+    "boarding_pass",
+    "hotel_booking",
+    "receipt",
+    "travel_insurance",
+    "vaccination_certificate",
+    "rental_agreement",
+    "other",
+]

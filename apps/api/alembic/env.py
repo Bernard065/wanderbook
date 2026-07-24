@@ -13,6 +13,7 @@ from api.config import settings
 from api.database import Base
 from api.models import (  # noqa: F401
     BucketListItemModel,
+    DocumentModel,
     ExpenseModel,
     JournalEntryModel,
     PhotoModel,

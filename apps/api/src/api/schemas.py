@@ -257,3 +257,14 @@ class PhotoRead(CamelModel):
     caption: str | None
     url: str
     created_at: datetime
+
+class DocumentRead(CamelModel):
+    """Schema for reading a document."""
+
+    id: str
+    place_id: str | None
+    trip_id: str | None
+    file_name: str
+    document_type: str
+    url: str
+    created_at: datetime

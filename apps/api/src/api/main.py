@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import (
     auth,
     bucket_list,
+    documents,
     expenses,
     journal,
     photos,
@@ -32,6 +33,7 @@ app.include_router(search.router)
 app.include_router(expenses.router)
 app.include_router(bucket_list.router)
 app.include_router(photos.router)
+app.include_router(documents.router)
 
 
 @app.get("/")
