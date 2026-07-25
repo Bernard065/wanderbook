@@ -298,3 +298,26 @@ class TripShareRead(CamelModel):
     shared_with_user_id: str
     shared_with: UserRead
     created_at: datetime
+
+class FlightCreate(CamelModel):
+    """Schema for logging a new flight."""
+
+    trip_id: str | None = None
+    airline: str | None = None
+    flight_number: str | None = None
+    departure_airport: str
+    arrival_airport: str
+    departure_date: date
+
+
+class FlightRead(CamelModel):
+    """Schema for reading a flight."""
+
+    id: str
+    trip_id: str | None
+    airline: str | None
+    flight_number: str | None
+    departure_airport: str
+    arrival_airport: str
+    departure_date: date
+    created_at: datetime

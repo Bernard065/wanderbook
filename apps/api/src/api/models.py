@@ -351,3 +351,49 @@ class TripShareModel(Base):
         default=utc_now,
         nullable=False,
     )
+
+class FlightModel(Base):
+    """Database model for a Flight."""
+
+    __tablename__ = "flights"
+
+    id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    user_id: Mapped[str] = mapped_column(
+        String,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+    trip_id: Mapped[str | None] = mapped_column(
+        String,
+        ForeignKey("trips.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    airline: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )
+    flight_number: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )
+    departure_airport: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    arrival_airport: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    departure_date: Mapped[date] = mapped_column(
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
+    )
