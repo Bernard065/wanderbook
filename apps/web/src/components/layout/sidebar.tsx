@@ -2,7 +2,6 @@ import { NavLink } from 'react-router';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants/nav-items';
 import { MapPin, X } from 'lucide-react';
-import { TravelBookPromo } from './travel-book-promo';
 import { UserProfileCard } from './user-profile-card';
 
 interface SidebarProps {
@@ -26,7 +25,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           'flex flex-col bg-white border-r h-screen z-50',
           'fixed inset-y-0 left-0 w-64 transition-transform duration-200',
           'md:static md:translate-x-0 md:w-16 lg:w-60',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <div className="px-4 md:px-3 lg:px-6 py-5 flex items-center justify-between gap-2">
@@ -55,7 +54,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                   'md:justify-center lg:justify-start',
                   isActive
                     ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    : 'text-gray-600 hover:bg-gray-100',
                 )
               }
             >
@@ -65,9 +64,6 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="hidden lg:block">
-          <TravelBookPromo />
-        </div>
         <UserProfileCard />
       </aside>
     </>

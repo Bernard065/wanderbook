@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Plus, Bell, ChevronDown, Menu, X, Search } from 'lucide-react';
+import { Plus, Bell, ChevronDown, Menu, X, Search, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
 import { AddTripDialog } from '@/components/add-trip-dialog';
+import { AddFlightDialog } from '@/components/add-flight-dialog';
 import { SearchDropdown } from '@/components/layout/search-dropdown';
 import { useAuthStore } from '@/stores/auth-store';
 import { getInitials } from '@/lib/get-initials';
@@ -58,7 +59,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <Menu className="h-5 w-5 text-gray-600" />
         </button>
 
-        <SearchDropdown className="hidden md:block md:w-64 lg:w-80" />
+        <SearchDropdown className="hidden md:block flex-1 max-w-xl" />
       </div>
 
       <button
@@ -88,16 +89,24 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                 Add Trip
               </DropdownMenuItem>
             </AddTripDialog>
-            <DropdownMenuItem>Write Journal Entry</DropdownMenuItem>
+            <AddFlightDialog>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                Log Flight
+              </DropdownMenuItem>
+            </AddFlightDialog>
             <DropdownMenuItem>Add Expense</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button className="relative rounded-full p-2 hover:bg-gray-100">
+        <button className="relative rounded-full p-2 hover:bg-gray-100 hidden sm:inline-flex">
           <Bell className="h-5 w-5 text-gray-600" />
           <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
             3
           </Badge>
+        </button>
+
+        <button className="rounded-full p-2 hover:bg-gray-100 hidden sm:inline-flex">
+          <Settings className="h-5 w-5 text-gray-600" />
         </button>
 
         <DropdownMenu>

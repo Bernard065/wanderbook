@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leaflet-icon-fix';
 import { usePlaces } from '@/hooks/use-places';
@@ -14,7 +15,10 @@ export function MapPage() {
 
   const center: [number, number] =
     placesWithCoords.length > 0
-      ? [placesWithCoords[0].gpsLat as number, placesWithCoords[0].gpsLng as number]
+      ? [
+          placesWithCoords[0].gpsLat as number,
+          placesWithCoords[0].gpsLng as number,
+        ]
       : [0, 20];
 
   return (
@@ -41,31 +45,33 @@ export function MapPage() {
             className="h-full w-full"
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             />
-            {placesWithCoords.map((place) => (
-              <Marker
-                key={place.id}
-                position={[place.gpsLat as number, place.gpsLng as number]}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <p className="font-medium">{place.name}</p>
-                    <p className="text-gray-500">
-                      {place.city ? `${place.city}, ` : ''}
-                      {place.country}
-                    </p>
-                    <button
-                      onClick={() => navigate(`/places/${place.id}`)}
-                      className="text-blue-600 text-xs mt-1"
-                    >
-                      View place →
-                    </button>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+            <MarkerClusterGroup>
+              {placesWithCoords.map((place) => (
+                <Marker
+                  key={place.id}
+                  position={[place.gpsLat as number, place.gpsLng as number]}
+                >
+                  <Popup>
+                    <div className="text-sm">
+                      <p className="font-medium">{place.name}</p>
+                      <p className="text-gray-500">
+                        {place.city ? `${place.city}, ` : ''}
+                        {place.country}
+                      </p>
+                      <button
+                        onClick={() => navigate(`/places/${place.id}`)}
+                        className="text-blue-600 text-xs mt-1"
+                      >
+                        View place →
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MarkerClusterGroup>
           </MapContainer>
         </div>
       )}
