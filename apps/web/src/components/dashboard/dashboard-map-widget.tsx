@@ -10,6 +10,9 @@ interface DashboardMapWidgetProps {
   places: Place[];
 }
 
+const DEFAULT_CENTER: [number, number] = [20, 0];
+const DEFAULT_ZOOM = 2;
+
 export function DashboardMapWidget({ places }: DashboardMapWidgetProps) {
   const navigate = useNavigate();
 
@@ -17,26 +20,16 @@ export function DashboardMapWidget({ places }: DashboardMapWidgetProps) {
     (p) => p.gpsLat != null && p.gpsLng != null,
   );
 
-  if (placesWithCoords.length === 0) {
-    return (
-      <div className="h-80 rounded-lg border bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-400 text-sm">
-          Add GPS coordinates to your places to see them here.
-        </p>
-      </div>
-    );
-  }
-
-  const center: [number, number] = [
-    placesWithCoords[0].gpsLat as number,
-    placesWithCoords[0].gpsLng as number,
-  ];
+  const center: [number, number] =
+    placesWithCoords.length > 0
+      ? [placesWithCoords[0].gpsLat as number, placesWithCoords[0].gpsLng as number]
+      : DEFAULT_CENTER;
 
   return (
     <div className="relative h-80 rounded-lg overflow-hidden border">
       <MapContainer
         center={center}
-        zoom={2}
+        zoom={DEFAULT_ZOOM}
         scrollWheelZoom={false}
         className="h-full w-full"
       >
@@ -44,16 +37,18 @@ export function DashboardMapWidget({ places }: DashboardMapWidgetProps) {
           attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <MarkerClusterGroup>
-          {placesWithCoords.map((place) => (
-            <Marker
-              key={place.id}
-              position={[place.gpsLat as number, place.gpsLng as number]}
-            >
-              <Popup>{place.name}</Popup>
-            </Marker>
-          ))}
-        </MarkerClusterGroup>
+        {placesWithCoords.length > 0 && (
+          <MarkerClusterGroup>
+            {placesWithCoords.map((place) => (
+              <Marker
+                key={place.id}
+                position={[place.gpsLat as number, place.gpsLng as number]}
+              >
+                <Popup>{place.name}</Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
+        )}
       </MapContainer>
       <button
         onClick={() => navigate('/map')}
