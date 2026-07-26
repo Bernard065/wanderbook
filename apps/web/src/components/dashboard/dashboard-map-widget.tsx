@@ -52,7 +52,7 @@ export function DashboardMapWidget({ places }: DashboardMapWidgetProps) {
       </MapContainer>
       <button
         onClick={() => navigate('/map')}
-        className="absolute bottom-3 left-3 z-[400] flex items-center gap-1.5 bg-white border rounded-md px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-gray-50"
+        className="absolute bottom-3 left-3 z-400 flex items-center gap-1.5 bg-white border rounded-md px-3 py-1.5 text-sm font-medium shadow-sm hover:bg-gray-50"
       >
         <Maximize2 className="h-3.5 w-3.5" />
         View Full Map

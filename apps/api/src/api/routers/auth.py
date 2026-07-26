@@ -1,10 +1,11 @@
 """Routes for authentication."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy import select
 
 from api.deps import CurrentUser, DbSession
 from api.models import UserModel
+from api.rate_limit import limiter
 from api.schemas import TokenResponse, UserCreate, UserLogin, UserRead
 from api.security import create_access_token, hash_password, verify_password
 
@@ -12,7 +13,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=TokenResponse, status_code=201)
-async def register(payload: UserCreate, db: DbSession):
+@limiter.limit("5/minute")
+async def register(request: Request, payload: UserCreate, db: DbSession):
     """Register a new user."""
     existing = await db.execute(
         select(UserModel).where(UserModel.email == payload.email)
@@ -34,9 +36,12 @@ async def register(payload: UserCreate, db: DbSession):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(payload: UserLogin, db: DbSession):
+@limiter.limit("10/minute")
+async def login(request: Request, payload: UserLogin, db: DbSession):
     """Log in an existing user."""
-    result = await db.execute(select(UserModel).where(UserModel.email == payload.email))
+    result = await db.execute(
+        select(UserModel).where(UserModel.email == payload.email)
+    )
     user = result.scalar_one_or_none()
 
     if user is None or not verify_password(payload.password, user.hashed_password):
