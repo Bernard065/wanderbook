@@ -1,5 +1,7 @@
 import { useAuthStore } from '@/stores/auth-store';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
+
 export async function apiRequest<T>(
   path: string,
   options?: RequestInit,
@@ -7,7 +9,7 @@ export async function apiRequest<T>(
   const token = useAuthStore.getState().token;
   const isFormData = options?.body instanceof FormData;
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
