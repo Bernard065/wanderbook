@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     s3_access_key: str
     s3_secret_key: str
     s3_bucket_name: str
+    s3_region: str = "us-east-1"
 
     environment: str = "development"
     cors_origins: str = "http://localhost:4200"
