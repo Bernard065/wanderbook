@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from api.config import settings
-from api.database import Base
+from api.database import Base, engine
 from api.models import (  # noqa: F401
     BucketListItemModel,
     DocumentModel,
@@ -44,23 +44,32 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
+
     with context.begin_transaction():
         context.run_migrations()
 
 
-def do_run_migrations(connection):
+def do_run_migrations(connection) -> None:
     """Run migrations using the given sync connection."""
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+    )
+
     with context.begin_transaction():
         context.run_migrations()
 
 
 async def run_migrations_online() -> None:
     """Run migrations using an async engine."""
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = str(engine.url)
+
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={"ssl": "require"} if settings.is_production else {},
     )
 
     async with connectable.connect() as connection:

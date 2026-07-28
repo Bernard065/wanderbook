@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncGenerator
 
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -11,8 +12,15 @@ from sqlalchemy.orm import DeclarativeBase
 
 from api.config import settings
 
+# asyncpg doesn't support libpq-style query params like sslmode/channel_binding
+# (used by Neon and other managed Postgres providers). Strip them from the URL
+# and pass SSL via connect_args instead.
+_url = make_url(settings.database_url).set(query={})
+
 engine = create_async_engine(
-    settings.database_url, echo=not settings.is_production
+    _url,
+    echo=not settings.is_production,
+    connect_args={"ssl": "require"} if settings.is_production else {},
 )
 
 ASYNC_SESSION_LOCAL = async_sessionmaker(
