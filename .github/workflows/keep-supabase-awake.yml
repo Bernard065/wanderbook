@@ -1,0 +1,37 @@
+name: Keep WanderBook API Awake
+
+on:
+  schedule:
+    # Runs once per day at 03:00 UTC
+    - cron: "0 3 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping WanderBook API
+        run: |
+          echo "Pinging ${{ vars.API_URL }}..."
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 5 \
+            --retry-delay 10 \
+            --retry-all-errors \
+            "${{ vars.API_URL }}/health"
+
+          echo ""
+          echo "✅ API responded successfully."
+
+      - name: Finished
+        run: echo "Keep-alive workflow completed."

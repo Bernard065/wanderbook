@@ -4,8 +4,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import text
 
 from api.config import settings
+from api.database import ASYNC_SESSION_LOCAL
 from api.rate_limit import limiter
 from api.routers import (
     auth,
@@ -48,12 +50,25 @@ app.include_router(flights.router)
 
 
 @app.get("/")
-def read_root():
-    """Root health check."""
+async def read_root():
+    """Root endpoint."""
     return {"message": "WanderBook API is running"}
 
 
 @app.get("/health")
-def health_check():
-    """Health check endpoint."""
-    return {"status": "ok"}
+async def health_check():
+    """
+    Health check endpoint.
+
+    Verifies that:
+    - The API is running.
+    - The database is reachable.
+    """
+
+    async with ASYNC_SESSION_LOCAL() as session:
+        await session.execute(text("SELECT 1"))
+
+    return {
+        "status": "ok",
+        "database": "connected",
+    }
