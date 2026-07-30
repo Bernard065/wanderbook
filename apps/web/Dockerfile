@@ -1,6 +1,15 @@
+# ============================
+# Build stage
+# ============================
 FROM node:24-alpine AS build
 
 WORKDIR /repo
+
+# Build argument supplied by Render
+ARG VITE_API_URL
+
+# Make it available to Vite
+ENV VITE_API_URL=$VITE_API_URL
 
 # Copy dependency manifests
 COPY package.json package-lock.json nx.json tsconfig.base.json ./
@@ -10,20 +19,18 @@ COPY libs/types/package.json libs/types/
 # Install dependencies
 RUN npm ci
 
-# Copy the rest of the repository
+# Copy repository
 COPY . .
 
-# Build the web application
+# Build frontend
 RUN npx nx build @org/web
 
-# ----------------------------
-# Production image
-# ----------------------------
+# ============================
+# Production stage
+# ============================
 FROM nginx:alpine
 
 COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
-
-# Copy nginx configuration if it exists
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
