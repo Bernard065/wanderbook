@@ -17,6 +17,7 @@ import { DocumentsPage } from '@/pages/documents-page';
 import { MapPage } from '@/pages/map-page';
 import { AchievementsPage } from '@/pages/achievements-page';
 import { FriendsPage } from '@/pages/friends-page';
+import { JournalPage } from '@/pages/journal-page';
 
 export function App() {
   return (
@@ -41,6 +42,7 @@ export function App() {
           <Route path="/map" element={<MapPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/friends" element={<FriendsPage />} />
+          <Route path="/journal" element={<JournalPage />} />
         </Route>
       </Route>
     </Routes>
