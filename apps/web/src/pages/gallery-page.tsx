@@ -35,7 +35,7 @@ export function GalleryPage() {
             >
               <img
                 src={photo.url}
-                alt={photo.caption ?? ''}
+                alt={photo.caption ?? 'Photo'}
                 className="w-full h-full object-cover rounded-lg"
               />
             </button>
@@ -64,7 +64,7 @@ export function GalleryPage() {
           </button>
           <img
             src={previewPhoto}
-            alt=""
+            alt="Preview photo"
             className="max-w-full max-h-full rounded-lg"
           />
         </div>

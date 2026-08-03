@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
 
 export default defineConfig(() => ({
@@ -27,7 +28,17 @@ export default defineConfig(() => ({
     port: 4200,
     host: 'localhost',
   },
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    visualizer({
+      filename: '../../reports/web-bundle-stats.html',
+      template: 'treemap',
+      open: false,
+      gzipSize: true,
+      brotliSize: true,
+    }),
+  ],
   build: {
     outDir: './dist',
     emptyOutDir: true,

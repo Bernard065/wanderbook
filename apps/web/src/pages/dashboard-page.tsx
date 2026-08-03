@@ -102,13 +102,8 @@ export function DashboardPage() {
 
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">
-                  Continue your journey
-                </h2>
-                <Link
-                  to="/trips"
-                  className="text-sm text-blue-600 font-medium"
-                >
+                <h2 className="text-lg font-semibold">Continue your journey</h2>
+                <Link to="/trips" className="text-sm text-blue-600 font-medium">
                   View all trips
                 </Link>
               </div>
@@ -137,10 +132,7 @@ export function DashboardPage() {
             <div className="bg-white border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">Upcoming Trips</h3>
-                <Link
-                  to="/trips"
-                  className="text-xs text-blue-600 font-medium"
-                >
+                <Link to="/trips" className="text-xs text-blue-600 font-medium">
                   View all
                 </Link>
               </div>
@@ -187,7 +179,7 @@ export function DashboardPage() {
                     <img
                       key={photo.id}
                       src={photo.url}
-                      alt=""
+                      alt={photo.caption ?? 'Photo'}
                       className="aspect-square w-full object-cover rounded-md"
                     />
                   ))}

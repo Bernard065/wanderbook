@@ -1,25 +1,16 @@
-import { useNavigate } from 'react-router';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
-import 'leaflet/dist/leaflet.css';
-import '@/lib/leaflet-icon-fix';
+import React, { Suspense } from 'react';
 import { usePlaces } from '@/hooks/use-places';
+
+const LeafletMap = React.lazy(
+  () => import('@/components/dashboard/leaflet-map'),
+);
 
 export function MapPage() {
   const { data: places, isLoading, error } = usePlaces();
-  const navigate = useNavigate();
 
   const placesWithCoords = (places ?? []).filter(
     (p) => p.gpsLat != null && p.gpsLng != null,
   );
-
-  const center: [number, number] =
-    placesWithCoords.length > 0
-      ? [
-          placesWithCoords[0].gpsLat as number,
-          placesWithCoords[0].gpsLng as number,
-        ]
-      : [0, 20];
 
   return (
     <div>
@@ -39,40 +30,19 @@ export function MapPage() {
 
       {placesWithCoords.length > 0 && (
         <div className="h-[70vh] rounded-lg overflow-hidden border">
-          <MapContainer
-            center={center}
-            zoom={placesWithCoords.length === 1 ? 8 : 2}
-            className="h-full w-full"
+          <Suspense
+            fallback={
+              <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+                Loading map...
+              </div>
+            }
           >
-            <TileLayer
-              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            <LeafletMap
+              places={placesWithCoords}
+              initialZoom={placesWithCoords.length === 1 ? 8 : 2}
+              className="h-full w-full"
             />
-            <MarkerClusterGroup>
-              {placesWithCoords.map((place) => (
-                <Marker
-                  key={place.id}
-                  position={[place.gpsLat as number, place.gpsLng as number]}
-                >
-                  <Popup>
-                    <div className="text-sm">
-                      <p className="font-medium">{place.name}</p>
-                      <p className="text-gray-500">
-                        {place.city ? `${place.city}, ` : ''}
-                        {place.country}
-                      </p>
-                      <button
-                        onClick={() => navigate(`/places/${place.id}`)}
-                        className="text-blue-600 text-xs mt-1"
-                      >
-                        View place →
-                      </button>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MarkerClusterGroup>
-          </MapContainer>
+          </Suspense>
         </div>
       )}
     </div>
