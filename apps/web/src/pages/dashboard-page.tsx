@@ -1,9 +1,22 @@
 import { Link } from 'react-router';
-import { Globe, MapPin, Mountain, Plane, Camera, BookOpen } from 'lucide-react';
+import {
+  Globe,
+  MapPin,
+  Mountain,
+  Plane,
+  Camera,
+  BookOpen,
+  Compass,
+  Sparkles,
+} from 'lucide-react';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { DashboardMapWidget } from '@/components/dashboard/dashboard-map-widget';
 import { TripProgressCard } from '@/components/dashboard/trip-progress-card';
 import { AchievementsPreview } from '@/components/dashboard/achievements-preview';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Button } from '@/components/ui/button';
+import { AddTripDialog } from '@/components/add-trip-dialog';
+import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
 import { useAuthStore } from '@/stores/auth-store';
 import { usePlaces } from '@/hooks/use-places';
 import { useTrips } from '@/hooks/use-trips';
@@ -49,14 +62,48 @@ export function DashboardPage() {
   const firstName = user?.fullName?.split(' ')[0] || 'there';
 
   return (
-    <div>
-      <h1 className="text-3xl font-serif mb-1">
-        Good morning, {firstName}! 👋
-      </h1>
-      <p className="text-gray-500 mb-6">Ready for your next adventure?</p>
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-slate-900 via-slate-800 to-slate-700 p-6 text-white shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
+              Your travel book
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold">
+              Good morning, {firstName}! 👋
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-300">
+              Capture memories, keep your trips organized, and revisit the
+              places that shaped your journey.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <AddTripDialog>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white text-slate-900 hover:bg-slate-100"
+              >
+                <Compass className="h-4 w-4" />
+                New trip
+              </Button>
+            </AddTripDialog>
+            <AddJournalEntryDialog>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-white/40 bg-white/10 text-white hover:bg-white/20"
+              >
+                <Sparkles className="h-4 w-4" />
+                Write memory
+              </Button>
+            </AddJournalEntryDialog>
+          </div>
+        </div>
+      </div>
 
       {isLoading ? (
-        <p>Loading dashboard...</p>
+        <p className="text-sm text-slate-500">Loading dashboard...</p>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -100,17 +147,31 @@ export function DashboardPage() {
 
             <DashboardMapWidget places={places ?? []} />
 
-            <div>
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">Continue your journey</h2>
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    Continue your journey
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    Pick up where you left off and add the next memory.
+                  </p>
+                </div>
                 <Link to="/trips" className="text-sm text-blue-600 font-medium">
                   View all trips
                 </Link>
               </div>
               {continueJourneyTrips.length === 0 ? (
-                <p className="text-gray-500 text-sm">
-                  No trips yet. Use "Add New" to plan your first one.
-                </p>
+                <EmptyState
+                  icon={Compass}
+                  title="Your next adventure is waiting"
+                  description="Create a trip, attach a few places, and start building your timeline."
+                  action={
+                    <AddTripDialog>
+                      <Button size="sm">Plan your first trip</Button>
+                    </AddTripDialog>
+                  }
+                />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {continueJourneyTrips.map((trip) => (
@@ -129,7 +190,7 @@ export function DashboardPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white border rounded-lg p-4">
+            <div className="bg-white border rounded-lg p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">Upcoming Trips</h3>
                 <Link to="/trips" className="text-xs text-blue-600 font-medium">
@@ -137,21 +198,26 @@ export function DashboardPage() {
                 </Link>
               </div>
               {upcomingTrips.length === 0 ? (
-                <p className="text-xs text-gray-400">No upcoming trips.</p>
+                <p className="text-sm text-slate-500">
+                  No upcoming trips yet. Add one when you’re ready to plan
+                  ahead.
+                </p>
               ) : (
                 <div className="space-y-3">
                   {upcomingTrips.map((trip) => (
                     <Link
                       key={trip.id}
                       to={`/trips/${trip.id}`}
-                      className="flex items-center gap-3"
+                      className="flex items-center gap-3 rounded-lg border border-slate-100 p-2 transition-colors hover:bg-slate-50"
                     >
-                      <div className="h-10 w-10 rounded-md bg-gray-100 shrink-0" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600">
+                        <Compass className="h-4 w-4" />
+                      </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">
                           {trip.name}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-slate-500">
                           {trip.startDate} – {trip.endDate}
                         </p>
                       </div>
@@ -161,7 +227,7 @@ export function DashboardPage() {
               )}
             </div>
 
-            <div className="bg-white border rounded-lg p-4">
+            <div className="bg-white border rounded-lg p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">Recent Memories</h3>
                 <Link
@@ -172,7 +238,9 @@ export function DashboardPage() {
                 </Link>
               </div>
               {recentPhotos.length === 0 ? (
-                <p className="text-xs text-gray-400">No photos yet.</p>
+                <p className="text-sm text-slate-500">
+                  Your latest photos will appear here once you add them.
+                </p>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   {recentPhotos.map((photo) => (

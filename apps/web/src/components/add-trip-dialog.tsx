@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Compass } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -75,10 +76,16 @@ export function AddTripDialog({
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
   const { data: places } = usePlaces();
-  const { mutate: createTrip, isPending: isCreating, error: createError } =
-    useCreateTrip();
-  const { mutate: updateTrip, isPending: isUpdating, error: updateError } =
-    useUpdateTrip();
+  const {
+    mutate: createTrip,
+    isPending: isCreating,
+    error: createError,
+  } = useCreateTrip();
+  const {
+    mutate: updateTrip,
+    isPending: isUpdating,
+    error: updateError,
+  } = useUpdateTrip();
 
   const isPending = isEditMode ? isUpdating : isCreating;
   const error = isEditMode ? updateError : createError;
@@ -123,13 +130,20 @@ export function AddTripDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Trip' : 'Add a Trip'}</DialogTitle>
-          <DialogDescription>
-            {isEditMode
-              ? 'Update the details for this trip.'
-              : "Plan a new trip and attach places you'll visit."}
-          </DialogDescription>
+        <DialogHeader className="space-y-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+            <Compass className="h-5 w-5" />
+          </div>
+          <div>
+            <DialogTitle>
+              {isEditMode ? 'Edit Trip' : 'Plan a new trip'}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditMode
+                ? 'Update the details for this trip.'
+                : 'Lay out your itinerary and connect the places you want to remember.'}
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         <Form {...form}>
@@ -158,7 +172,11 @@ export function AddTripDialog({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Optional" rows={2} {...field} />
+                    <Textarea
+                      placeholder="Capture the mood of the trip or why it matters."
+                      rows={2}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -229,7 +247,7 @@ export function AddTripDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Places</FormLabel>
-                  <div className="border rounded-md max-h-40 overflow-y-auto p-2 space-y-1">
+                  <div className="border rounded-md max-h-40 overflow-y-auto p-2 space-y-1 bg-slate-50/60">
                     {!places || places.length === 0 ? (
                       <p className="text-sm text-gray-400 px-1 py-1">
                         No places yet — add one first.

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { BookOpen } from 'lucide-react';
 import { z } from 'zod';
 import {
   Dialog,
@@ -90,11 +91,16 @@ export function AddJournalEntryDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Write a Journal Entry</DialogTitle>
-          <DialogDescription>
-            Capture a memory from one of your places.
-          </DialogDescription>
+        <DialogHeader className="space-y-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+            <BookOpen className="h-5 w-5" />
+          </div>
+          <div>
+            <DialogTitle>Write a memory</DialogTitle>
+            <DialogDescription>
+              Capture a moment from one of your places while it is still fresh.
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         <Form {...form}>
@@ -139,7 +145,10 @@ export function AddJournalEntryDialog({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Sunrise at the summit" {...field} />
+                    <Input
+                      placeholder="e.g. Sunrise at the summit"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -153,7 +162,11 @@ export function AddJournalEntryDialog({
                 <FormItem>
                   <FormLabel>What happened here?</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} {...field} />
+                    <Textarea
+                      rows={4}
+                      placeholder="What happened here? What did you notice?"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,7 +180,10 @@ export function AddJournalEntryDialog({
                 <FormItem>
                   <FormLabel>Mood</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Peaceful, Excited" {...field} />
+                    <Input
+                      placeholder="e.g. Peaceful, Excited, Awe-struck"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,7 +201,9 @@ export function AddJournalEntryDialog({
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <FormLabel className="mt-0!">Keep this entry private</FormLabel>
+                  <FormLabel className="mt-0!">
+                    Keep this entry private
+                  </FormLabel>
                 </FormItem>
               )}
             />
