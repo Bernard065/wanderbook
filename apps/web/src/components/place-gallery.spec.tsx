@@ -27,7 +27,8 @@ describe('PlaceGallery', () => {
     render(<PlaceGallery placeId="place-1" />);
 
     expect(screen.getByText(/no photos in this place yet/i)).toBeTruthy();
-    expect(screen.getByText(/upload a photo to start/i)).toBeTruthy();
+    expect(screen.getByText(/drag and drop or browse/i)).toBeTruthy();
+    expect(screen.getByLabelText(/caption/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /upload photo/i })).toBeTruthy();
   });
 });
