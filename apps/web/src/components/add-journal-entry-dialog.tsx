@@ -67,9 +67,10 @@ export function AddJournalEntryDialog({
   const form = useForm<JournalEntryFormValues>({
     resolver: zodResolver(journalEntrySchema),
     defaultValues,
+    mode: 'onChange',
   });
 
-  function onSubmit(values: JournalEntryFormValues) {
+  const onSubmit = (values: JournalEntryFormValues) => {
     mutate(
       {
         placeId: values.placeId,
@@ -83,8 +84,52 @@ export function AddJournalEntryDialog({
           form.reset(defaultValues);
           setOpen(false);
         },
+        onError: (err: unknown) => {
+          const maybeMessage = (err as { message?: unknown })?.message;
+          let msg = '';
+          if (typeof maybeMessage === 'string') msg = maybeMessage;
+          else if (typeof maybeMessage === 'object' && maybeMessage !== null)
+            msg = JSON.stringify(maybeMessage);
+          else msg = String(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof JournalEntryFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                console.error('Failed to set form error for key', k, 'with message', m);
+              }
+            });
+          }
+        },
       },
     );
+  }
+
+  const extractJsonFromMessage = (msg: string) => {
+    const braceIndex = msg.indexOf('{');
+    if (braceIndex >= 0) {
+      const maybe = msg.slice(braceIndex);
+      try {
+        return JSON.parse(maybe);
+      } catch {
+        return null;
+      }
+    }
+    const parts = msg.split('—').map((p) => p.trim());
+    if (parts.length > 1) {
+      const last = parts[parts.length - 1];
+      try {
+        return JSON.parse(last);
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   return (
@@ -220,7 +265,10 @@ export function AddJournalEntryDialog({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending || !form.formState.isValid}
+              >
                 {isPending ? 'Saving...' : 'Save Entry'}
               </Button>
             </DialogFooter>

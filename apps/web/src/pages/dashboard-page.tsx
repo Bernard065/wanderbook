@@ -34,9 +34,9 @@ export function DashboardPage() {
 
   const isLoading = placesLoading || tripsLoading;
 
-  const countries = new Set(places?.map((p) => p.country)).size;
+  const countries = new Set((places ?? []).map((p) => p.country)).size;
   const cities = new Set(
-    places?.map((p) => p.city).filter((c): c is string => !!c),
+    (places ?? []).map((p) => p.city).filter((c): c is string => !!c),
   ).size;
 
   const journalCountByPlace = new Map<string, number>();

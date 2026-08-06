@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Compass } from 'lucide-react';
@@ -34,11 +35,14 @@ import {
 import { TRIP_STATUSES } from '@/constants/trip-statuses';
 import { usePlaces } from '@/hooks/use-places';
 import { useCreateTrip, useUpdateTrip } from '@/hooks/use-trips';
-import { tripSchema, type TripFormValues } from '@/schemas/trip-schemas';
+import {
+  tripSchemaWithChecks,
+  type TripFormValues,
+} from '@/schemas/trip-schemas';
 import type { Trip } from '@org/types';
 
 interface AddTripDialogProps {
-  children: React.ReactNode;
+  children: ReactNode;
   trip?: Trip;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -53,7 +57,7 @@ const emptyValues: TripFormValues = {
   placeIds: [],
 };
 
-function tripToFormValues(trip: Trip): TripFormValues {
+const tripToFormValues = (trip: Trip): TripFormValues => {
   return {
     name: trip.name,
     description: trip.description ?? '',
@@ -91,8 +95,9 @@ export function AddTripDialog({
   const error = isEditMode ? updateError : createError;
 
   const form = useForm<TripFormValues>({
-    resolver: zodResolver(tripSchema),
+    resolver: zodResolver(tripSchemaWithChecks),
     defaultValues: trip ? tripToFormValues(trip) : emptyValues,
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -101,7 +106,7 @@ export function AddTripDialog({
     }
   }, [open, trip, form]);
 
-  function onSubmit(values: TripFormValues) {
+  const onSubmit = (values: TripFormValues) => {
     const payload = {
       name: values.name,
       description: values.description || undefined,
@@ -114,7 +119,33 @@ export function AddTripDialog({
     if (isEditMode) {
       updateTrip(
         { id: trip.id, ...payload },
-        { onSuccess: () => setOpen(false) },
+        {
+          onSuccess: () => setOpen(false),
+          onError: (err: unknown) => {
+            // attempt to parse server validation errors and map to form fields
+            const maybeMessage = (err as { message?: unknown })?.message;
+            let msg = '';
+            if (typeof maybeMessage === 'string') msg = maybeMessage;
+            else if (typeof maybeMessage === 'object' && maybeMessage !== null)
+              msg = JSON.stringify(maybeMessage);
+            else msg = String(err);
+
+            const json = extractJsonFromMessage(msg);
+            if (json && json.errors && typeof json.errors === 'object') {
+              Object.entries(json.errors).forEach(([k, v]) => {
+                const m = Array.isArray(v) ? v.join(', ') : String(v);
+                try {
+                  form.setError(k as keyof TripFormValues, {
+                    type: 'server',
+                    message: m,
+                  });
+                } catch {
+                  console.error('Failed to set form error for key', k, 'with message', m);
+                }
+              });
+            }
+          },
+        },
       );
     } else {
       createTrip(payload, {
@@ -122,8 +153,54 @@ export function AddTripDialog({
           form.reset(emptyValues);
           setOpen(false);
         },
+        onError: (err: unknown) => {
+          const maybeMessage2 = (err as { message?: unknown })?.message;
+          let msg2 = '';
+          if (typeof maybeMessage2 === 'string') msg2 = maybeMessage2;
+          else if (typeof maybeMessage2 === 'object' && maybeMessage2 !== null)
+            msg2 = JSON.stringify(maybeMessage2);
+          else msg2 = String(err);
+          const json = extractJsonFromMessage(msg2);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof TripFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                console.error('Failed to set form error for key', k, 'with message', m);
+              }
+            });
+          }
+        },
       });
     }
+  }
+
+  const extractJsonFromMessage = (msg: string) => {
+    // attempt to find a JSON object in the message text
+    const braceIndex = msg.indexOf('{');
+    if (braceIndex >= 0) {
+      const maybe = msg.slice(braceIndex);
+      try {
+        return JSON.parse(maybe);
+      } catch {
+        return null;
+      }
+    }
+    // fallback: try after em-dash separator
+    const parts = msg.split('—').map((p) => p.trim());
+    if (parts.length > 1) {
+      const last = parts[parts.length - 1];
+      try {
+        return JSON.parse(last);
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   return (
@@ -292,7 +369,10 @@ export function AddTripDialog({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending || !form.formState.isValid}
+              >
                 {isPending
                   ? 'Saving...'
                   : isEditMode
