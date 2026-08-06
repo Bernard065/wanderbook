@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { ImagePlus, Trash2, X } from 'lucide-react';
+import { ImagePlus, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePhotos, useUploadPhoto, useDeletePhoto } from '@/hooks/use-photos';
 import {
@@ -19,7 +19,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -30,26 +30,49 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
         onError: (err: unknown) => {
           const msg = extractMessageString(err);
           const json = extractJsonFromMessage(msg);
-          if (json && json.detail) setUploadError(String(json.detail));
-          else setUploadError(msg);
+          if (json && typeof json === 'object' && json !== null) {
+            const detail = (json as { detail?: unknown }).detail;
+            if (typeof detail === 'string') {
+              setUploadError(detail);
+              return;
+            }
+          }
+          setUploadError(msg || 'The upload failed. Please try again.');
         },
       },
     );
     e.target.value = '';
   }
 
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
+  }
+
   return (
-    <div className="mt-8">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">Gallery</h2>
+    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Gallery</h2>
+          <p className="text-sm text-slate-500">
+            Capture memories from this place and keep them easy to revisit.
+          </p>
+        </div>
         <Button
           size="sm"
           variant="outline"
           disabled={isUploading}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={openFilePicker}
+          className="gap-2"
         >
-          <ImagePlus className="h-4 w-4" />
-          {isUploading ? 'Uploading...' : 'Upload Photo'}
+          {isUploading ? (
+            <>
+              <UploadCloud className="h-4 w-4 animate-pulse" /> Uploading...
+            </>
+          ) : (
+            <>
+              <ImagePlus className="h-4 w-4" /> Upload Photo
+            </>
+          )}
         </Button>
         <input
           ref={fileInputRef}
@@ -61,15 +84,46 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
       </div>
 
       {uploadError && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-3">
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {uploadError}
-        </p>
+        </div>
       )}
 
-      {isLoading && <p>Loading photos...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
-      {photos?.length === 0 && (
-        <p className="text-gray-500">No photos yet. Upload your first one.</p>
+      {isUploading && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+          <Sparkles className="h-4 w-4" />
+          Uploading your photo…
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-500">
+          Loading photos…
+        </div>
+      )}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700">
+          Error: {error.message}
+        </div>
+      )}
+      {!isLoading && !error && photos?.length === 0 && (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+          <p className="font-medium text-slate-700">
+            No photos in this place yet
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Upload a photo to start building a richer memory of this stop.
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="mt-4"
+            onClick={openFilePicker}
+          >
+            <ImagePlus className="mr-2 h-4 w-4" />
+            Add the first photo
+          </Button>
+        </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -108,7 +162,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
           </button>
           <img
             src={previewPhoto}
-            alt="Preview photo"
+            alt=""
             className="max-w-full max-h-full rounded-lg"
           />
         </div>

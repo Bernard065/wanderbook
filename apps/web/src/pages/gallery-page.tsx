@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { Camera, X } from 'lucide-react';
+import { Camera, ImagePlus, X } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { usePhotos } from '@/hooks/use-photos';
 import { usePlaces } from '@/hooks/use-places';
@@ -29,6 +29,12 @@ export function GalleryPage() {
           icon={Camera}
           title="No memories in the gallery yet"
           description="Add a photo from one of your places to start building your visual travel archive."
+          action={
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700">
+              <ImagePlus className="h-4 w-4" />
+              Start with your first photo
+            </div>
+          }
         />
       )}
 
@@ -72,7 +78,7 @@ export function GalleryPage() {
           </button>
           <img
             src={previewPhoto}
-            alt="Preview photo"
+            alt=""
             className="max-w-full max-h-full rounded-lg"
           />
         </div>

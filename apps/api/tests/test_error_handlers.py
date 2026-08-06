@@ -24,9 +24,7 @@ async def http_exception_handler(request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content=body)
 
 
-async def validation_exception_handler(
-    request, exc: RequestValidationError
-):
+async def validation_exception_handler(request, exc: RequestValidationError):
     """Map FastAPI validation errors into the API's standard error format."""
     del request
 
@@ -53,10 +51,12 @@ def create_test_app() -> FastAPI:
 
     @app.get("/raise-http-string")
     async def raise_http_string():
+        """Raise an HTTPException with a string detail."""
         raise HTTPException(status_code=400, detail="oops")
 
     @app.get("/raise-http-structured")
     async def raise_http_structured():
+        """Raise an HTTPException with a structured error payload."""
         raise HTTPException(
             status_code=404,
             detail={"errors": {"place_id": ["Place not found"]}},
@@ -64,23 +64,28 @@ def create_test_app() -> FastAPI:
 
     @app.get("/raise-http-dict")
     async def raise_http_dict():
+        """Raise an HTTPException with a dictionary detail."""
         raise HTTPException(
             status_code=400,
             detail={"message": "Invalid request"},
         )
 
     class Item(BaseModel):
+        """Test model used for request body validation."""
+
         name: str
         qty: int
 
     @app.post("/validate-body")
     async def validate_body(item: Item):
+        """Validate the request body and echo the parsed item."""
         return {"ok": True, "item": item.model_dump()}
 
     return app
 
 
-def test_http_exception_string_message():
+def test_http_exception_string_message() -> None:
+    """Ensure string HTTPException details use the standard error format."""
     app = create_test_app()
     client = TestClient(app)
 
@@ -94,7 +99,8 @@ def test_http_exception_string_message():
     }
 
 
-def test_http_exception_structured_message():
+def test_http_exception_structured_message() -> None:
+    """Ensure structured HTTPException errors are preserved."""
     app = create_test_app()
     client = TestClient(app)
 
@@ -108,7 +114,8 @@ def test_http_exception_structured_message():
     }
 
 
-def test_http_exception_dict_message():
+def test_http_exception_dict_message() -> None:
+    """Ensure dictionary HTTPException details are wrapped correctly."""
     app = create_test_app()
     client = TestClient(app)
 
@@ -124,21 +131,17 @@ def test_http_exception_dict_message():
     }
 
 
-def test_request_validation_error_mapping():
+def test_request_validation_error_mapping() -> None:
+    """Ensure request validation errors are mapped to the API error format."""
     app = create_test_app()
     client = TestClient(app)
 
     response = client.post("/validate-body", json={})
 
     assert response.status_code == 400
-
-    body = response.json()
-    assert "errors" in body
-
-    assert "name" in body["errors"]
-    assert "qty" in body["errors"]
-
-    assert isinstance(body["errors"]["name"], list)
-    assert isinstance(body["errors"]["qty"], list)
-    assert len(body["errors"]["name"]) > 0
-    assert len(body["errors"]["qty"]) > 0
+    assert response.json() == {
+        "errors": {
+            "name": ["Field required"],
+            "qty": ["Field required"],
+        }
+    }
