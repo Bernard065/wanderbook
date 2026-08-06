@@ -21,16 +21,19 @@ The remaining work is mostly about polishing the experience and closing the gap 
 ## Running the workspace
 
 ### Web app
+
 ```sh
 npx nx run @org/web:dev
 ```
 
 ### API
+
 ```sh
 npx nx run api:serve
 ```
 
 ### Tests
+
 ```sh
 npx nx run @org/web:test
 npx nx run api:test
