@@ -33,6 +33,10 @@ import { BUCKET_LIST_CATEGORIES } from '@/constants/bucket-list-categories';
 import { BUCKET_LIST_STATUSES } from '@/constants/bucket-list-statuses';
 import { useCreateBucketListItem } from '@/hooks/use-bucket-list';
 import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
+import {
   bucketListItemSchema,
   type BucketListItemFormValues,
 } from '@/schemas/bucket-list-schemas';
@@ -71,6 +75,23 @@ export function AddBucketListItemDialog({
         onSuccess: () => {
           form.reset(defaultValues);
           setOpen(false);
+        },
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof BucketListItemFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                // ignore
+              }
+            });
+          }
         },
       },
     );

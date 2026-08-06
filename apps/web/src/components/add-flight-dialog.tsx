@@ -23,6 +23,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCreateFlight } from '@/hooks/use-flights';
+import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
 
 const flightSchema = z.object({
   airline: z.string().optional(),
@@ -70,6 +74,23 @@ export function AddFlightDialog({ children, tripId }: AddFlightDialogProps) {
         onSuccess: () => {
           form.reset(defaultValues);
           setOpen(false);
+        },
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof FlightFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                // ignore
+              }
+            });
+          }
         },
       },
     );

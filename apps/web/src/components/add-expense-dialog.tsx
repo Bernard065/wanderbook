@@ -31,6 +31,10 @@ import {
 import { EXPENSE_CATEGORIES } from '@/constants/expense-categories';
 import { useCreateExpense } from '@/hooks/use-expenses';
 import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
+import {
   expenseSchema,
   type ExpenseFormValues,
 } from '@/schemas/expense-schemas';
@@ -77,6 +81,23 @@ export function AddExpenseDialog({
         onSuccess: () => {
           form.reset(defaultValues);
           setOpen(false);
+        },
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof ExpenseFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                // ignore
+              }
+            });
+          }
         },
       },
     );

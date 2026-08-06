@@ -2,6 +2,10 @@ import { useRef, useState } from 'react';
 import { ImagePlus, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePhotos, useUploadPhoto, useDeletePhoto } from '@/hooks/use-photos';
+import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
 
 interface PlaceGalleryProps {
   placeId: string;
@@ -23,7 +27,12 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
     uploadPhoto(
       { file, placeId },
       {
-        onError: (err) => setUploadError(err.message),
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.detail) setUploadError(String(json.detail));
+          else setUploadError(msg);
+        },
       },
     );
     e.target.value = '';

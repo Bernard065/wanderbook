@@ -17,6 +17,10 @@ import {
   journalEntrySchema,
   type JournalEntryFormValues,
 } from '@/schemas/journal-schemas';
+import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
 
 interface AddJournalEntryFormProps {
   placeId: string;
@@ -48,6 +52,23 @@ export function AddJournalEntryForm({ placeId }: AddJournalEntryFormProps) {
       },
       {
         onSuccess: () => form.reset(defaultValues),
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof JournalEntryFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                // ignore
+              }
+            });
+          }
+        },
       },
     );
   }

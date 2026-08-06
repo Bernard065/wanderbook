@@ -31,6 +31,10 @@ import {
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
 import { useCreatePlace, useUpdatePlace } from '@/hooks/use-places';
 import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
+import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
 import type { Place } from '@org/types';
 
 interface AddPlaceDialogProps {
@@ -73,10 +77,16 @@ export function AddPlaceDialog({
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
-  const { mutate: createPlace, isPending: isCreating, error: createError } =
-    useCreatePlace();
-  const { mutate: updatePlace, isPending: isUpdating, error: updateError } =
-    useUpdatePlace();
+  const {
+    mutate: createPlace,
+    isPending: isCreating,
+    error: createError,
+  } = useCreatePlace();
+  const {
+    mutate: updatePlace,
+    isPending: isUpdating,
+    error: updateError,
+  } = useUpdatePlace();
 
   const isPending = isEditMode ? isUpdating : isCreating;
   const error = isEditMode ? updateError : createError;
@@ -106,13 +116,49 @@ export function AddPlaceDialog({
     if (isEditMode) {
       updatePlace(
         { id: place.id, ...payload },
-        { onSuccess: () => setOpen(false) },
+        {
+          onSuccess: () => setOpen(false),
+          onError: (err: unknown) => {
+            const msg = extractMessageString(err);
+            const json = extractJsonFromMessage(msg);
+            if (json && json.errors && typeof json.errors === 'object') {
+              Object.entries(json.errors).forEach(([k, v]) => {
+                const m = Array.isArray(v) ? v.join(', ') : String(v);
+                try {
+                  form.setError(k as keyof PlaceFormValues, {
+                    type: 'server',
+                    message: m,
+                  });
+                } catch {
+                  // ignore
+                }
+              });
+            }
+          },
+        },
       );
     } else {
       createPlace(payload, {
         onSuccess: () => {
           form.reset(emptyValues);
           setOpen(false);
+        },
+        onError: (err: unknown) => {
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
+          if (json && json.errors && typeof json.errors === 'object') {
+            Object.entries(json.errors).forEach(([k, v]) => {
+              const m = Array.isArray(v) ? v.join(', ') : String(v);
+              try {
+                form.setError(k as keyof PlaceFormValues, {
+                  type: 'server',
+                  message: m,
+                });
+              } catch {
+                // ignore
+              }
+            });
+          }
         },
       });
     }
@@ -127,7 +173,7 @@ export function AddPlaceDialog({
           <DialogDescription>
             {isEditMode
               ? 'Update the details for this place.'
-              : "Add a new place to your WanderBook. You can fill in more details later."}
+              : 'Add a new place to your WanderBook. You can fill in more details later.'}
           </DialogDescription>
         </DialogHeader>
 
