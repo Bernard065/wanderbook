@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { ImagePlus, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
+import {
+  AlertCircle,
+  Check,
+  ImagePlus,
+  Sparkles,
+  Trash2,
+  UploadCloud,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  usePhotos,
-  useUploadPhoto,
-  useDeletePhoto,
-} from '@/hooks/use-photos';
+import { usePhotos, useUploadPhoto, useDeletePhoto } from '@/hooks/use-photos';
 import {
   extractJsonFromMessage,
   extractMessageString,
@@ -14,6 +18,14 @@ import {
 
 interface PlaceGalleryProps {
   placeId: string;
+}
+
+interface PendingUpload {
+  id: string;
+  file: File;
+  status: 'uploading' | 'success' | 'error';
+  progress: number;
+  error?: string;
 }
 
 export function PlaceGallery({ placeId }: PlaceGalleryProps) {
@@ -24,10 +36,11 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [caption, setCaption] = useState('');
   const [isDragging, setIsDragging] = useState(false);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<PendingUpload[]>([]);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const intervalRefs = useRef<number[]>([]);
 
   useEffect(() => {
     if (!previewPhoto) return;
@@ -45,9 +58,49 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
     };
   }, [previewPhoto]);
 
-  const uploadFile = (file: File) => {
+  useEffect(() => {
+    return () => {
+      intervalRefs.current.forEach((value) => window.clearInterval(value));
+      intervalRefs.current = [];
+    };
+  }, []);
+
+  const uploadFile = (file: File, existingId?: string) => {
+    const id =
+      existingId ??
+      `${file.name}-${file.size}-${file.lastModified}-${Math.random()
+        .toString(36)
+        .slice(2, 10)}`;
+
+    const uploadItem: PendingUpload = {
+      id,
+      file,
+      status: 'uploading',
+      progress: 0,
+    };
+
     setUploadError(null);
-    setPendingFiles((current) => [...current, file]);
+    setPendingFiles((current) => {
+      if (existingId) {
+        return current.map((item) =>
+          item.id === existingId ? uploadItem : item,
+        );
+      }
+
+      return [...current, uploadItem];
+    });
+
+    const intervalId = window.setInterval(() => {
+      setPendingFiles((current) =>
+        current.map((item) =>
+          item.id === id && item.status === 'uploading'
+            ? { ...item, progress: Math.min(item.progress + 12, 90) }
+            : item,
+        ),
+      );
+    }, 180);
+
+    intervalRefs.current.push(intervalId);
 
     uploadPhoto(
       {
@@ -56,45 +109,62 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
         caption: caption.trim() || undefined,
       },
       {
-        onSettled: () => {
+        onSuccess: () => {
+          window.clearInterval(intervalId);
+          intervalRefs.current = intervalRefs.current.filter(
+            (value) => value !== intervalId,
+          );
+
           setPendingFiles((current) =>
-            current.filter((item) => item !== file),
+            current.map((item) =>
+              item.id === id
+                ? { ...item, status: 'success', progress: 100 }
+                : item,
+            ),
           );
         },
         onError: (err: unknown) => {
+          window.clearInterval(intervalId);
+          intervalRefs.current = intervalRefs.current.filter(
+            (value) => value !== intervalId,
+          );
+
           const msg = extractMessageString(err);
           const json = extractJsonFromMessage(msg);
 
+          let errorMessage = msg || 'The upload failed. Please try again.';
           if (json && typeof json === 'object') {
             const detail = (json as { detail?: unknown }).detail;
             if (typeof detail === 'string') {
-              setUploadError(detail);
-              return;
+              errorMessage = detail;
             }
           }
 
-          setUploadError(msg || 'The upload failed. Please try again.');
+          setPendingFiles((current) =>
+            current.map((item) =>
+              item.id === id
+                ? { ...item, status: 'error', progress: 0, error: errorMessage }
+                : item,
+            ),
+          );
+          setUploadError(errorMessage);
         },
       },
     );
   };
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
 
     if (files.length === 0) return;
 
-    files.forEach(uploadFile);
+    files.forEach((file) => uploadFile(file));
 
     e.target.value = '';
     setCaption('');
   };
 
-  const handleDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-  ) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
 
@@ -102,24 +172,17 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
 
     if (files.length === 0) return;
 
-    files.forEach(uploadFile);
+    files.forEach((file) => uploadFile(file));
     setCaption('');
   };
 
-  const handleDragOver = (
-    e: React.DragEvent<HTMLDivElement>,
-  ) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (
-    e: React.DragEvent<HTMLDivElement>,
-  ) => {
-    if (
-      e.relatedTarget &&
-      e.currentTarget.contains(e.relatedTarget as Node)
-    ) {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node)) {
       return;
     }
 
@@ -142,12 +205,9 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
     <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Gallery
-          </h2>
+          <h2 className="text-lg font-semibold text-slate-900">Gallery</h2>
           <p className="text-sm text-slate-500">
-            Capture memories from this place and keep them easy to
-            revisit.
+            Capture memories from this place and keep them easy to revisit.
           </p>
         </div>
 
@@ -210,22 +270,61 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
         />
 
         <p className="mt-2 text-xs text-slate-500">
-          Captions are optional, but they make the gallery easier to
-          revisit later.
+          Captions are optional, but they make the gallery easier to revisit
+          later.
         </p>
       </div>
 
       {pendingFiles.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-2">
-          {pendingFiles.map((file) => (
+          {pendingFiles.map((item) => (
             <div
-              key={`${file.name}-${file.size}-${file.lastModified}`}
+              key={item.id}
               className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm"
             >
-              <ImagePlus className="h-4 w-4" />
-              <span className="max-w-40 truncate">
-                {file.name}
-              </span>
+              {item.status === 'success' ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : item.status === 'error' ? (
+                <AlertCircle className="h-4 w-4 text-red-500" />
+              ) : (
+                <UploadCloud className="h-4 w-4 text-blue-600" />
+              )}
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="max-w-36 truncate">{item.file.name}</span>
+                  <span className="text-xs text-slate-400">
+                    {item.status === 'uploading'
+                      ? `${item.progress}%`
+                      : item.status === 'success'
+                        ? 'uploaded'
+                        : 'needs retry'}
+                  </span>
+                </div>
+
+                <div className="mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      item.status === 'success'
+                        ? 'bg-green-500'
+                        : item.status === 'error'
+                          ? 'bg-red-400'
+                          : 'bg-blue-500'
+                    }`}
+                    style={{ width: `${item.progress}%` }}
+                  />
+                </div>
+              </div>
+
+              {item.status === 'error' && (
+                <button
+                  type="button"
+                  className="ml-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                  onClick={() => uploadFile(item.file, item.id)}
+                >
+                  Retry
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -291,15 +390,10 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {photos?.map((photo) => (
-          <div
-            key={photo.id}
-            className="group relative aspect-square"
-          >
+          <div key={photo.id} className="group relative aspect-square">
             <button
               type="button"
-              aria-label={`Preview ${
-                photo.caption ?? 'photo'
-              }`}
+              aria-label={`Preview ${photo.caption ?? 'photo'}`}
               className="h-full w-full"
               onClick={() => setPreviewPhoto(photo.url)}
             >
