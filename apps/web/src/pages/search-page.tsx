@@ -1,79 +1,214 @@
-import { useSearchParams, Link } from 'react-router';
-import { MapPin, Luggage, BookOpen } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router';
+import { BookOpen, Camera, Luggage, MapPin } from 'lucide-react';
+
 import { PlaceCard } from '@/components/place-card';
 import { TripCard } from '@/components/trip-card';
 import { useSearch } from '@/hooks/use-search';
 
+const SearchSection = ({
+  icon: Icon,
+  title,
+  count,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  count: number;
+  children: React.ReactNode;
+}) => {
+  return (
+    <section className="mb-10">
+      <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+        <Icon className="h-5 w-5" />
+        <span>{title}</span>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+          {count}
+        </span>
+      </h2>
+      {children}
+    </section>
+  );
+}
+
 export function SearchPage() {
   const [searchParams] = useSearchParams();
-  const query = searchParams.get('q') ?? '';
+  const query = searchParams.get('q')?.trim() ?? '';
+
   const { data, isLoading, error } = useSearch(query);
 
+  const {
+    places = [],
+    trips = [],
+    journalEntries = [],
+    photos = [],
+  } = data ?? {};
+
   const totalResults =
-    (data?.places.length ?? 0) +
-    (data?.trips.length ?? 0) +
-    (data?.journalEntries.length ?? 0);
+    places.length +
+    trips.length +
+    journalEntries.length +
+    photos.length;
+
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+  });
+
+  if (!query) {
+    return (
+      <div className="mx-auto max-w-2xl py-16 text-center">
+        <h1 className="mb-2 text-3xl font-bold">Search</h1>
+        <p className="text-slate-500">
+          Search your places, trips, journal entries, and photos.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">Search results</h1>
-      <p className="text-gray-500 mb-6">
-        {query ? `Showing results for "${query}"` : 'Enter a search term'}
-      </p>
+      <header className="mb-8">
+        <h1 className="mb-1 text-2xl font-bold">Search results</h1>
+        <p className="text-slate-500">
+          Showing results for{' '}
+          <span className="font-medium text-slate-900">"{query}"</span>
+        </p>
+      </header>
 
-      {isLoading && <p>Searching...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
-
-      {!isLoading && query && totalResults === 0 && (
-        <p className="text-gray-500">No results found.</p>
-      )}
-
-      {data && data.places.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
-            <MapPin className="h-4 w-4" /> Places
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {data.places.map((place) => (
-              <PlaceCard key={place.id} place={place} />
-            ))}
-          </div>
+      {isLoading && (
+        <div className="py-12 text-center text-slate-500">
+          Searching…
         </div>
       )}
 
-      {data && data.trips.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
-            <Luggage className="h-4 w-4" /> Trips
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {data.trips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
-            ))}
-          </div>
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          {error.message}
         </div>
       )}
 
-      {data && data.journalEntries.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
-            <BookOpen className="h-4 w-4" /> Journal entries
-          </h2>
-          <div className="space-y-3">
-            {data.journalEntries.map((entry) => (
-              <Link
-                key={entry.id}
-                to={`/places/${entry.placeId}`}
-                className="block border rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <p className="font-medium">{entry.title}</p>
-                <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                  {entry.content}
-                </p>
-              </Link>
-            ))}
-          </div>
+      {!isLoading && !error && totalResults === 0 && (
+        <div className="rounded-lg border border-dashed p-12 text-center">
+          <h2 className="mb-2 text-lg font-semibold">No results found</h2>
+          <p className="text-slate-500">
+            Try a different keyword or check your spelling.
+          </p>
         </div>
+      )}
+
+      {!isLoading && !error && totalResults > 0 && (
+        <>
+          {places.length > 0 && (
+            <SearchSection
+              icon={MapPin}
+              title="Places"
+              count={places.length}
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {places.map((place) => (
+                  <PlaceCard key={place.id} place={place} />
+                ))}
+              </div>
+            </SearchSection>
+          )}
+
+          {trips.length > 0 && (
+            <SearchSection
+              icon={Luggage}
+              title="Trips"
+              count={trips.length}
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {trips.map((trip) => (
+                  <TripCard key={trip.id} trip={trip} />
+                ))}
+              </div>
+            </SearchSection>
+          )}
+
+          {journalEntries.length > 0 && (
+            <SearchSection
+              icon={BookOpen}
+              title="Journal entries"
+              count={journalEntries.length}
+            >
+              <div className="space-y-3">
+                {journalEntries.map((entry) => (
+                  <Link
+                    key={entry.id}
+                    to={`/places/${entry.placeId}`}
+                    className="block rounded-lg border bg-white p-4 transition-shadow hover:shadow-md"
+                  >
+                    <h3 className="font-medium">{entry.title}</h3>
+
+                    <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+                      {entry.content}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </SearchSection>
+          )}
+
+          {photos.length > 0 && (
+            <SearchSection
+              icon={Camera}
+              title="Photos"
+              count={photos.length}
+            >
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {photos.map((photo) => {
+                  const card = (
+                    <>
+                      <img
+                        src={photo.url}
+                        alt={
+                          photo.caption
+                            ? `Photo: ${photo.caption}`
+                            : 'Travel photo'
+                        }
+                        loading="lazy"
+                        className="h-36 w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      />
+
+                      <div className="p-3">
+                        <p className="truncate text-sm font-medium">
+                          {photo.caption ?? 'Photo memory'}
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          {dateFormatter.format(
+                            new Date(photo.createdAt)
+                          )}
+                        </p>
+                      </div>
+                    </>
+                  );
+
+                  if (!photo.placeId) {
+                    return (
+                      <div
+                        key={photo.id}
+                        className="overflow-hidden rounded-lg border bg-white shadow-sm"
+                      >
+                        {card}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={photo.id}
+                      to={`/places/${photo.placeId}`}
+                      className="group block overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md"
+                    >
+                      {card}
+                    </Link>
+                  );
+                })}
+              </div>
+            </SearchSection>
+          )}
+        </>
       )}
     </div>
   );
