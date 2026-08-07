@@ -177,6 +177,7 @@ class SearchResults(CamelModel):
     places: list[PlaceRead]
     trips: list[TripRead]
     journal_entries: list[JournalEntryRead]
+    photos: list[PhotoRead]
 
 
 class ExpenseCreate(CamelModel):
@@ -250,6 +251,7 @@ class BucketListItemRead(CamelModel):
     created_at: datetime
     updated_at: datetime
 
+
 class PhotoRead(CamelModel):
     """Schema for reading a photo."""
 
@@ -258,6 +260,7 @@ class PhotoRead(CamelModel):
     caption: str | None
     url: str
     created_at: datetime
+
 
 class DocumentRead(CamelModel):
     """Schema for reading a document."""
@@ -269,6 +272,7 @@ class DocumentRead(CamelModel):
     document_type: str
     url: str
     created_at: datetime
+
 
 class FriendRequestCreate(CamelModel):
     """Schema for sending a friend request."""
@@ -286,6 +290,7 @@ class FriendshipRead(CamelModel):
     friend: UserRead
     created_at: datetime
 
+
 class TripShareCreate(CamelModel):
     """Schema for sharing a trip with a friend."""
 
@@ -298,6 +303,7 @@ class TripShareRead(CamelModel):
     shared_with_user_id: str
     shared_with: UserRead
     created_at: datetime
+
 
 class FlightCreate(CamelModel):
     """Schema for logging a new flight."""
