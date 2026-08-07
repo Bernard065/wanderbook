@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { Place, Trip } from '@org/types';
 
 import type { JournalEntry } from '@/hooks/use-journal-entries';
@@ -15,13 +15,12 @@ export interface SearchResults {
 export function useSearch(query: string) {
   const searchQuery = query.trim();
 
-  return useQuery({
+  return useQuery<SearchResults>({
     queryKey: ['search', searchQuery],
     queryFn: () => {
       const params = new URLSearchParams({ q: searchQuery });
       return apiRequest<SearchResults>(`/search?${params}`);
     },
     enabled: searchQuery.length >= 2,
-    placeholderData: keepPreviousData,
   });
 }

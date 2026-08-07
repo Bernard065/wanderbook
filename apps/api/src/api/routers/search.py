@@ -40,6 +40,7 @@ async def search(q: str, db: DbSession, current_user: CurrentUser):
                 PlaceModel.name.ilike(term),
                 PlaceModel.country.ilike(term),
                 PlaceModel.city.ilike(term),
+                PlaceModel.description.ilike(term),
             ),
         )
         .order_by(PlaceModel.created_at.desc())
@@ -50,7 +51,10 @@ async def search(q: str, db: DbSession, current_user: CurrentUser):
         select(TripModel)
         .where(
             TripModel.user_id == current_user.id,
-            TripModel.name.ilike(term),
+            or_(
+                TripModel.name.ilike(term),
+                TripModel.description.ilike(term),
+            ),
         )
         .options(selectinload(TripModel.places))
         .order_by(TripModel.created_at.desc())

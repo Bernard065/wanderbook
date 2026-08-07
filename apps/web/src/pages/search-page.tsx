@@ -3,7 +3,7 @@ import { BookOpen, Camera, Luggage, MapPin } from 'lucide-react';
 
 import { PlaceCard } from '@/components/place-card';
 import { TripCard } from '@/components/trip-card';
-import { useSearch } from '@/hooks/use-search';
+import { useSearch, type SearchResults } from '@/hooks/use-search';
 
 const SearchSection = ({
   icon: Icon,
@@ -28,7 +28,7 @@ const SearchSection = ({
       {children}
     </section>
   );
-}
+};
 
 export function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -41,13 +41,15 @@ export function SearchPage() {
     trips = [],
     journalEntries = [],
     photos = [],
-  } = data ?? {};
+  }: SearchResults = data ?? {
+    places: [],
+    trips: [],
+    journalEntries: [],
+    photos: [],
+  };
 
   const totalResults =
-    places.length +
-    trips.length +
-    journalEntries.length +
-    photos.length;
+    places.length + trips.length + journalEntries.length + photos.length;
 
   const dateFormatter = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -72,12 +74,17 @@ export function SearchPage() {
           Showing results for{' '}
           <span className="font-medium text-slate-900">"{query}"</span>
         </p>
+        <p className="mt-2 text-sm text-slate-500">
+          {totalResults} total result{totalResults === 1 ? '' : 's'} across{' '}
+          {places.length} place{places.length === 1 ? '' : 's'}, {trips.length}{' '}
+          trip{trips.length === 1 ? '' : 's'}, {journalEntries.length} journal
+          entr{journalEntries.length === 1 ? 'y' : 'ies'}, and {photos.length}{' '}
+          photo{photos.length === 1 ? '' : 's'}.
+        </p>
       </header>
 
       {isLoading && (
-        <div className="py-12 text-center text-slate-500">
-          Searching…
-        </div>
+        <div className="py-12 text-center text-slate-500">Searching…</div>
       )}
 
       {error && (
@@ -98,11 +105,7 @@ export function SearchPage() {
       {!isLoading && !error && totalResults > 0 && (
         <>
           {places.length > 0 && (
-            <SearchSection
-              icon={MapPin}
-              title="Places"
-              count={places.length}
-            >
+            <SearchSection icon={MapPin} title="Places" count={places.length}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {places.map((place) => (
                   <PlaceCard key={place.id} place={place} />
@@ -112,11 +115,7 @@ export function SearchPage() {
           )}
 
           {trips.length > 0 && (
-            <SearchSection
-              icon={Luggage}
-              title="Trips"
-              count={trips.length}
-            >
+            <SearchSection icon={Luggage} title="Trips" count={trips.length}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {trips.map((trip) => (
                   <TripCard key={trip.id} trip={trip} />
@@ -150,11 +149,7 @@ export function SearchPage() {
           )}
 
           {photos.length > 0 && (
-            <SearchSection
-              icon={Camera}
-              title="Photos"
-              count={photos.length}
-            >
+            <SearchSection icon={Camera} title="Photos" count={photos.length}>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {photos.map((photo) => {
                   const card = (
@@ -176,9 +171,7 @@ export function SearchPage() {
                         </p>
 
                         <p className="mt-1 text-xs text-slate-500">
-                          {dateFormatter.format(
-                            new Date(photo.createdAt)
-                          )}
+                          {dateFormatter.format(new Date(photo.createdAt))}
                         </p>
                       </div>
                     </>

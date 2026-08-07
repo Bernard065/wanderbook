@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "outDir": "./out-tsc/vitest",
     "types": [
       "vitest/globals",
@@ -13,7 +15,10 @@
     ],
     "jsx": "react-jsx",
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "vite.config.ts",

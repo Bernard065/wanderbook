@@ -127,3 +127,85 @@ def test_search_includes_photo_results() -> None:
             "createdAt": "2026-08-07T00:00:00Z",
         }
     ]
+
+
+def test_search_returns_all_result_types() -> None:
+    """Search should return matching places, trips, journal entries, and photos."""
+    place = SimpleNamespace(
+        id="place-1",
+        name="Beach Hut",
+        description="Ocean view retreat",
+        country="USA",
+        region="CA",
+        city="Santa Monica",
+        category="landmark",
+        gps_lat=34.0,
+        gps_lng=-118.5,
+        rating=4.5,
+        visit_count=1,
+        created_at=datetime(2026, 8, 7, tzinfo=UTC),
+        updated_at=datetime(2026, 8, 7, tzinfo=UTC),
+    )
+
+    trip = SimpleNamespace(
+        id="trip-1",
+        name="Summer Trip",
+        description="Coastal drive",
+        start_date=None,
+        end_date=None,
+        status="planning",
+        places=[place],
+        created_at=datetime(2026, 8, 7, tzinfo=UTC),
+        updated_at=datetime(2026, 8, 7, tzinfo=UTC),
+    )
+
+    journal_entry = SimpleNamespace(
+        id="entry-1",
+        place_id="place-1",
+        title="Beach day",
+        content="Sunny and bright.",
+        mood="happy",
+        is_private=False,
+        created_at=datetime(2026, 8, 7, tzinfo=UTC),
+        updated_at=datetime(2026, 8, 7, tzinfo=UTC),
+    )
+
+    photo = SimpleNamespace(
+        id="photo-1",
+        place_id="place-1",
+        caption="Sunset",
+        storage_key="test-key",
+        created_at=datetime(2026, 8, 7, tzinfo=UTC),
+    )
+
+    original_execute = FakeDbSession.execute
+
+    async def all_results_execute(self, query):
+        model = query.column_descriptions[0]["type"]
+
+        if model is PlaceModel:
+            return FakeResult([place])
+        if model is TripModel:
+            return FakeResult([trip])
+        if model is JournalEntryModel:
+            return FakeResult([journal_entry])
+        if model is PhotoModel:
+            return FakeResult([photo])
+
+        return await original_execute(self, query)
+
+    with (
+        patch(
+            "api.routers.search.get_file_url",
+            return_value="https://example.test/test-key",
+        ),
+        patch.object(FakeDbSession, "execute", all_results_execute),
+    ):
+        response = client.get("/search?q=beach")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["places"][0]["id"] == "place-1"
+    assert body["trips"][0]["id"] == "trip-1"
+    assert body["journalEntries"][0]["id"] == "entry-1"
+    assert body["photos"][0]["id"] == "photo-1"

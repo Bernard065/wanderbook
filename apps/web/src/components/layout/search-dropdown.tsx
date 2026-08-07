@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
-import { useSearch } from '@/hooks/use-search';
+import { useSearch, type SearchResults } from '@/hooks/use-search';
 
 interface SearchDropdownProps {
   className?: string;
@@ -42,16 +42,27 @@ export function SearchDropdown({
 
   const { data, isFetching } = useSearch(debouncedQuery);
 
-  const places = data?.places ?? [];
-  const trips = data?.trips ?? [];
-  const journalEntries = data?.journalEntries ?? [];
-  const photos = data?.photos ?? [];
+  const {
+    places = [],
+    trips = [],
+    journalEntries = [],
+    photos = [],
+  }: SearchResults = data ?? {
+    places: [],
+    trips: [],
+    journalEntries: [],
+    photos: [],
+  };
 
   const totalResults =
-    places.length +
-    trips.length +
-    journalEntries.length +
-    photos.length;
+    places.length + trips.length + journalEntries.length + photos.length;
+
+  const resultsSummary = [
+    { label: 'Places', count: places.length },
+    { label: 'Trips', count: trips.length },
+    { label: 'Journal entries', count: journalEntries.length },
+    { label: 'Photos', count: photos.length },
+  ];
 
   const flatResults: FlatResult[] = [
     ...places.slice(0, 4).map((place) => ({
@@ -143,7 +154,7 @@ export function SearchDropdown({
 
         event.preventDefault();
         setActiveIndex((index) =>
-          index <= 0 ? flatResults.length - 1 : index - 1
+          index <= 0 ? flatResults.length - 1 : index - 1,
         );
         return;
 
@@ -201,13 +212,19 @@ export function SearchDropdown({
             <p className="px-4 py-3 text-sm text-gray-400">Searching...</p>
           )}
 
-          {!isFetching &&
-            debouncedQuery === query &&
-            totalResults === 0 && (
-              <p className="px-4 py-3 text-sm text-gray-400">
-                No results found.
-              </p>
-            )}
+          {!isFetching && totalResults > 0 && (
+            <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
+              {resultsSummary.map((item) => (
+                <span key={item.label} className="truncate">
+                  {item.label}: {item.count}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {!isFetching && debouncedQuery === query && totalResults === 0 && (
+            <p className="px-4 py-3 text-sm text-gray-400">No results found.</p>
+          )}
 
           {!isFetching &&
             flatResults.map((result, index) => (
@@ -215,9 +232,7 @@ export function SearchDropdown({
                 key={`${result.path}-${result.label}`}
                 type="button"
                 className={`flex w-full items-center gap-2 px-4 py-3 text-left text-sm md:py-2 ${
-                  index === activeIndex
-                    ? 'bg-blue-50'
-                    : 'hover:bg-gray-50'
+                  index === activeIndex ? 'bg-blue-50' : 'hover:bg-gray-50'
                 }`}
                 onMouseDown={() => goToResult(result.path)}
                 onMouseEnter={() => setActiveIndex(index)}
