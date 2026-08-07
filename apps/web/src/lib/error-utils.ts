@@ -10,7 +10,9 @@ export function extractMessageString(err: unknown): string {
   return String(err);
 }
 
-export function extractJsonFromMessage(msg: string): unknown | null {
+export function extractJsonFromMessage(
+  msg: string,
+): Record<string, unknown> | null {
   const braceIndex = msg.indexOf('{');
   if (braceIndex >= 0) {
     const maybe = msg.slice(braceIndex);
