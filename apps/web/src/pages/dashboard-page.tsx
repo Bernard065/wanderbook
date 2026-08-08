@@ -13,6 +13,10 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { DashboardMapWidget } from '@/components/dashboard/dashboard-map-widget';
 import { TripProgressCard } from '@/components/dashboard/trip-progress-card';
 import { AchievementsPreview } from '@/components/dashboard/achievements-preview';
+import { PassportCard } from '@/components/dashboard/passport-card';
+import { TravelTimeline } from '@/components/dashboard/travel-timeline';
+import { QuickActions } from '@/components/dashboard/quick-actions';
+import { BucketListPreview } from '@/components/dashboard/bucket-list-preview';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { AddTripDialog } from '@/components/add-trip-dialog';
@@ -63,42 +67,79 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-slate-900 via-slate-800 to-slate-700 p-6 text-white shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
-              Your travel book
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold">
-              Good morning, {firstName}! 👋
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-300">
-              Capture memories, keep your trips organized, and revisit the
-              places that shaped your journey.
-            </p>
+      {/* Hero / Map Header */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="rounded-2xl border overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-700 text-white shadow-sm">
+            <div className="relative">
+              <DashboardMapWidget places={places ?? []} />
+
+              <div className="absolute inset-0 bg-linear-to-b from-black/50 via-transparent to-transparent pointer-events-none" />
+
+              <div className="absolute inset-6 flex flex-col justify-between pointer-events-none">
+                <div className="pointer-events-auto flex justify-end mb-4">
+                  <AddTripDialog>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="bg-white text-slate-900 hover:bg-slate-100 mr-2"
+                    >
+                      <Compass className="h-4 w-4" />
+                      New trip
+                    </Button>
+                  </AddTripDialog>
+
+                  <AddJournalEntryDialog>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-white/40 bg-white/10 text-white hover:bg-white/20"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Write memory
+                    </Button>
+                  </AddJournalEntryDialog>
+                </div>
+
+                <div className="pointer-events-auto max-w-2xl">
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
+                    Your World, Your Stories.
+                  </p>
+                  <h1 className="mt-2 text-3xl font-semibold">
+                    Capture every place, every moment and relive them forever.
+                  </h1>
+                  <p className="mt-2 text-sm text-slate-200">
+                    Good morning, {firstName}! 👋
+                  </p>
+                  <p className="mt-2 text-sm text-slate-300">
+                    Explore your map, stats, and memories from one place.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pointer-events-auto">
+                  <div className="rounded-full bg-white/10 px-3 py-2">
+                    <p className="text-sm font-semibold">{countries}</p>
+                    <p className="text-xs text-slate-300">Countries</p>
+                  </div>
+                  <div className="rounded-full bg-white/10 px-3 py-2">
+                    <p className="text-sm font-semibold">{cities}</p>
+                    <p className="text-xs text-slate-300">Cities</p>
+                  </div>
+                  <div className="rounded-full bg-white/10 px-3 py-2">
+                    <p className="text-sm font-semibold">
+                      {places?.length ?? 0}
+                    </p>
+                    <p className="text-xs text-slate-300">Places</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <AddTripDialog>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white text-slate-900 hover:bg-slate-100"
-              >
-                <Compass className="h-4 w-4" />
-                New trip
-              </Button>
-            </AddTripDialog>
-            <AddJournalEntryDialog>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-white/40 bg-white/10 text-white hover:bg-white/20"
-              >
-                <Sparkles className="h-4 w-4" />
-                Write memory
-              </Button>
-            </AddJournalEntryDialog>
-          </div>
+        </div>
+
+        <div className="space-y-6">
+          <PassportCard />
+          <QuickActions />
         </div>
       </div>
 
@@ -145,47 +186,85 @@ export function DashboardPage() {
               />
             </div>
 
-            <DashboardMapWidget places={places ?? []} />
-
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    Continue your journey
-                  </h2>
-                  <p className="text-sm text-slate-500">
-                    Pick up where you left off and add the next memory.
-                  </p>
-                </div>
-                <Link to="/trips" className="text-sm text-blue-600 font-medium">
-                  View all trips
-                </Link>
-              </div>
-              {continueJourneyTrips.length === 0 ? (
-                <EmptyState
-                  icon={Compass}
-                  title="Your next adventure is waiting"
-                  description="Create a trip, attach a few places, and start building your timeline."
-                  action={
-                    <AddTripDialog>
-                      <Button size="sm">Plan your first trip</Button>
-                    </AddTripDialog>
-                  }
-                />
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {continueJourneyTrips.map((trip) => (
-                    <TripProgressCard
-                      key={trip.id}
-                      trip={trip}
-                      memoriesCount={trip.places.reduce(
-                        (sum, p) => sum + (journalCountByPlace.get(p.id) ?? 0),
-                        0,
-                      )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <div className="rounded-2xl border bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h2 className="text-lg font-semibold">
+                        Continue your journey
+                      </h2>
+                      <p className="text-sm text-slate-500">
+                        Pick up where you left off and add the next memory.
+                      </p>
+                    </div>
+                    <Link
+                      to="/trips"
+                      className="text-sm text-blue-600 font-medium"
+                    >
+                      View all trips
+                    </Link>
+                  </div>
+                  {continueJourneyTrips.length === 0 ? (
+                    <EmptyState
+                      icon={Compass}
+                      title="Your next adventure is waiting"
+                      description="Create a trip, attach a few places, and start building your timeline."
+                      action={
+                        <AddTripDialog>
+                          <Button size="sm">Plan your first trip</Button>
+                        </AddTripDialog>
+                      }
                     />
-                  ))}
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {continueJourneyTrips.map((trip) => (
+                        <TripProgressCard
+                          key={trip.id}
+                          trip={trip}
+                          memoriesCount={trip.places.reduce(
+                            (sum, p) =>
+                              sum + (journalCountByPlace.get(p.id) ?? 0),
+                            0,
+                          )}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
+              <div>
+                <div className="bg-white border rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-sm">Recent Memories</h3>
+                    <Link
+                      to="/gallery"
+                      className="text-xs text-blue-600 font-medium"
+                    >
+                      View all
+                    </Link>
+                  </div>
+                  {recentPhotos.length === 0 ? (
+                    <p className="text-sm text-slate-500">
+                      Your latest photos will appear here once you add them.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {recentPhotos.map((photo) => (
+                        <img
+                          key={photo.id}
+                          src={photo.url}
+                          alt={photo.caption ?? 'Photo'}
+                          className="aspect-square w-full object-cover rounded-md"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <AchievementsPreview />
+              </div>
             </div>
           </div>
 
@@ -197,13 +276,11 @@ export function DashboardPage() {
                   View all
                 </Link>
               </div>
+
               {upcomingTrips.length === 0 ? (
-                <p className="text-sm text-slate-500">
-                  No upcoming trips yet. Add one when you’re ready to plan
-                  ahead.
-                </p>
+                <p className="text-sm text-slate-500">No upcoming trips yet.</p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {upcomingTrips.map((trip) => (
                     <Link
                       key={trip.id}
@@ -226,36 +303,8 @@ export function DashboardPage() {
                 </div>
               )}
             </div>
-
-            <div className="bg-white border rounded-lg p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-sm">Recent Memories</h3>
-                <Link
-                  to="/gallery"
-                  className="text-xs text-blue-600 font-medium"
-                >
-                  View all
-                </Link>
-              </div>
-              {recentPhotos.length === 0 ? (
-                <p className="text-sm text-slate-500">
-                  Your latest photos will appear here once you add them.
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  {recentPhotos.map((photo) => (
-                    <img
-                      key={photo.id}
-                      src={photo.url}
-                      alt={photo.caption ?? 'Photo'}
-                      className="aspect-square w-full object-cover rounded-md"
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <AchievementsPreview />
+            <TravelTimeline />
+            <BucketListPreview places={places ?? []} />
           </div>
         </div>
       )}
