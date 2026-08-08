@@ -31,10 +31,8 @@ import {
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
 import { useCreatePlace, useUpdatePlace } from '@/hooks/use-places';
 import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
-import {
-  extractMessageString,
-  extractJsonFromMessage,
-} from '@/lib/error-utils';
+import { extractMessageString } from '@/lib/error-utils';
+import { ErrorMessage } from '@/components/ui/error-message';
 import type { Place } from '@org/types';
 
 interface AddPlaceDialogProps {
@@ -298,11 +296,7 @@ export function AddPlaceDialog({
               />
             </div>
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                {error.message}
-              </p>
-            )}
+            {error && <ErrorMessage error={error} />}
 
             <DialogFooter className="pt-2">
               <DialogClose asChild>

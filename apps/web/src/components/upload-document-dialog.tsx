@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DOCUMENT_TYPES, type DocumentType } from '@/constants/document-types';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useUploadDocument } from '@/hooks/use-documents';
 
 interface UploadDocumentDialogProps {
@@ -95,11 +96,7 @@ export function UploadDocumentDialog({
             </Select>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-              {error.message}
-            </p>
-          )}
+          {error && <ErrorMessage error={error} />}
 
           <DialogFooter className="pt-2">
             <DialogClose asChild>

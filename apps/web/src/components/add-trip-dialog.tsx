@@ -39,6 +39,7 @@ import {
   tripSchemaWithChecks,
   type TripFormValues,
 } from '@/schemas/trip-schemas';
+import { ErrorMessage } from '@/components/ui/error-message';
 import type { Trip } from '@org/types';
 
 interface AddTripDialogProps {
@@ -66,7 +67,7 @@ const tripToFormValues = (trip: Trip): TripFormValues => {
     status: trip.status,
     placeIds: trip.places.map((p) => p.id),
   };
-}
+};
 
 export function AddTripDialog({
   children,
@@ -140,7 +141,12 @@ export function AddTripDialog({
                     message: m,
                   });
                 } catch {
-                  console.error('Failed to set form error for key', k, 'with message', m);
+                  console.error(
+                    'Failed to set form error for key',
+                    k,
+                    'with message',
+                    m,
+                  );
                 }
               });
             }
@@ -170,14 +176,19 @@ export function AddTripDialog({
                   message: m,
                 });
               } catch {
-                console.error('Failed to set form error for key', k, 'with message', m);
+                console.error(
+                  'Failed to set form error for key',
+                  k,
+                  'with message',
+                  m,
+                );
               }
             });
           }
         },
       });
     }
-  }
+  };
 
   const extractJsonFromMessage = (msg: string) => {
     // attempt to find a JSON object in the message text
@@ -201,7 +212,7 @@ export function AddTripDialog({
       }
     }
     return null;
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -357,11 +368,7 @@ export function AddTripDialog({
               )}
             />
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                {error.message}
-              </p>
-            )}
+            {error && <ErrorMessage error={error} />}
 
             <DialogFooter className="pt-2">
               <DialogClose asChild>

@@ -24,12 +24,11 @@ export function PlaceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: place, isLoading, error } = usePlace(id);
-  const { mutateAsync: deletePlace, isPending: isDeleting } =
-    useDeletePlace();
+  const { mutateAsync: deletePlace, isPending: isDeleting } = useDeletePlace();
   const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-600">Error: {error.message}</p>;
+  if (error) return <ErrorMessage error={error} />;
   if (!place) return <p>Place not found.</p>;
 
   async function handleDelete() {
@@ -77,16 +76,13 @@ export function PlaceDetailPage() {
                 <AlertDialogTitle>Delete this place?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This will permanently delete "{place.name}" and cannot be
-                  undone. Journal entries, expenses, and photos linked to
-                  it will also be affected.
+                  undone. Journal entries, expenses, and photos linked to it
+                  will also be affected.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
+                <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>

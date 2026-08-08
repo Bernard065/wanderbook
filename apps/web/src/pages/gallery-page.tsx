@@ -22,7 +22,7 @@ export function GalleryPage() {
       </div>
 
       {isLoading && <p className="text-sm text-slate-500">Loading photos...</p>}
-      {error && <p className="text-sm text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
 
       {!isLoading && !error && photos?.length === 0 && (
         <EmptyState

@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
 import { usePhotos, useUploadPhoto, useDeletePhoto } from '@/hooks/use-photos';
 import {
@@ -336,11 +337,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
         </div>
       )}
 
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700">
-          Error: {error.message}
-        </div>
-      )}
+      {error && <ErrorMessage error={error} />}
 
       {!isLoading &&
         !error &&

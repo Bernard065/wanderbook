@@ -9,7 +9,7 @@ export function PlacesPage() {
       <h1 className="text-2xl font-bold mb-6">Places</h1>
 
       {isLoading && <p>Loading places...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
       {places?.length === 0 && (
         <p className="text-gray-500">
           No places yet. Use "Add New" to add your first one.

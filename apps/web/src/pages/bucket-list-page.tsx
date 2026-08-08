@@ -29,7 +29,7 @@ export function BucketListPage() {
       {isLoading && (
         <p className="text-sm text-slate-500">Loading bucket list...</p>
       )}
-      {error && <p className="text-sm text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
 
       {!isLoading && !error && items?.length === 0 && (
         <EmptyState

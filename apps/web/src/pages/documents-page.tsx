@@ -20,11 +20,11 @@ export function DocumentsPage() {
       </div>
 
       {isLoading && <p>Loading documents...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
       {documents?.length === 0 && (
         <p className="text-gray-500">
-          No documents yet. Upload passports, tickets, or receipts to keep
-          them all in one place.
+          No documents yet. Upload passports, tickets, or receipts to keep them
+          all in one place.
         </p>
       )}
 

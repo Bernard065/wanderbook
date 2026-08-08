@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { UserPlus, Check, X, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuthStore } from '@/stores/auth-store';
 import { getInitials } from '@/lib/get-initials';
 import {
@@ -14,8 +15,11 @@ import {
 export function FriendsPage() {
   const currentUser = useAuthStore((s) => s.user);
   const { data: friendships, isLoading, error } = useFriendships();
-  const { mutate: sendRequest, isPending: isSending, error: sendError } =
-    useSendFriendRequest();
+  const {
+    mutate: sendRequest,
+    isPending: isSending,
+    error: sendError,
+  } = useSendFriendRequest();
   const { mutate: respond } = useRespondToFriendRequest();
   const { mutate: remove } = useRemoveFriendship();
   const [email, setEmail] = useState('');
@@ -43,10 +47,7 @@ export function FriendsPage() {
         Connect with friends to share your trips.
       </p>
 
-      <form
-        onSubmit={handleSendRequest}
-        className="flex gap-2 mb-8 max-w-md"
-      >
+      <form onSubmit={handleSendRequest} className="flex gap-2 mb-8 max-w-md">
         <Input
           type="email"
           placeholder="Friend's email"
@@ -59,14 +60,10 @@ export function FriendsPage() {
         </Button>
       </form>
 
-      {sendError && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2 mb-6 max-w-md">
-          {sendError.message}
-        </p>
-      )}
+      {sendError && <ErrorMessage error={sendError} />}
 
       {isLoading && <p>Loading friends...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
 
       {incomingPending.length > 0 && (
         <div className="mb-8">

@@ -42,7 +42,7 @@ export function TripDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-600">Error: {error.message}</p>;
+  if (error) return <ErrorMessage error={error} />;
   if (!trip) return <p>Trip not found.</p>;
 
   async function handleDelete() {
@@ -70,11 +70,7 @@ export function TripDetailPage() {
             </Button>
           </ShareTripDialog>
 
-          <AddTripDialog
-            trip={trip}
-            open={editOpen}
-            onOpenChange={setEditOpen}
-          >
+          <AddTripDialog trip={trip} open={editOpen} onOpenChange={setEditOpen}>
             <Button
               variant="outline"
               size="sm"
@@ -96,16 +92,13 @@ export function TripDetailPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete this trip?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete "{trip.name}" and its
-                  associated expenses. This cannot be undone.
+                  This will permanently delete "{trip.name}" and its associated
+                  expenses. This cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
+                <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>

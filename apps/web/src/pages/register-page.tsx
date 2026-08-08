@@ -13,7 +13,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useRegister } from '@/hooks/use-auth';
-import { registerSchema, type RegisterFormValues } from '@/schemas/auth-schemas';
+import {
+  registerSchema,
+  type RegisterFormValues,
+} from '@/schemas/auth-schemas';
+import { extractMessageString } from '@/lib/error-utils';
+import { ApiError } from '@/lib/api-client';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -88,9 +93,9 @@ export function RegisterPage() {
 
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                  {error.message === 'Request failed: 409'
+                  {error instanceof ApiError && error.status === 409
                     ? 'An account with this email already exists'
-                    : error.message}
+                    : extractMessageString(error)}
                 </p>
               )}
 

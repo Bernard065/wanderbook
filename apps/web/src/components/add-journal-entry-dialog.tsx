@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { usePlaces } from '@/hooks/use-places';
 import { useCreateJournalEntry } from '@/hooks/use-journal-entries';
 
@@ -101,14 +102,19 @@ export function AddJournalEntryDialog({
                   message: m,
                 });
               } catch {
-                console.error('Failed to set form error for key', k, 'with message', m);
+                console.error(
+                  'Failed to set form error for key',
+                  k,
+                  'with message',
+                  m,
+                );
               }
             });
           }
         },
       },
     );
-  }
+  };
 
   const extractJsonFromMessage = (msg: string) => {
     const braceIndex = msg.indexOf('{');
@@ -130,7 +136,7 @@ export function AddJournalEntryDialog({
       }
     }
     return null;
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -253,11 +259,7 @@ export function AddJournalEntryDialog({
               )}
             />
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                {error.message}
-              </p>
-            )}
+            {error && <ErrorMessage error={error} />}
 
             <DialogFooter className="pt-2">
               <DialogClose asChild>

@@ -32,7 +32,7 @@ export function JournalPage() {
       {isLoading && (
         <p className="text-sm text-slate-500">Loading journal...</p>
       )}
-      {error && <p className="text-sm text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
 
       {!isLoading && !error && entries?.length === 0 && (
         <EmptyState

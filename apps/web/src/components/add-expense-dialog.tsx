@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -205,11 +206,7 @@ export function AddExpenseDialog({
               )}
             />
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                {error.message}
-              </p>
-            )}
+            {error && <ErrorMessage error={error} />}
 
             <DialogFooter className="pt-2">
               <DialogClose asChild>

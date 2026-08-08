@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useLogin } from '@/hooks/use-auth';
 import { loginSchema, type LoginFormValues } from '@/schemas/auth-schemas';
+import { extractMessageString } from '@/lib/error-utils';
+import { ApiError } from '@/lib/api-client';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -74,9 +76,11 @@ export function LoginPage() {
 
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-                  {error.message === 'Request failed: 401'
-                    ? 'Invalid email or password'
-                    : error.message}
+                  {error instanceof ApiError
+                    ? error.status === 401
+                      ? 'Invalid email or password'
+                      : extractMessageString(error)
+                    : extractMessageString(error)}
                 </p>
               )}
 

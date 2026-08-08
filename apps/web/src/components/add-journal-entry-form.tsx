@@ -137,11 +137,7 @@ export function AddJournalEntryForm({ placeId }: AddJournalEntryFormProps) {
           )}
         />
 
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
-            {error.message}
-          </p>
-        )}
+        {error && <ErrorMessage error={error} />}
 
         <Button type="submit" disabled={isPending}>
           {isPending ? 'Saving...' : 'Add Entry'}

@@ -3,6 +3,7 @@ import { BookOpen, Camera, Luggage, MapPin } from 'lucide-react';
 
 import { PlaceCard } from '@/components/place-card';
 import { TripCard } from '@/components/trip-card';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useSearch, type SearchResults } from '@/hooks/use-search';
 
 const SearchSection = ({
@@ -85,11 +86,7 @@ export function SearchPage() {
         <div className="py-12 text-center text-slate-500">Searching…</div>
       )}
 
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-          {error.message}
-        </div>
-      )}
+      {error && <ErrorMessage error={error} />}
 
       {!isLoading && !error && totalResults === 0 && (
         <div className="rounded-lg border border-dashed p-12 text-center">

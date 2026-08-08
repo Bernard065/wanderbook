@@ -1,5 +1,6 @@
 import { JournalEntryCard } from '@/components/journal-entry-card';
 import { AddJournalEntryForm } from '@/components/add-journal-entry-form';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useJournalEntries } from '@/hooks/use-journal-entries';
 
 interface PlaceJournalProps {
@@ -18,7 +19,7 @@ export function PlaceJournal({ placeId }: PlaceJournalProps) {
       </div>
 
       {isLoading && <p>Loading journal...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
       {entries?.length === 0 && (
         <p className="text-gray-500">
           No journal entries yet. Write about your experience above.
