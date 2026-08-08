@@ -1,6 +1,7 @@
 import { ExpenseRow } from '@/components/expense-row';
 import { AddExpenseDialog } from '@/components/add-expense-dialog';
 import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { Plus } from 'lucide-react';
 import { useExpenses } from '@/hooks/use-expenses';
 
@@ -33,7 +34,7 @@ export function TripExpenses({ tripId }: TripExpensesProps) {
       </div>
 
       {isLoading && <p>Loading expenses...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
       {expenses?.length === 0 && (
         <p className="text-gray-500">No expenses recorded yet.</p>
       )}
