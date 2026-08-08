@@ -17,10 +17,14 @@ from api.config import settings
 # and pass SSL via connect_args instead.
 _url = make_url(settings.database_url).set(query={})
 
+connect_args = {"statement_cache_size": 0}
+if settings.is_production:
+    connect_args["ssl"] = "require"
+
 engine = create_async_engine(
     _url,
     echo=not settings.is_production,
-    connect_args={"ssl": "require"} if settings.is_production else {},
+    connect_args=connect_args,
 )
 
 ASYNC_SESSION_LOCAL = async_sessionmaker(
