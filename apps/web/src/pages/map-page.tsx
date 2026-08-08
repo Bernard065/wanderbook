@@ -1,8 +1,8 @@
 import React, { Suspense } from 'react';
 import { usePlaces } from '@/hooks/use-places';
 
-const LeafletMap = React.lazy(
-  () => import('@/components/dashboard/leaflet-map'),
+const MapLibreMap = React.lazy(
+  () => import('@/components/dashboard/maplibre-map'),
 );
 
 export function MapPage() {
@@ -20,7 +20,7 @@ export function MapPage() {
       </p>
 
       {isLoading && <p>Loading map...</p>}
-      {error && <p className="text-red-600">Error: {error.message}</p>}
+      {error && <ErrorMessage error={error} />}
       {!isLoading && placesWithCoords.length === 0 && (
         <p className="text-gray-500">
           No places with GPS coordinates yet. Add latitude/longitude when
@@ -37,7 +37,7 @@ export function MapPage() {
               </div>
             }
           >
-            <LeafletMap
+            <MapLibreMap
               places={placesWithCoords}
               initialZoom={placesWithCoords.length === 1 ? 8 : 2}
               className="h-full w-full"
