@@ -12,10 +12,12 @@ export function AppLayout() {
         mobileOpen={mobileNavOpen}
         onClose={() => setMobileNavOpen(false)}
       />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onMenuClick={() => setMobileNavOpen(true)} />
         <main className="flex-1 p-4 md:p-6">
-          <Outlet />
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

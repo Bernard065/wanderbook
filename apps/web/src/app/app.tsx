@@ -30,6 +30,7 @@ export function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/places" element={<PlacesPage />} />
           <Route path="/places/:id" element={<PlaceDetailPage />} />
           <Route path="/trips" element={<TripsPage />} />

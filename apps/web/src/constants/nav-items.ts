@@ -22,7 +22,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', label: 'Home', icon: LayoutGrid, end: true },
+  { to: '/', label: 'Dashboard', icon: LayoutGrid, end: true },
   { to: '/map', label: 'Map', icon: Map },
   { to: '/places', label: 'Places', icon: MapPin },
   { to: '/trips', label: 'Trips', icon: Luggage },

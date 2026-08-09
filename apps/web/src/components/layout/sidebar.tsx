@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS } from '@/constants/nav-items';
 import { MapPin, X } from 'lucide-react';
@@ -10,6 +10,20 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
+  const location = useLocation();
+
+  const isItemActive = (to: string, end: boolean | undefined) => {
+    if (to === '/') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
+    }
+
+    if (end) {
+      return location.pathname === to;
+    }
+
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
+
   return (
     <>
       {mobileOpen && (
@@ -27,6 +41,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           'md:static md:translate-x-0 md:w-16 lg:w-60',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
+        aria-label="Sidebar navigation"
       >
         <div className="px-4 md:px-3 lg:px-6 py-5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -40,28 +55,33 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              title={label}
-              onClick={onClose}
-              className={({ isActive }) =>
-                cn(
+        <nav
+          className="flex-1 px-3 space-y-1 overflow-y-auto"
+          aria-label="Primary"
+        >
+          {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => {
+            const active = isItemActive(to, end);
+
+            return (
+              <Link
+                key={to}
+                to={to}
+                title={label}
+                onClick={onClose}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
                   'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   'md:justify-center lg:justify-start',
-                  isActive
+                  active
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-600 hover:bg-gray-100',
-                )
-              }
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              <span className="md:hidden lg:inline">{label}</span>
-            </NavLink>
-          ))}
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="md:hidden lg:inline">{label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <UserProfileCard />
