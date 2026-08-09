@@ -27,6 +27,7 @@ import { usePlaces } from '@/hooks/use-places';
 import { useTrips } from '@/hooks/use-trips';
 import { useAllJournalEntries } from '@/hooks/use-journal-entries';
 import { usePhotos } from '@/hooks/use-photos';
+import { MemoriesGrid } from '@/components/dashboard/memories-grid';
 import { useFlights } from '@/hooks/use-flights';
 import { useExpenses } from '@/hooks/use-expenses';
 import { useAchievements } from '@/hooks/use-achievements';
@@ -35,7 +36,7 @@ export function DashboardPage() {
   const { data: places, isLoading: placesLoading } = usePlaces();
   const { data: trips, isLoading: tripsLoading } = useTrips();
   const { data: journalEntries } = useAllJournalEntries();
-  const { data: photos } = usePhotos();
+  const { data: photos, isLoading: photosLoading } = usePhotos();
   const { data: flights } = useFlights();
   const { data: expenses } = useExpenses();
   const { unlockedCount, totalCount } = useAchievements();
@@ -65,7 +66,20 @@ export function DashboardPage() {
     .slice(0, 3);
 
   const continueJourneyTrips = (trips ?? []).slice(0, 3);
-  const recentPhotos = (photos ?? []).slice(0, 4);
+
+  const memories = (photos ?? []).slice(0, 6).map((p) => {
+    const place = (places ?? []).find((pl) => pl.id === p.placeId);
+    return {
+      id: p.id,
+      title: p.caption ?? 'Memory',
+      location: place
+        ? `${place.city ? place.city + ', ' : ''}${place.country}`
+        : undefined,
+      date: p.createdAt,
+      coverUrl: p.url,
+      favorite: false,
+    };
+  });
 
   const tripDays = (trips ?? []).reduce((sum, trip) => {
     if (!trip.startDate || !trip.endDate) return sum;
@@ -302,22 +316,7 @@ export function DashboardPage() {
                       </Link>
                     }
                   />
-                  {recentPhotos.length === 0 ? (
-                    <p className="text-sm text-slate-500">
-                      Your latest photos will appear here once you add them.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      {recentPhotos.map((photo) => (
-                        <img
-                          key={photo.id}
-                          src={photo.url}
-                          alt={photo.caption ?? 'Photo'}
-                          className="aspect-square w-full object-cover rounded-md"
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <MemoriesGrid memories={memories} isLoading={photosLoading} />
                 </SurfaceCard>
 
                 <AchievementsPreview />

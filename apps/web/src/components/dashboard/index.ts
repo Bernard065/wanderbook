@@ -4,6 +4,8 @@ export { QuickActions } from './quick-actions';
 export { BucketListPreview } from './bucket-list-preview';
 export { StatCard } from './stat-card';
 export { TravelStatisticsSection } from './travel-statistics-section';
+export { MemoryCard } from './memory-card';
+export { MemoriesGrid } from './memories-grid';
 export { DashboardMapWidget } from './dashboard-map-widget';
 export { TripProgressCard } from './trip-progress-card';
 export { AchievementsPreview } from './achievements-preview';
