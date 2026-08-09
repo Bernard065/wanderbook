@@ -19,6 +19,9 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { BucketListPreview } from '@/components/dashboard/bucket-list-preview';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
+import { SectionHeader } from '@/components/ui/section-header';
+import { SurfaceCard } from '@/components/ui/surface-card';
 import { AddTripDialog } from '@/components/add-trip-dialog';
 import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
 import { useAuthStore } from '@/stores/auth-store';
@@ -67,6 +70,27 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        title={`Welcome back, ${firstName}`}
+        description="Capture every place, every moment and relive them forever."
+        action={
+          <div className="flex flex-wrap gap-2">
+            <AddTripDialog>
+              <Button size="sm">
+                <Compass className="h-4 w-4" />
+                New trip
+              </Button>
+            </AddTripDialog>
+            <AddJournalEntryDialog>
+              <Button variant="outline" size="sm">
+                <Sparkles className="h-4 w-4" />
+                Write memory
+              </Button>
+            </AddJournalEntryDialog>
+          </div>
+        }
+      />
+
       {/* Hero / Map Header */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -104,15 +128,6 @@ export function DashboardPage() {
                 <div className="pointer-events-auto max-w-2xl">
                   <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
                     Your World, Your Stories.
-                  </p>
-                  <h1 className="mt-2 text-3xl font-semibold">
-                    Capture every place, every moment and relive them forever.
-                  </h1>
-                  <p className="mt-2 text-sm text-slate-200">
-                    Good morning, {firstName}! 👋
-                  </p>
-                  <p className="mt-2 text-sm text-slate-300">
-                    Explore your map, stats, and memories from one place.
                   </p>
                 </div>
 
@@ -188,23 +203,19 @@ export function DashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h2 className="text-lg font-semibold">
-                        Continue your journey
-                      </h2>
-                      <p className="text-sm text-slate-500">
-                        Pick up where you left off and add the next memory.
-                      </p>
-                    </div>
-                    <Link
-                      to="/trips"
-                      className="text-sm text-blue-600 font-medium"
-                    >
-                      View all trips
-                    </Link>
-                  </div>
+                <SurfaceCard>
+                  <SectionHeader
+                    title="Continue your journey"
+                    description="Pick up where you left off and add the next memory."
+                    action={
+                      <Link
+                        to="/trips"
+                        className="text-sm font-medium text-blue-600"
+                      >
+                        View all trips
+                      </Link>
+                    }
+                  />
                   {continueJourneyTrips.length === 0 ? (
                     <EmptyState
                       icon={Compass}
@@ -231,20 +242,22 @@ export function DashboardPage() {
                       ))}
                     </div>
                   )}
-                </div>
+                </SurfaceCard>
               </div>
 
               <div>
-                <div className="bg-white border rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-sm">Recent Memories</h3>
-                    <Link
-                      to="/gallery"
-                      className="text-xs text-blue-600 font-medium"
-                    >
-                      View all
-                    </Link>
-                  </div>
+                <SurfaceCard>
+                  <SectionHeader
+                    title="Recent Memories"
+                    action={
+                      <Link
+                        to="/gallery"
+                        className="text-xs font-medium text-blue-600"
+                      >
+                        View all
+                      </Link>
+                    }
+                  />
                   {recentPhotos.length === 0 ? (
                     <p className="text-sm text-slate-500">
                       Your latest photos will appear here once you add them.
@@ -261,7 +274,7 @@ export function DashboardPage() {
                       ))}
                     </div>
                   )}
-                </div>
+                </SurfaceCard>
 
                 <AchievementsPreview />
               </div>
@@ -269,13 +282,18 @@ export function DashboardPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white border rounded-lg p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-sm">Upcoming Trips</h3>
-                <Link to="/trips" className="text-xs text-blue-600 font-medium">
-                  View all
-                </Link>
-              </div>
+            <SurfaceCard>
+              <SectionHeader
+                title="Upcoming Trips"
+                action={
+                  <Link
+                    to="/trips"
+                    className="text-xs font-medium text-blue-600"
+                  >
+                    View all
+                  </Link>
+                }
+              />
 
               {upcomingTrips.length === 0 ? (
                 <p className="text-sm text-slate-500">No upcoming trips yet.</p>
@@ -302,7 +320,7 @@ export function DashboardPage() {
                   ))}
                 </div>
               )}
-            </div>
+            </SurfaceCard>
             <TravelTimeline />
             <BucketListPreview places={places ?? []} />
           </div>

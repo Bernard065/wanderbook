@@ -14,9 +14,9 @@ export function StatCard({
   iconClassName,
 }: StatCardProps) {
   return (
-    <div className="flex min-w-0 items-start gap-3 rounded-2xl border bg-white p-4">
+    <div className="flex min-w-0 items-start gap-3 rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_16px_40px_-22px_rgba(15,23,42,0.24)]">
       <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
           iconClassName ?? 'bg-blue-50 text-blue-600'
         }`}
       >
@@ -24,8 +24,10 @@ export function StatCard({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-2xl font-bold leading-none">{value}</p>
-        <p className="mt-1 text-sm leading-tight text-gray-500 wrap-break-word">
+        <p className="text-2xl font-semibold leading-none text-slate-900">
+          {value}
+        </p>
+        <p className="mt-1 text-sm leading-tight text-slate-600 wrap-break-word">
           {label}
         </p>
       </div>

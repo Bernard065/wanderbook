@@ -24,7 +24,7 @@ export function DashboardMapWidget({ places }: DashboardMapWidgetProps) {
         <MapLibreMap places={places} className="h-full w-full" />
       </Suspense>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/70 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-b from-slate-950/30 via-transparent to-slate-950/70 pointer-events-none" />
 
       <button
         onClick={() => navigate('/map')}
