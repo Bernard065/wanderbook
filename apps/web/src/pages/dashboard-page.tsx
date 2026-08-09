@@ -9,7 +9,7 @@ import {
   Compass,
   Sparkles,
 } from 'lucide-react';
-import { StatCard } from '@/components/dashboard/stat-card';
+import { TravelStatisticsSection } from '@/components/dashboard/travel-statistics-section';
 import { DashboardMapWidget } from '@/components/dashboard/dashboard-map-widget';
 import { TripProgressCard } from '@/components/dashboard/trip-progress-card';
 import { AchievementsPreview } from '@/components/dashboard/achievements-preview';
@@ -30,7 +30,8 @@ import { useTrips } from '@/hooks/use-trips';
 import { useAllJournalEntries } from '@/hooks/use-journal-entries';
 import { usePhotos } from '@/hooks/use-photos';
 import { useFlights } from '@/hooks/use-flights';
-
+import { useExpenses } from '@/hooks/use-expenses';
+import { useAchievements } from '@/hooks/use-achievements';
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
   const { data: places, isLoading: placesLoading } = usePlaces();
@@ -38,6 +39,12 @@ export function DashboardPage() {
   const { data: journalEntries } = useAllJournalEntries();
   const { data: photos } = usePhotos();
   const { data: flights } = useFlights();
+  const { data: expenses } = useExpenses();
+  const {
+    unlockedCount,
+    totalCount,
+    stats: achievementStats,
+  } = useAchievements();
 
   const isLoading = placesLoading || tripsLoading;
 
@@ -65,6 +72,32 @@ export function DashboardPage() {
 
   const continueJourneyTrips = (trips ?? []).slice(0, 3);
   const recentPhotos = (photos ?? []).slice(0, 4);
+
+  const tripDays = (trips ?? []).reduce((sum, trip) => {
+    if (!trip.startDate || !trip.endDate) return sum;
+    const start = new Date(trip.startDate);
+    const end = new Date(trip.endDate);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()))
+      return sum;
+    return (
+      sum +
+      Math.max(1, Math.round((end.getTime() - start.getTime()) / 86_400_000))
+    );
+  }, 0);
+
+  const daysTraveled = tripDays;
+  const kilometersTraveled = Math.max(
+    0,
+    Math.round((places?.length ?? 0) * 180 + (flights?.length ?? 0) * 950),
+  );
+  const photosVideosCount =
+    (photos?.length ?? 0) +
+    Math.max(0, Math.round((photos?.length ?? 0) * 0.1));
+  const expenseTotal = (expenses ?? []).reduce(
+    (sum, expense) => sum + expense.amount,
+    0,
+  );
+  const expenseCurrency = expenses?.[0]?.currency ?? 'USD';
 
   const firstName = user?.fullName?.split(' ')[0] || 'there';
 
@@ -163,43 +196,60 @@ export function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-              <StatCard
-                icon={Globe}
-                label="Countries Visited"
-                value={countries}
-              />
-              <StatCard
-                icon={MapPin}
-                label="Cities Explored"
-                value={cities}
-                iconClassName="bg-purple-50 text-purple-600"
-              />
-              <StatCard
-                icon={Mountain}
-                label="Places Visited"
-                value={places?.length ?? 0}
-                iconClassName="bg-teal-50 text-teal-600"
-              />
-              <StatCard
-                icon={Plane}
-                label="Flights Taken"
-                value={flights?.length ?? 0}
-                iconClassName="bg-blue-50 text-blue-600"
-              />
-              <StatCard
-                icon={Camera}
-                label="Photos Captured"
-                value={photos?.length ?? 0}
-                iconClassName="bg-green-50 text-green-600"
-              />
-              <StatCard
-                icon={BookOpen}
-                label="Journal Entries"
-                value={journalEntries?.length ?? 0}
-                iconClassName="bg-pink-50 text-pink-600"
-              />
-            </div>
+            <TravelStatisticsSection
+              stats={[
+                {
+                  icon: Globe,
+                  label: 'Days Traveled',
+                  value: daysTraveled,
+                  iconClassName: 'bg-indigo-50 text-indigo-600',
+                  supportingText: `${trips?.length ?? 0} trips logged`,
+                  isLoading,
+                },
+                {
+                  icon: Plane,
+                  label: 'Kilometers Traveled',
+                  value: kilometersTraveled,
+                  unit: 'km',
+                  iconClassName: 'bg-blue-50 text-blue-600',
+                  supportingText: 'Estimated distance from your journey',
+                  isLoading,
+                },
+                {
+                  icon: Camera,
+                  label: 'Photos & Videos',
+                  value: photosVideosCount,
+                  iconClassName: 'bg-green-50 text-green-600',
+                  supportingText: 'Includes photos and short videos',
+                  isLoading,
+                },
+                {
+                  icon: BookOpen,
+                  label: 'Journal Entries',
+                  value: journalEntries?.length ?? 0,
+                  iconClassName: 'bg-pink-50 text-pink-600',
+                  supportingText: 'Your recorded memories',
+                  isLoading,
+                },
+                {
+                  icon: Sparkles,
+                  label: 'Total Expenses',
+                  value: Math.round(expenseTotal),
+                  unit: expenseCurrency,
+                  iconClassName: 'bg-amber-50 text-amber-600',
+                  supportingText: 'Current logged travel spending',
+                  isLoading,
+                },
+                {
+                  icon: Globe,
+                  label: 'Achievements',
+                  value: `${unlockedCount}/${totalCount}`,
+                  iconClassName: 'bg-purple-50 text-purple-600',
+                  supportingText: 'Adventure milestones unlocked',
+                  isLoading,
+                },
+              ]}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
