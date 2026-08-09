@@ -1,6 +1,7 @@
+import React from 'react';
 import type { LucideIcon } from 'lucide-react';
 
-interface StatCardProps {
+export interface StatCardProps {
   icon: LucideIcon;
   label: string;
   value?: number | string;
@@ -10,7 +11,7 @@ interface StatCardProps {
   isLoading?: boolean;
 }
 
-export function StatCard({
+export const StatCard: React.FC<StatCardProps> = ({
   icon: Icon,
   label,
   value,
@@ -18,7 +19,7 @@ export function StatCard({
   supportingText,
   iconClassName,
   isLoading = false,
-}: StatCardProps) {
+}) => {
   return (
     <div className="flex min-w-0 flex-col gap-3 rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_16px_40px_-22px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
@@ -67,4 +68,4 @@ export function StatCard({
       )}
     </div>
   );
-}
+};

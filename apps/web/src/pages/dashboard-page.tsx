@@ -1,8 +1,6 @@
 import { Link } from 'react-router';
 import {
   Globe,
-  MapPin,
-  Mountain,
   Plane,
   Camera,
   BookOpen,
@@ -40,11 +38,7 @@ export function DashboardPage() {
   const { data: photos } = usePhotos();
   const { data: flights } = useFlights();
   const { data: expenses } = useExpenses();
-  const {
-    unlockedCount,
-    totalCount,
-    stats: achievementStats,
-  } = useAchievements();
+  const { unlockedCount, totalCount } = useAchievements();
 
   const isLoading = placesLoading || tripsLoading;
 

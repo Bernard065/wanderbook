@@ -33,7 +33,8 @@ describe('StatCard', () => {
       />,
     );
 
-    expect(screen.getByText(/Total Expenses/i)).toBeTruthy();
+    // When loading, the label and supporting text are replaced by skeletons
+    expect(queryByText(/Total Expenses/i)).toBeNull();
     expect(queryByText('Loading spending data')).toBeNull();
     expect(container.querySelector('.animate-pulse')).toBeTruthy();
   });
