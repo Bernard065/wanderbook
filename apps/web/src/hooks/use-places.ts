@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Place } from '@org/types';
+import type { Place, PlaceCategory } from '@org/types';
 import { apiRequest } from '@/lib/api-client';
 
 const PLACES_KEY = ['places'];
@@ -24,7 +24,7 @@ export interface CreatePlaceInput {
   country: string;
   region?: string | null;
   city?: string | null;
-  category: string;
+  category: PlaceCategory;
   gpsLat?: number | null;
   gpsLng?: number | null;
   visitDate?: string | null;
@@ -55,7 +55,7 @@ export interface UpdatePlaceInput {
   country?: string;
   region?: string | null;
   city?: string | null;
-  category?: string;
+  category?: PlaceCategory;
   gpsLat?: number | null;
   gpsLng?: number | null;
   rating?: number | null;
