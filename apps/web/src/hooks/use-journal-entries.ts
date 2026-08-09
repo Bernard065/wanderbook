@@ -36,6 +36,14 @@ export function useAllJournalEntries() {
   });
 }
 
+export interface UpdateJournalEntryInput {
+  id: string;
+  title?: string;
+  content?: string;
+  mood?: string;
+  isPrivate?: boolean;
+}
+
 export function useCreateJournalEntry() {
   const queryClient = useQueryClient();
 
@@ -45,10 +53,23 @@ export function useCreateJournalEntry() {
         method: 'POST',
         body: JSON.stringify(input),
       }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ['journal-entries', { placeId: data.placeId }],
-      });
+    onSuccess: (_data) => {
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+    },
+  });
+}
+
+export function useUpdateJournalEntry() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...input }: UpdateJournalEntryInput) =>
+      apiRequest<JournalEntry>(`/journal-entries/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
     },
   });
 }
