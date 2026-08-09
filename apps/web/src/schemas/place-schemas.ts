@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
 
-function isValidLatString(val: string | undefined) {
+const isValidLatString = (val: string | undefined) => {
   if (!val) return true;
   const num = parseFloat(val);
   return !Number.isNaN(num) && num >= -90 && num <= 90;
 }
 
-function isValidLngString(val: string | undefined) {
+const isValidLngString = (val: string | undefined) => {
   if (!val) return true;
   const num = parseFloat(val);
   return !Number.isNaN(num) && num >= -180 && num <= 180;
@@ -29,6 +29,10 @@ export const placeSchema = z.object({
     .string()
     .optional()
     .refine(isValidLngString, 'Longitude must be between -180 and 180'),
+  visitDate: z.string().optional(),
+  notes: z.string().optional(),
+  favorite: z.boolean().optional(),
+  coverUrl: z.string().optional(),
 });
 
 export type PlaceFormValues = z.infer<typeof placeSchema>;

@@ -27,6 +27,10 @@ export interface CreatePlaceInput {
   category: string;
   gpsLat?: number | null;
   gpsLng?: number | null;
+  visitDate?: string | null;
+  notes?: string | null;
+  favorite?: boolean | null;
+  coverUrl?: string | null;
 }
 
 export function useCreatePlace() {

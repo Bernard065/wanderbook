@@ -20,6 +20,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -29,14 +31,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
-import { useCreatePlace, useUpdatePlace } from '@/hooks/use-places';
+import { useUpdatePlace, type CreatePlaceInput } from '@/hooks/use-places';
+import { useCreatePlaceLocal } from '@/hooks/use-create-place-local';
+import { useUploadPhoto } from '@/hooks/use-photos';
 import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
 import {
   extractJsonFromMessage,
   extractMessageString,
 } from '@/lib/error-utils';
 import { ErrorMessage } from '@/components/ui/error-message';
+import { showToast, showErrorToast } from '@/lib/toast';
 import type { Place } from '@org/types';
+
+type PlaceWithExtras = Place & {
+  visitDate?: string | null;
+  notes?: string | null;
+  favorite?: boolean | null;
+  coverUrl?: string | null;
+};
 
 interface AddPlaceDialogProps {
   children: React.ReactNode;
@@ -53,9 +65,13 @@ const emptyValues: PlaceFormValues = {
   category: '' as PlaceFormValues['category'],
   gpsLat: '',
   gpsLng: '',
+  visitDate: '',
+  notes: '',
+  favorite: false,
+  coverUrl: '',
 };
 
-function placeToFormValues(place: Place): PlaceFormValues {
+const placeToFormValues = (place: PlaceWithExtras): PlaceFormValues => {
   return {
     name: place.name,
     country: place.country,
@@ -64,8 +80,12 @@ function placeToFormValues(place: Place): PlaceFormValues {
     category: place.category,
     gpsLat: place.gpsLat != null ? String(place.gpsLat) : '',
     gpsLng: place.gpsLng != null ? String(place.gpsLng) : '',
+    visitDate: place.visitDate ?? '',
+    notes: place.notes ?? '',
+    favorite: !!place.favorite,
+    coverUrl: place.coverUrl ?? '',
   };
-}
+};
 
 export function AddPlaceDialog({
   children,
@@ -75,19 +95,18 @@ export function AddPlaceDialog({
 }: AddPlaceDialogProps) {
   const isEditMode = !!place;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
-  const {
-    mutate: createPlace,
-    isPending: isCreating,
-    error: createError,
-  } = useCreatePlace();
+  const createPlaceMutation = useCreatePlaceLocal();
+  const { isPending: isCreating, error: createError } = createPlaceMutation;
   const {
     mutate: updatePlace,
     isPending: isUpdating,
     error: updateError,
   } = useUpdatePlace();
+  const uploadPhoto = useUploadPhoto();
 
   const isPending = isEditMode ? isUpdating : isCreating;
   const error = isEditMode ? updateError : createError;
@@ -103,8 +122,8 @@ export function AddPlaceDialog({
     }
   }, [open, place, form]);
 
-  function onSubmit(values: PlaceFormValues) {
-    const payload = {
+  async function onSubmit(values: PlaceFormValues) {
+    const payload: CreatePlaceInput = {
       name: values.name,
       country: values.country,
       region: values.region || null,
@@ -112,7 +131,25 @@ export function AddPlaceDialog({
       category: values.category,
       gpsLat: values.gpsLat ? parseFloat(values.gpsLat) : null,
       gpsLng: values.gpsLng ? parseFloat(values.gpsLng) : null,
+      visitDate: values.visitDate || undefined,
+      notes: values.notes || undefined,
+      favorite: !!values.favorite,
+      coverUrl: values.coverUrl || undefined,
     };
+
+    // If a file was selected, upload it to the server and use the returned URL.
+    if (coverFile) {
+      try {
+        const uploaded = await uploadPhoto.mutateAsync({
+          file: coverFile,
+          caption: values.name,
+        });
+        payload.coverUrl = uploaded.url;
+      } catch {
+        showErrorToast('Failed to upload cover image');
+        // proceed without cover
+      }
+    }
 
     if (isEditMode) {
       updatePlace(
@@ -139,29 +176,30 @@ export function AddPlaceDialog({
         },
       );
     } else {
-      createPlace(payload, {
-        onSuccess: () => {
-          form.reset(emptyValues);
-          setOpen(false);
-        },
-        onError: (err: unknown) => {
-          const msg = extractMessageString(err);
-          const json = extractJsonFromMessage(msg);
-          if (json && json.errors && typeof json.errors === 'object') {
-            Object.entries(json.errors).forEach(([k, v]) => {
-              const m = Array.isArray(v) ? v.join(', ') : String(v);
-              try {
-                form.setError(k as keyof PlaceFormValues, {
-                  type: 'server',
-                  message: m,
-                });
-              } catch {
-                // ignore
-              }
-            });
-          }
-        },
-      });
+      try {
+        await createPlaceMutation.mutateAsync(payload);
+        form.reset(emptyValues);
+        setOpen(false);
+        setCoverFile(null);
+        showToast('Place added');
+      } catch (err: unknown) {
+        const msg = extractMessageString(err);
+        const json = extractJsonFromMessage(msg);
+        if (json && json.errors && typeof json.errors === 'object') {
+          Object.entries(json.errors).forEach(([k, v]) => {
+            const m = Array.isArray(v) ? v.join(', ') : String(v);
+            try {
+              form.setError(k as keyof PlaceFormValues, {
+                type: 'server',
+                message: m,
+              });
+            } catch {
+              // ignore
+            }
+          });
+        }
+        showErrorToast('Failed to add place');
+      }
     }
   }
 
@@ -292,6 +330,81 @@ export function AddPlaceDialog({
                     <FormLabel>Longitude</FormLabel>
                     <FormControl>
                       <Input placeholder="Optional" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <FormField
+                control={form.control}
+                name="coverUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover image (optional)</FormLabel>
+                    <FormControl>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const f = e.target.files && e.target.files[0];
+                          setCoverFile(f ?? null);
+                          // keep the underlying field value in sync with filename for validation/debug
+                          field.onChange(f ? f.name : '');
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="visitDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Visit date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="favorite"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={!!field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className="m-0">Mark as favorite</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Optional notes about this place"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
