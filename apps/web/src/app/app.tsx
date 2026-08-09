@@ -32,7 +32,7 @@ export function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/places" element={<PlacesPage />} />
-          <Route path="/places/:id" element={<PlaceDetailPage />} />
+          <Route path="/places/:placeId" element={<PlaceDetailPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/trips/:id" element={<TripDetailPage />} />
           <Route path="/search" element={<SearchPage />} />
