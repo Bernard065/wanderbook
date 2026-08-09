@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { BucketListItemCard } from '@/components/bucket-list-item-card';
 import { AddBucketListItemDialog } from '@/components/add-bucket-list-item-dialog';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useBucketList } from '@/hooks/use-bucket-list';
 
 export function BucketListPage() {

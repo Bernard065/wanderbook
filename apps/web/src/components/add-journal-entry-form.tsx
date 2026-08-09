@@ -21,6 +21,7 @@ import {
   extractMessageString,
   extractJsonFromMessage,
 } from '@/lib/error-utils';
+import { ErrorMessage } from '@/components/ui/error-message';
 
 interface AddJournalEntryFormProps {
   placeId: string;

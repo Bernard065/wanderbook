@@ -8,6 +8,7 @@ import { PlaceExpenses } from '@/components/place-expenses';
 import { PlaceDocuments } from '@/components/place-documents';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
 import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
 import {
   AlertDialog,
   AlertDialogAction,

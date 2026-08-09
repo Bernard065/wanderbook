@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { JournalEntryListItem } from '@/components/journal-entry-list-item';
 import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useAllJournalEntries } from '@/hooks/use-journal-entries';
 import { usePlaces } from '@/hooks/use-places';
 

@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { usePlaces } from '@/hooks/use-places';
 
 const MapLibreMap = React.lazy(

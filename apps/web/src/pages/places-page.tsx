@@ -1,4 +1,5 @@
 import { PlaceCard } from '@/components/place-card';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { usePlaces } from '@/hooks/use-places';
 
 export function PlacesPage() {

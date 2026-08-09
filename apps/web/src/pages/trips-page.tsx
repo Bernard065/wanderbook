@@ -1,6 +1,7 @@
 import { Compass, Sparkles } from 'lucide-react';
 import { TripCard } from '@/components/trip-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { useTrips } from '@/hooks/use-trips';
 import { useSharedTrips } from '@/hooks/use-trip-shares';
 

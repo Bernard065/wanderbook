@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
+import type { StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { Place } from '@org/types';
 
@@ -88,7 +89,7 @@ export default function MapLibreMap({
           source: 'osm',
         },
       ],
-    } as const;
+    } as StyleSpecification;
   }, []);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { DocumentRow } from '@/components/document-row';
 import { UploadDocumentDialog } from '@/components/upload-document-dialog';
 import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { Plus } from 'lucide-react';
 import { useDocuments } from '@/hooks/use-documents';
 

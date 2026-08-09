@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { Camera, ImagePlus, X } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { usePhotos } from '@/hooks/use-photos';
 import { usePlaces } from '@/hooks/use-places';
 

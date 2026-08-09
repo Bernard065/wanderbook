@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
+    "lib": ["dom", "es2022"],
     "outDir": "./out-tsc/vitest",
     "types": [
       "vitest/globals",

@@ -31,7 +31,10 @@ import {
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
 import { useCreatePlace, useUpdatePlace } from '@/hooks/use-places';
 import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
-import { extractMessageString } from '@/lib/error-utils';
+import {
+  extractJsonFromMessage,
+  extractMessageString,
+} from '@/lib/error-utils';
 import { ErrorMessage } from '@/components/ui/error-message';
 import type { Place } from '@org/types';
 
