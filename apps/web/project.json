@@ -2,12 +2,14 @@
   "name": "web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "root": "apps/web",
   "sourceRoot": "apps/web/src",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "apps/web/dist",
         "config": "apps/web/vite.config.mts"
@@ -32,15 +34,12 @@
       }
     },
     "lint": {
-      "executor": "@nx/js:eslint",
-      "outputs": [],
       "options": {
-        "lintFilePatterns": [
-          "apps/web/src/**/*.{ts,tsx,js,jsx}",
-          "apps/web/**/*.{ts,tsx,js,jsx}"
+        "args": [
+          "src/**/*.{ts,tsx,js,jsx}",
+          "**/*.{ts,tsx,js,jsx}"
         ]
       }
     }
-  },
-  "tags": []
+  }
 }
