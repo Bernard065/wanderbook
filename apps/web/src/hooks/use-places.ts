@@ -1,91 +1,105 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Place, PlaceCategory } from '@org/types';
-import { apiRequest } from '@/lib/api-client';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-const PLACES_KEY = ['places'];
+import {
+  createPlace,
+  deletePlace,
+  getPlace,
+  listPlaces,
+  PLACES_QUERY_KEY,
+  updatePlace,
+  type CreatePlaceRequest,
+  type UpdatePlaceRequest,
+} from '@/api/places';
 
+export type CreatePlaceInput = CreatePlaceRequest;
+
+export interface UpdatePlaceInput extends UpdatePlaceRequest {
+  id: string;
+}
+
+/**
+ * Fetch all places.
+ */
 export function usePlaces() {
   return useQuery({
-    queryKey: PLACES_KEY,
-    queryFn: () => apiRequest<Place[]>('/places'),
+    queryKey: PLACES_QUERY_KEY,
+    queryFn: listPlaces,
   });
 }
 
+/**
+ * Fetch a single place by ID.
+ */
 export function usePlace(id: string | undefined) {
   return useQuery({
-    queryKey: ['places', id],
-    queryFn: () => apiRequest<Place>(`/places/${id}`),
-    enabled: !!id,
+    queryKey: [...PLACES_QUERY_KEY, id],
+    queryFn: () => {
+      if (!id) {
+        throw new Error('Place ID is required.');
+      }
+
+      return getPlace(id);
+    },
+    enabled: Boolean(id),
   });
 }
 
-export interface CreatePlaceInput {
-  name: string;
-  country: string;
-  region?: string | null;
-  city?: string | null;
-  category: PlaceCategory;
-  gpsLat?: number | null;
-  gpsLng?: number | null;
-  visitDate?: string | null;
-  notes?: string | null;
-  favorite?: boolean | null;
-  coverUrl?: string | null;
-}
-
+/**
+ * Create a new place.
+ */
 export function useCreatePlace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreatePlaceInput) =>
-      apiRequest<Place>('/places', {
-        method: 'POST',
-        body: JSON.stringify(input),
-      }),
+    mutationFn: (input: CreatePlaceInput) => createPlace(input),
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
+      queryClient.invalidateQueries({
+        queryKey: PLACES_QUERY_KEY,
+      });
     },
   });
 }
 
-export interface UpdatePlaceInput {
-  id: string;
-  name?: string;
-  description?: string;
-  country?: string;
-  region?: string | null;
-  city?: string | null;
-  category?: PlaceCategory;
-  gpsLat?: number | null;
-  gpsLng?: number | null;
-  rating?: number | null;
-}
-
+/**
+ * Update an existing place.
+ */
 export function useUpdatePlace() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, ...input }: UpdatePlaceInput) =>
-      apiRequest<Place>(`/places/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(input),
-      }),
+      updatePlace(id, input),
+
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
-      queryClient.invalidateQueries({ queryKey: ['places', variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: PLACES_QUERY_KEY,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [...PLACES_QUERY_KEY, variables.id],
+      });
     },
   });
 }
 
+/**
+ * Delete a place.
+ */
 export function useDeletePlace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      apiRequest<void>(`/places/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => deletePlace(id),
+
     onSuccess: (_data, id) => {
-      queryClient.removeQueries({ queryKey: ['places', id] });
-      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
+      queryClient.removeQueries({
+        queryKey: [...PLACES_QUERY_KEY, id],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: PLACES_QUERY_KEY,
+      });
     },
   });
 }
