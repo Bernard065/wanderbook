@@ -197,7 +197,8 @@ class SearchResults(CamelModel):
     places: list[PlaceRead]
     trips: list[TripRead]
     journal_entries: list[JournalEntryRead]
-    photos: list[PhotoRead]
+    memories: list[PhotoRead]
+    bucket_list_items: list[BucketListItemRead]
 
 
 class ExpenseCreate(CamelModel):

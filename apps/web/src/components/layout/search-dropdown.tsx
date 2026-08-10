@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import type * as React from 'react';
 import { useNavigate } from 'react-router';
 import {
   BookOpen,
+  Bookmark,
   Camera,
   Luggage,
   MapPin,
@@ -13,6 +13,7 @@ import {
 
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useSearch, type SearchResults } from '@/hooks/use-search';
+import { SearchResultRow } from '@/components/search/search-result-row';
 
 interface SearchDropdownProps {
   className?: string;
@@ -24,12 +25,25 @@ interface FlatResult {
   id: string;
   path: string;
   label: string;
+  subtitle?: string;
   icon: LucideIcon;
 }
 
+const EMPTY_SEARCH_RESULTS: SearchResults = {
+  places: [],
+  trips: [],
+  journalEntries: [],
+  memories: [],
+  bucketListItems: [],
+};
+
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+});
+
 export function SearchDropdown({
   className,
-  autoFocus,
+  autoFocus = false,
   onNavigate,
 }: SearchDropdownProps) {
   const [query, setQuery] = useState('');
@@ -38,6 +52,7 @@ export function SearchDropdown({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
   const navigate = useNavigate();
 
   const debouncedQuery = useDebouncedValue(query, 300);
@@ -46,25 +61,41 @@ export function SearchDropdown({
   const { data, isFetching, isError } = useSearch(debouncedQuery);
 
   const {
-    places = [],
-    trips = [],
-    journalEntries = [],
-    photos = [],
-  }: SearchResults = data ?? {
-    places: [],
-    trips: [],
-    journalEntries: [],
-    photos: [],
-  };
+    places,
+    trips,
+    journalEntries,
+    memories,
+    bucketListItems,
+  } = data ?? EMPTY_SEARCH_RESULTS;
 
   const totalResults =
-    places.length + trips.length + journalEntries.length + photos.length;
+    places.length +
+    trips.length +
+    journalEntries.length +
+    memories.length +
+    bucketListItems.length;
 
   const resultsSummary = [
-    { label: 'Places', count: places.length },
-    { label: 'Trips', count: trips.length },
-    { label: 'Journal entries', count: journalEntries.length },
-    { label: 'Photos', count: photos.length },
+    {
+      label: 'Places',
+      count: places.length,
+    },
+    {
+      label: 'Trips',
+      count: trips.length,
+    },
+    {
+      label: 'Journal entries',
+      count: journalEntries.length,
+    },
+    {
+      label: 'Memories',
+      count: memories.length,
+    },
+    {
+      label: 'Bucket list',
+      count: bucketListItems.length,
+    },
   ].filter((item) => item.count > 0);
 
   const flatResults: FlatResult[] = [
@@ -72,49 +103,72 @@ export function SearchDropdown({
       id: `place-${place.id}`,
       path: `/places/${place.id}`,
       label: place.name,
+      subtitle: [place.city, place.country].filter(Boolean).join(', '),
       icon: MapPin,
     })),
+
     ...trips.slice(0, 4).map((trip) => ({
       id: `trip-${trip.id}`,
       path: `/trips/${trip.id}`,
       label: trip.name,
+      subtitle: trip.status ? `Status: ${trip.status}` : undefined,
       icon: Luggage,
     })),
+
     ...journalEntries.slice(0, 4).map((entry) => ({
       id: `entry-${entry.id}`,
       path: `/places/${entry.placeId}`,
       label: entry.title,
+      subtitle: entry.content,
       icon: BookOpen,
     })),
-    ...photos.slice(0, 4).map((photo) => ({
-      id: `photo-${photo.id}`,
+
+    ...memories.slice(0, 4).map((photo) => ({
+      id: `memory-${photo.id}`,
       path: photo.placeId ? `/places/${photo.placeId}` : '/gallery',
-      label: photo.caption ?? 'Photo',
+      label: photo.caption ?? 'Memory',
+      subtitle: photo.createdAt
+        ? dateFormatter.format(new Date(photo.createdAt))
+        : 'Memory',
       icon: Camera,
+    })),
+
+    ...bucketListItems.slice(0, 4).map((item) => ({
+      id: `bucket-list-${item.id}`,
+      path: '/bucket-list',
+      label: item.name,
+      subtitle: item.category.replace(/_/g, ' '),
+      icon: Bookmark,
     })),
   ];
 
   const showDropdown = focused && trimmedQuery.length > 0;
   const isStaleQuery = debouncedQuery !== query;
-  const showLoadingSkeletons = isFetching && trimmedQuery.length > 0;
+  const showLoadingSkeletons =
+    isFetching && trimmedQuery.length > 0;
 
-  // Keep activeIndex in range whenever the result set changes shape.
   useEffect(() => {
     setActiveIndex((current) => {
-      if (current < 0) return current;
+      if (current < 0) {
+        return current;
+      }
+
       return current >= flatResults.length ? -1 : current;
     });
   }, [flatResults.length]);
 
-  // Scroll the active item into view when navigating by keyboard.
   useEffect(() => {
-    if (activeIndex < 0 || !listRef.current) return;
-    const activeEl = listRef.current.querySelector<HTMLElement>(
+    if (activeIndex < 0 || !listRef.current) {
+      return;
+    }
+
+    const activeElement = listRef.current.querySelector<HTMLElement>(
       `[data-index="${activeIndex}"]`,
     );
-    if (activeEl && typeof activeEl.scrollIntoView === 'function') {
-      activeEl.scrollIntoView({ block: 'nearest' });
-    }
+
+    activeElement?.scrollIntoView({
+      block: 'nearest',
+    });
   }, [activeIndex]);
 
   const closeDropdown = () => {
@@ -136,65 +190,92 @@ export function SearchDropdown({
   };
 
   const goToResults = () => {
-    if (!trimmedQuery) return;
+    if (!trimmedQuery) {
+      return;
+    }
+
     navigate(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     closeDropdown();
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (activeIndex >= 0 && flatResults[activeIndex]) {
-      goToResult(flatResults[activeIndex].path);
-      return;
-    }
-
-    goToResults();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>,
+  ) => {
     switch (event.key) {
-      case 'Escape':
+      case 'Escape': {
         if (query) {
           clearQuery();
         } else {
           inputRef.current?.blur();
           closeDropdown();
         }
-        return;
 
-      case 'ArrowDown':
-        if (!showDropdown || flatResults.length === 0) return;
-        event.preventDefault();
-        setActiveIndex((index) => (index + 1) % flatResults.length);
         return;
+      }
 
-      case 'ArrowUp':
-        if (!showDropdown || flatResults.length === 0) return;
+      case 'ArrowDown': {
+        if (!showDropdown || flatResults.length === 0) {
+          return;
+        }
+
         event.preventDefault();
-        setActiveIndex((index) =>
-          index <= 0 ? flatResults.length - 1 : index - 1,
+
+        setActiveIndex(
+          (current) => (current + 1) % flatResults.length,
         );
-        return;
 
-      case 'Home':
-        if (!showDropdown || flatResults.length === 0) return;
+        return;
+      }
+
+      case 'ArrowUp': {
+        if (!showDropdown || flatResults.length === 0) {
+          return;
+        }
+
+        event.preventDefault();
+
+        setActiveIndex((current) =>
+          current <= 0
+            ? flatResults.length - 1
+            : current - 1,
+        );
+
+        return;
+      }
+
+      case 'Home': {
+        if (!showDropdown || flatResults.length === 0) {
+          return;
+        }
+
         event.preventDefault();
         setActiveIndex(0);
-        return;
 
-      case 'End':
-        if (!showDropdown || flatResults.length === 0) return;
+        return;
+      }
+
+      case 'End': {
+        if (!showDropdown || flatResults.length === 0) {
+          return;
+        }
+
         event.preventDefault();
         setActiveIndex(flatResults.length - 1);
-        return;
 
-      case 'Enter':
-        if (activeIndex >= 0 && flatResults[activeIndex]) {
+        return;
+      }
+
+      case 'Enter': {
+        if (
+          activeIndex >= 0 &&
+          flatResults[activeIndex]
+        ) {
           event.preventDefault();
           goToResult(flatResults[activeIndex].path);
         }
+
         return;
+      }
 
       default:
         return;
@@ -206,16 +287,26 @@ export function SearchDropdown({
       ? `search-option-${flatResults[activeIndex].id}`
       : undefined;
 
-  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    const nextFocusTarget = event.relatedTarget as HTMLElement | null;
+  const handleInputBlur = (
+    event: React.FocusEvent<HTMLInputElement>,
+  ) => {
+    const nextFocusTarget =
+      event.relatedTarget instanceof HTMLElement
+        ? event.relatedTarget
+        : null;
+
     const isMovingWithinDropdown =
-      nextFocusTarget?.closest('[data-search-dropdown-root]') ?? false;
+      nextFocusTarget?.closest(
+        '[data-search-dropdown-root]',
+      );
 
     if (isMovingWithinDropdown) {
       return;
     }
 
-    window.setTimeout(() => setFocused(false), 150);
+    window.setTimeout(() => {
+      setFocused(false);
+    }, 150);
   };
 
   return (
@@ -223,28 +314,50 @@ export function SearchDropdown({
       className={`relative w-full ${className ?? ''}`}
       data-search-dropdown-root
     >
-      <form className="relative" role="search" onSubmit={handleSubmit}>
-        <Search className="absolute left-3 top-1/2 h-4 w-4 shrink-0 -translate-y-1/2 text-gray-400" />
+      <form
+        className="relative"
+        role="search"
+        onSubmit={(event) => {
+          event.preventDefault();
+
+          if (
+            activeIndex >= 0 &&
+            flatResults[activeIndex]
+          ) {
+            goToResult(flatResults[activeIndex].path);
+            return;
+          }
+
+          goToResults();
+        }}
+      >
+        <Search
+          aria-hidden="true"
+          className="absolute left-3 top-1/2 h-4 w-4 shrink-0 -translate-y-1/2 text-gray-400"
+        />
 
         <input
           ref={inputRef}
           autoFocus={autoFocus}
-          type="text"
+          data-global-search-input
+          type="search"
           role="combobox"
-          aria-label="Search places, countries, journal entries, and photos"
+          aria-label="Search places, trips, journal entries, memories, and bucket list items"
           aria-expanded={showDropdown}
           aria-controls="search-dropdown-listbox"
           aria-activedescendant={activeDescendantId}
           aria-autocomplete="list"
           autoComplete="off"
           value={query}
-          placeholder="Search places, countries, journal..."
+          placeholder="Search places, trips, memories, journal..."
           className="w-full rounded-md border bg-gray-50 py-2.5 pl-9 pr-9 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 md:py-2 md:text-sm"
           onChange={(event) => {
             setQuery(event.target.value);
             setActiveIndex(-1);
           }}
-          onFocus={() => setFocused(true)}
+          onFocus={() => {
+            setFocused(true);
+          }}
           onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
         />
@@ -253,11 +366,16 @@ export function SearchDropdown({
           <button
             type="button"
             aria-label="Clear search"
-            className="absolute right-2.5 top-1/2 rounded p-1 -translate-y-1/2 hover:bg-gray-200"
-            onMouseDown={(event) => event.preventDefault()}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-gray-200"
+            onMouseDown={(event) => {
+              event.preventDefault();
+            }}
             onClick={clearQuery}
           >
-            <X className="h-4 w-4 text-gray-400 md:h-3.5 md:w-3.5" />
+            <X
+              aria-hidden="true"
+              className="h-4 w-4 text-gray-400 md:h-3.5 md:w-3.5"
+            />
           </button>
         )}
       </form>
@@ -265,91 +383,119 @@ export function SearchDropdown({
       {showDropdown && (
         <div
           id="search-dropdown-listbox"
+          ref={listRef}
           role="listbox"
           aria-label="Search results"
-          ref={listRef}
           className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-md border bg-white shadow-lg sm:max-h-80"
         >
           {showLoadingSkeletons && (
-            <div className="px-4 py-3" role="status">
+            <div
+              className="px-4 py-3"
+              role="status"
+              aria-live="polite"
+            >
               <div className="mb-3 text-sm text-gray-400">
                 Searching for "{trimmedQuery}"...
               </div>
+
               <div className="mb-3 h-2.5 w-32 animate-pulse rounded bg-slate-200" />
+
               <div className="space-y-2">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div
-                    key={`skeleton-${index}`}
-                    data-testid="search-skeleton"
-                    className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2"
-                  >
-                    <div className="h-4 w-4 animate-pulse rounded-full bg-slate-200" />
-                    <div className="h-3 flex-1 animate-pulse rounded bg-slate-200" />
-                  </div>
-                ))}
+                {Array.from({ length: 3 }).map(
+                  (_, index) => (
+                    <div
+                      key={`skeleton-${index}`}
+                      data-testid="search-skeleton"
+                      className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2"
+                    >
+                      <div className="h-4 w-4 animate-pulse rounded-full bg-slate-200" />
+
+                      <div className="h-3 flex-1 animate-pulse rounded bg-slate-200" />
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           )}
 
           {isError && !isFetching && (
-            <div className="px-4 py-3 text-sm text-red-600" role="alert">
-              Something went wrong while searching. Please try again.
-            </div>
-          )}
-
-          {!isFetching && !isError && totalResults > 0 && (
-            <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
-              {resultsSummary.map((item) => (
-                <span key={item.label} className="truncate">
-                  {item.label}: {item.count}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {!isFetching && !isError && !isStaleQuery && totalResults === 0 && (
-            <div className="px-4 py-3 text-sm text-gray-500">
-              <p className="font-medium text-slate-700">No results found</p>
-              <p className="mt-1 text-gray-500">
-                Try a broader term or search for places, trips, journal entries,
-                or photos.
-              </p>
+            <div
+              className="px-4 py-3 text-sm text-red-600"
+              role="alert"
+            >
+              Something went wrong while searching. Please
+              try again.
             </div>
           )}
 
           {!isFetching &&
             !isError &&
+            totalResults > 0 && (
+              <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
+                {resultsSummary.map((item) => (
+                  <span
+                    key={item.label}
+                    className="truncate"
+                  >
+                    {item.label}: {item.count}
+                  </span>
+                ))}
+              </div>
+            )}
+
+          {!isFetching &&
+            !isError &&
+            !isStaleQuery &&
+            totalResults === 0 && (
+              <div className="px-4 py-3 text-sm text-gray-500">
+                <p className="font-medium text-slate-700">
+                  No results found
+                </p>
+
+                <p className="mt-1 text-gray-500">
+                  Try a broader term or search for places,
+                  trips, journal entries, or photos.
+                </p>
+              </div>
+            )}
+
+          {!isFetching &&
+            !isError &&
             flatResults.map((result, index) => (
-              <button
+              <SearchResultRow
                 key={result.id}
                 id={`search-option-${result.id}`}
-                data-index={index}
-                type="button"
                 role="option"
-                aria-selected={index === activeIndex}
-                className={`flex w-full items-center gap-2 px-4 py-3 text-left text-sm md:py-2 ${
-                  index === activeIndex ? 'bg-blue-50' : 'hover:bg-gray-50'
-                }`}
-                onMouseDown={() => goToResult(result.path)}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                <result.icon
-                  className="h-4 w-4 shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                <span className="truncate">{result.label}</span>
-              </button>
+                ariaSelected={index === activeIndex}
+                dataIndex={index}
+                icon={result.icon}
+                label={result.label}
+                subtitle={result.subtitle}
+                active={index === activeIndex}
+                onMouseDown={() => {
+                  goToResult(result.path);
+                }}
+                onMouseEnter={() => {
+                  setActiveIndex(index);
+                }}
+              />
             ))}
 
-          {!isFetching && !isError && totalResults > 0 && (
-            <button
-              type="button"
-              className="w-full border-t px-4 py-3 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 md:py-2.5"
-              onMouseDown={goToResults}
-            >
-              See all {totalResults} results for "{trimmedQuery}"
-            </button>
-          )}
+          {!isFetching &&
+            !isError &&
+            totalResults > 0 && (
+              <button
+                type="button"
+                className="w-full border-t px-4 py-3 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 md:py-2.5"
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  goToResults();
+                }}
+              >
+                See all {totalResults} results for "
+                {trimmedQuery}"
+              </button>
+            )}
         </div>
       )}
     </div>

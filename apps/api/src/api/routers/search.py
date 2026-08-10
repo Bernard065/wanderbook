@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from api.deps import CurrentUser, DbSession
 from api.models import (
+    BucketListItemModel,
     JournalEntryModel,
     PhotoModel,
     PlaceModel,
@@ -84,11 +85,25 @@ async def search(q: str, db: DbSession, current_user: CurrentUser):
         .limit(20)
     )
 
+    bucket_list_result = await db.execute(
+        select(BucketListItemModel)
+        .where(
+            BucketListItemModel.user_id == current_user.id,
+            or_(
+                BucketListItemModel.name.ilike(term),
+                BucketListItemModel.notes.ilike(term),
+                BucketListItemModel.category.ilike(term),
+            ),
+        )
+        .order_by(BucketListItemModel.created_at.desc())
+        .limit(20)
+    )
+
     return SearchResults(
         places=places_result.scalars().all(),
         trips=trips_result.scalars().all(),
         journal_entries=journal_result.scalars().all(),
-        photos=[
+        memories=[
             PhotoRead(
                 id=photo.id,
                 place_id=photo.place_id,
@@ -98,4 +113,5 @@ async def search(q: str, db: DbSession, current_user: CurrentUser):
             )
             for photo in photo_result.scalars().all()
         ],
+        bucket_list_items=bucket_list_result.scalars().all(),
     )
