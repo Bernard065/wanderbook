@@ -118,7 +118,7 @@ def test_search_includes_photo_results() -> None:
         response = client.get("/search?q=beach")
 
     assert response.status_code == 200
-    assert response.json()["photos"] == [
+    assert response.json()["memories"] == [
         {
             "id": "photo-1",
             "placeId": "place-1",
@@ -214,4 +214,4 @@ def test_search_returns_all_result_types() -> None:
     assert body["places"][0]["id"] == "place-1"
     assert body["trips"][0]["id"] == "trip-1"
     assert body["journalEntries"][0]["id"] == "entry-1"
-    assert body["photos"][0]["id"] == "photo-1"
+    assert body["memories"][0]["id"] == "photo-1"
