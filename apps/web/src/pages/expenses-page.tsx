@@ -189,35 +189,6 @@ export function ExpensesPage() {
       .slice(0, 5);
   }, [filteredExpenses, tripsById]);
 
-  const activeBudget = useMemo(() => {
-    if (!trips || trips.length === 0) {
-      return 0;
-    }
-
-    if (tripFilter !== 'all') {
-      return trips.find((trip) => trip.id === tripFilter)?.budget ?? 0;
-    }
-
-    if (filteredExpenses.length === 0) {
-      return trips.reduce((sum, trip) => sum + (trip.budget ?? 0), 0);
-    }
-
-    const referencedTripIds = new Set(
-      filteredExpenses
-        .map((expense) => expense.tripId)
-        .filter((id): id is string => Boolean(id)),
-    );
-
-    return trips.reduce(
-      (sum, trip) =>
-        referencedTripIds.has(trip.id) ? sum + (trip.budget ?? 0) : sum,
-      0,
-    );
-  }, [filteredExpenses, tripFilter, trips]);
-
-  const budgetRemaining =
-    activeBudget > 0 ? Math.max(0, activeBudget - totalSpent) : 0;
-
   const recentExpenses = useMemo(
     () =>
       [...filteredExpenses]
