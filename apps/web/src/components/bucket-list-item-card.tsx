@@ -1,4 +1,11 @@
-import { Trash2, MapPin } from 'lucide-react';
+import {
+  Calendar,
+  DollarSign,
+  ImageOff,
+  MapPin,
+  Trash2,
+} from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,85 +26,166 @@ interface BucketListItemCardProps {
   item: BucketListItem;
 }
 
-const statusStyles: Record<BucketListItem['status'], string> = {
-  dreaming: 'bg-purple-50 text-purple-600',
-  planning: 'bg-blue-50 text-blue-600',
-  booked: 'bg-yellow-50 text-yellow-700',
-  visited: 'bg-green-50 text-green-600',
-  cancelled: 'bg-red-50 text-red-600',
+const STATUS_STYLES: Record<BucketListItem['status'], string> = {
+  dreaming:
+    'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300',
+  planning:
+    'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
+  booked:
+    'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300',
+  visited:
+    'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300',
+  cancelled:
+    'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
 };
 
-export function BucketListItemCard({ item }: BucketListItemCardProps) {
+const STATUS_LABELS: Record<BucketListItem['status'], string> = {
+  dreaming: 'Dreaming',
+  planning: 'Planning',
+  booked: 'Booked',
+  visited: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+function formatCategory(category: string) {
+  return category.replace(/_/g, ' ');
+}
+
+function formatBudget(budget: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(budget);
+}
+
+export function BucketListItemCard({
+  item,
+}: BucketListItemCardProps) {
   const { mutate: deleteItem, isPending: isDeleting } =
     useDeleteBucketListItem();
-  const { mutate: updateItem } = useUpdateBucketListItem();
+
+  const { mutate: updateItem, isPending: isUpdating } =
+    useUpdateBucketListItem();
+
+  const handleStatusChange = (status: BucketListItem['status']) => {
+    if (status === item.status) {
+      return;
+    }
+
+    updateItem({
+      id: item.id,
+      status,
+    });
+  };
 
   return (
-    <div className="border rounded-lg p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="font-medium truncate">{item.name}</p>
-          <p className="text-xs text-gray-400 capitalize mt-0.5">
-            {item.category.replace(/_/g, ' ')}
-          </p>
+    <article className="group overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md">
+      {item.coverImageUrl ? (
+        <div className="relative aspect-video overflow-hidden bg-muted">
+          <img
+            src={item.coverImageUrl}
+            alt={item.name}
+            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 shrink-0"
-          disabled={isDeleting}
-          onClick={() => deleteItem(item.id)}
-        >
-          <Trash2 className="h-4 w-4 text-gray-400" />
-        </Button>
-      </div>
-
-      {item.notes && (
-        <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-          {item.notes}
-        </p>
+      ) : (
+        <div className="flex aspect-video items-center justify-center bg-muted text-muted-foreground">
+          <ImageOff className="size-8" aria-hidden="true" />
+        </div>
       )}
 
-      {item.placeId && (
-        <p className="text-xs text-gray-400 flex items-center gap-1 mt-2">
-          <MapPin className="h-3 w-3 shrink-0" />
-          Linked to a place
-        </p>
-      )}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate font-semibold">{item.name}</h3>
 
-      <div className="mt-3">
-        <Select
-          value={item.status}
-          onValueChange={(value) =>
-            updateItem({
-              id: item.id,
-              status: value as BucketListItem['status'],
-            })
-          }
-        >
-          <SelectTrigger className="w-full h-9">
-            <SelectValue>
-              <Badge
-                className={statusStyles[item.status]}
-                variant="secondary"
-              >
-                {item.status}
-              </Badge>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {BUCKET_LIST_STATUSES.map((status) => (
-              <SelectItem
-                key={status}
-                value={status}
-                className="capitalize py-2.5 md:py-1.5"
-              >
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <p className="mt-1 truncate text-sm text-muted-foreground capitalize">
+              {item.country || formatCategory(item.category)}
+            </p>
+          </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+            disabled={isDeleting}
+            onClick={() => deleteItem(item.id)}
+            aria-label={`Delete ${item.name}`}
+          >
+            <Trash2 className="size-4" aria-hidden="true" />
+          </Button>
+        </div>
+
+        {item.notes && (
+          <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
+            {item.notes}
+          </p>
+        )}
+
+        {(item.targetYear ||
+          typeof item.estimatedBudget === 'number' ||
+          item.placeId) && (
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
+            {item.targetYear && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="size-3.5" aria-hidden="true" />
+                <span>{item.targetYear}</span>
+              </div>
+            )}
+
+            {typeof item.estimatedBudget === 'number' && (
+              <div className="flex items-center gap-1.5">
+                <DollarSign className="size-3.5" aria-hidden="true" />
+                <span>{formatBudget(item.estimatedBudget)}</span>
+              </div>
+            )}
+
+            {item.placeId && (
+              <div className="flex items-center gap-1.5">
+                <MapPin className="size-3.5" aria-hidden="true" />
+                <span>Linked place</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-4">
+          <Select
+            value={item.status}
+            onValueChange={handleStatusChange}
+            disabled={isUpdating}
+          >
+            <SelectTrigger
+              className="h-9 w-full"
+              aria-label={`Status for ${item.name}`}
+            >
+              <SelectValue>
+                <Badge
+                  variant="outline"
+                  className={STATUS_STYLES[item.status]}
+                >
+                  {STATUS_LABELS[item.status]}
+                </Badge>
+              </SelectValue>
+            </SelectTrigger>
+
+            <SelectContent>
+              {BUCKET_LIST_STATUSES.map((status) => (
+                <SelectItem
+                  key={status}
+                  value={status}
+                  className="capitalize"
+                >
+                  {STATUS_LABELS[status]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }

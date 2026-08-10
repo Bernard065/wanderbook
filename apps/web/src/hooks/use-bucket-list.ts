@@ -1,7 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/api-client';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+
 import type { BucketListCategory } from '@/constants/bucket-list-categories';
 import type { BucketListStatus } from '@/constants/bucket-list-statuses';
+import { apiRequest } from '@/lib/api-client';
+
+export type BucketListPriority =
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'must_have';
 
 export interface BucketListItem {
   id: string;
@@ -9,6 +20,11 @@ export interface BucketListItem {
   category: BucketListCategory;
   status: BucketListStatus;
   notes: string | null;
+  coverImageUrl: string | null;
+  country: string | null;
+  priority: BucketListPriority | null;
+  targetYear: number | null;
+  estimatedBudget: number | null;
   placeId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -19,15 +35,39 @@ export interface CreateBucketListItemInput {
   category: BucketListCategory;
   status: BucketListStatus;
   notes?: string;
+  coverImageUrl?: string;
+  country?: string;
+  priority?: BucketListPriority;
+  targetYear?: number;
+  estimatedBudget?: number;
   placeId?: string;
 }
 
-const BUCKET_LIST_KEY = ['bucket-list'];
+export type UpdateBucketListItemInput =
+  Partial<Omit<CreateBucketListItemInput, 'name'>> & {
+    id: string;
+    name?: string;
+  };
+
+export const bucketListKeys = {
+  all: ['bucket-list'] as const,
+
+  lists: () => [...bucketListKeys.all, 'list'] as const,
+
+  list: () => bucketListKeys.lists(),
+
+  details: () => [...bucketListKeys.all, 'detail'] as const,
+
+  detail: (id: string) =>
+    [...bucketListKeys.details(), id] as const,
+};
 
 export function useBucketList() {
   return useQuery({
-    queryKey: BUCKET_LIST_KEY,
-    queryFn: () => apiRequest<BucketListItem[]>('/bucket-list'),
+    queryKey: bucketListKeys.list(),
+
+    queryFn: () =>
+      apiRequest<BucketListItem[]>('/bucket-list'),
   });
 }
 
@@ -40,8 +80,16 @@ export function useCreateBucketListItem() {
         method: 'POST',
         body: JSON.stringify(input),
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: BUCKET_LIST_KEY });
+
+    onSuccess: (createdItem) => {
+      queryClient.setQueryData<BucketListItem>(
+        bucketListKeys.detail(createdItem.id),
+        createdItem,
+      );
+
+      void queryClient.invalidateQueries({
+        queryKey: bucketListKeys.lists(),
+      });
     },
   });
 }
@@ -53,13 +101,24 @@ export function useUpdateBucketListItem() {
     mutationFn: ({
       id,
       ...input
-    }: Partial<CreateBucketListItemInput> & { id: string }) =>
-      apiRequest<BucketListItem>(`/bucket-list/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(input),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: BUCKET_LIST_KEY });
+    }: UpdateBucketListItemInput) =>
+      apiRequest<BucketListItem>(
+        `/bucket-list/${id}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(input),
+        },
+      ),
+
+    onSuccess: (updatedItem) => {
+      queryClient.setQueryData<BucketListItem>(
+        bucketListKeys.detail(updatedItem.id),
+        updatedItem,
+      );
+
+      void queryClient.invalidateQueries({
+        queryKey: bucketListKeys.lists(),
+      });
     },
   });
 }
@@ -69,10 +128,18 @@ export function useDeleteBucketListItem() {
 
   return useMutation({
     mutationFn: (id: string) =>
-      apiRequest<void>(`/bucket-list/${id}`, { method: 'DELETE' }),
+      apiRequest<void>(`/bucket-list/${id}`, {
+        method: 'DELETE',
+      }),
+
     onSuccess: (_data, id) => {
-      queryClient.removeQueries({ queryKey: ['bucket-list', id] });
-      queryClient.invalidateQueries({ queryKey: BUCKET_LIST_KEY });
+      queryClient.removeQueries({
+        queryKey: bucketListKeys.detail(id),
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: bucketListKeys.lists(),
+      });
     },
   });
 }
