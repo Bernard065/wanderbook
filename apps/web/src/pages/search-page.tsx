@@ -1,12 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import {
-  BookOpen,
-  Bookmark,
-  Camera,
-  Luggage,
-  MapPin,
-} from 'lucide-react';
+import { BookOpen, Bookmark, Camera, Luggage, MapPin } from 'lucide-react';
 
 import { PlaceCard } from '@/components/place-card';
 import { TripCard } from '@/components/trip-card';
@@ -16,8 +10,7 @@ import { useSearch, type SearchResults } from '@/hooks/use-search';
 
 const SEARCH_SUGGESTIONS = ['beach', 'summer', 'family', 'hotel'];
 
-const CARD_GRID_CLASS =
-  'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3';
+const CARD_GRID_CLASS = 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3';
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
@@ -46,15 +39,13 @@ export function SearchPage() {
 
   const { data, isLoading, error } = useSearch(query);
 
-  const results = data ?? EMPTY_RESULTS;
-
   const {
-    places,
-    trips,
-    journalEntries,
-    memories,
-    bucketListItems,
-  } = results;
+    places = [],
+    trips = [],
+    journalEntries = [],
+    memories = [],
+    bucketListItems = [],
+  } = data ?? EMPTY_RESULTS;
 
   const totalResults = useMemo(
     () =>
@@ -175,11 +166,7 @@ export function SearchPage() {
       {!isLoading && !error && totalResults > 0 && (
         <div className="grid gap-8">
           {places.length > 0 && (
-            <SearchSection
-              icon={MapPin}
-              title="Places"
-              count={places.length}
-            >
+            <SearchSection icon={MapPin} title="Places" count={places.length}>
               <div className={CARD_GRID_CLASS}>
                 {places.map((place) => (
                   <PlaceCard key={place.id} place={place} />
@@ -189,11 +176,7 @@ export function SearchPage() {
           )}
 
           {trips.length > 0 && (
-            <SearchSection
-              icon={Luggage}
-              title="Trips"
-              count={trips.length}
-            >
+            <SearchSection icon={Luggage} title="Trips" count={trips.length}>
               <div className={CARD_GRID_CLASS}>
                 {trips.map((trip) => (
                   <TripCard key={trip.id} trip={trip} />
@@ -270,15 +253,11 @@ export function SearchPage() {
                           dateTime={photo.createdAt}
                           className="mt-1 text-xs text-slate-500"
                         >
-                          {dateFormatter.format(
-                            new Date(photo.createdAt),
-                          )}
+                          {dateFormatter.format(new Date(photo.createdAt))}
                         </time>
 
                         <p className="mt-2 text-xs font-medium text-blue-600">
-                          {photo.placeId
-                            ? 'Open memory →'
-                            : 'Gallery photo'}
+                          {photo.placeId ? 'Open memory →' : 'Gallery photo'}
                         </p>
                       </div>
                     </div>
@@ -325,9 +304,7 @@ export function SearchPage() {
                     to="/bucket-list"
                     className="block rounded-xl border border-slate-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <h3 className="font-medium text-slate-900">
-                      {item.name}
-                    </h3>
+                    <h3 className="font-medium text-slate-900">{item.name}</h3>
 
                     <p className="mt-1 text-sm capitalize text-slate-500">
                       {item.category.replace(/_/g, ' ')}

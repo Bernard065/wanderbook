@@ -61,11 +61,11 @@ export function SearchDropdown({
   const { data, isFetching, isError } = useSearch(debouncedQuery);
 
   const {
-    places,
-    trips,
-    journalEntries,
-    memories,
-    bucketListItems,
+    places = [],
+    trips = [],
+    journalEntries = [],
+    memories = [],
+    bucketListItems = [],
   } = data ?? EMPTY_SEARCH_RESULTS;
 
   const totalResults =
@@ -144,8 +144,7 @@ export function SearchDropdown({
 
   const showDropdown = focused && trimmedQuery.length > 0;
   const isStaleQuery = debouncedQuery !== query;
-  const showLoadingSkeletons =
-    isFetching && trimmedQuery.length > 0;
+  const showLoadingSkeletons = isFetching && trimmedQuery.length > 0;
 
   useEffect(() => {
     setActiveIndex((current) => {
@@ -166,9 +165,11 @@ export function SearchDropdown({
       `[data-index="${activeIndex}"]`,
     );
 
-    activeElement?.scrollIntoView({
-      block: 'nearest',
-    });
+    if (typeof activeElement?.scrollIntoView === 'function') {
+      activeElement.scrollIntoView({
+        block: 'nearest',
+      });
+    }
   }, [activeIndex]);
 
   const closeDropdown = () => {
@@ -198,9 +199,7 @@ export function SearchDropdown({
     closeDropdown();
   };
 
-  const handleKeyDown = (
-    event: KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case 'Escape': {
         if (query) {
@@ -220,9 +219,7 @@ export function SearchDropdown({
 
         event.preventDefault();
 
-        setActiveIndex(
-          (current) => (current + 1) % flatResults.length,
-        );
+        setActiveIndex((current) => (current + 1) % flatResults.length);
 
         return;
       }
@@ -235,9 +232,7 @@ export function SearchDropdown({
         event.preventDefault();
 
         setActiveIndex((current) =>
-          current <= 0
-            ? flatResults.length - 1
-            : current - 1,
+          current <= 0 ? flatResults.length - 1 : current - 1,
         );
 
         return;
@@ -266,10 +261,7 @@ export function SearchDropdown({
       }
 
       case 'Enter': {
-        if (
-          activeIndex >= 0 &&
-          flatResults[activeIndex]
-        ) {
+        if (activeIndex >= 0 && flatResults[activeIndex]) {
           event.preventDefault();
           goToResult(flatResults[activeIndex].path);
         }
@@ -287,18 +279,13 @@ export function SearchDropdown({
       ? `search-option-${flatResults[activeIndex].id}`
       : undefined;
 
-  const handleInputBlur = (
-    event: React.FocusEvent<HTMLInputElement>,
-  ) => {
+  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     const nextFocusTarget =
-      event.relatedTarget instanceof HTMLElement
-        ? event.relatedTarget
-        : null;
+      event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
 
-    const isMovingWithinDropdown =
-      nextFocusTarget?.closest(
-        '[data-search-dropdown-root]',
-      );
+    const isMovingWithinDropdown = nextFocusTarget?.closest(
+      '[data-search-dropdown-root]',
+    );
 
     if (isMovingWithinDropdown) {
       return;
@@ -320,10 +307,7 @@ export function SearchDropdown({
         onSubmit={(event) => {
           event.preventDefault();
 
-          if (
-            activeIndex >= 0 &&
-            flatResults[activeIndex]
-          ) {
+          if (activeIndex >= 0 && flatResults[activeIndex]) {
             goToResult(flatResults[activeIndex].path);
             return;
           }
@@ -389,11 +373,7 @@ export function SearchDropdown({
           className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-md border bg-white shadow-lg sm:max-h-80"
         >
           {showLoadingSkeletons && (
-            <div
-              className="px-4 py-3"
-              role="status"
-              aria-live="polite"
-            >
+            <div className="px-4 py-3" role="status" aria-live="polite">
               <div className="mb-3 text-sm text-gray-400">
                 Searching for "{trimmedQuery}"...
               </div>
@@ -401,63 +381,47 @@ export function SearchDropdown({
               <div className="mb-3 h-2.5 w-32 animate-pulse rounded bg-slate-200" />
 
               <div className="space-y-2">
-                {Array.from({ length: 3 }).map(
-                  (_, index) => (
-                    <div
-                      key={`skeleton-${index}`}
-                      data-testid="search-skeleton"
-                      className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2"
-                    >
-                      <div className="h-4 w-4 animate-pulse rounded-full bg-slate-200" />
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`skeleton-${index}`}
+                    data-testid="search-skeleton"
+                    className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2"
+                  >
+                    <div className="h-4 w-4 animate-pulse rounded-full bg-slate-200" />
 
-                      <div className="h-3 flex-1 animate-pulse rounded bg-slate-200" />
-                    </div>
-                  ),
-                )}
+                    <div className="h-3 flex-1 animate-pulse rounded bg-slate-200" />
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {isError && !isFetching && (
-            <div
-              className="px-4 py-3 text-sm text-red-600"
-              role="alert"
-            >
-              Something went wrong while searching. Please
-              try again.
+            <div className="px-4 py-3 text-sm text-red-600" role="alert">
+              Something went wrong while searching. Please try again.
             </div>
           )}
 
-          {!isFetching &&
-            !isError &&
-            totalResults > 0 && (
-              <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
-                {resultsSummary.map((item) => (
-                  <span
-                    key={item.label}
-                    className="truncate"
-                  >
-                    {item.label}: {item.count}
-                  </span>
-                ))}
-              </div>
-            )}
+          {!isFetching && !isError && totalResults > 0 && (
+            <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
+              {resultsSummary.map((item) => (
+                <span key={item.label} className="truncate">
+                  {item.label}: {item.count}
+                </span>
+              ))}
+            </div>
+          )}
 
-          {!isFetching &&
-            !isError &&
-            !isStaleQuery &&
-            totalResults === 0 && (
-              <div className="px-4 py-3 text-sm text-gray-500">
-                <p className="font-medium text-slate-700">
-                  No results found
-                </p>
+          {!isFetching && !isError && !isStaleQuery && totalResults === 0 && (
+            <div className="px-4 py-3 text-sm text-gray-500">
+              <p className="font-medium text-slate-700">No results found</p>
 
-                <p className="mt-1 text-gray-500">
-                  Try a broader term or search for places,
-                  trips, journal entries, or photos.
-                </p>
-              </div>
-            )}
+              <p className="mt-1 text-gray-500">
+                Try a broader term or search for places, trips, journal entries,
+                or photos.
+              </p>
+            </div>
+          )}
 
           {!isFetching &&
             !isError &&
@@ -481,21 +445,18 @@ export function SearchDropdown({
               />
             ))}
 
-          {!isFetching &&
-            !isError &&
-            totalResults > 0 && (
-              <button
-                type="button"
-                className="w-full border-t px-4 py-3 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 md:py-2.5"
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  goToResults();
-                }}
-              >
-                See all {totalResults} results for "
-                {trimmedQuery}"
-              </button>
-            )}
+          {!isFetching && !isError && totalResults > 0 && (
+            <button
+              type="button"
+              className="w-full border-t px-4 py-3 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 md:py-2.5"
+              onMouseDown={(event) => {
+                event.preventDefault();
+                goToResults();
+              }}
+            >
+              See all {totalResults} results for "{trimmedQuery}"
+            </button>
+          )}
         </div>
       )}
     </div>

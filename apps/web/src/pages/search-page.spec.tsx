@@ -31,7 +31,7 @@ describe('SearchPage', () => {
     expect(screen.getByRole('heading', { name: 'Search' })).toBeTruthy();
     expect(
       screen.getByText(
-        /Search your places, trips, journal entries, and photos./,
+        /Search your places, trips, journal entries, memories, and bucket list items./,
       ),
     ).toBeTruthy();
   });
@@ -42,7 +42,7 @@ describe('SearchPage', () => {
         places: [],
         trips: [],
         journalEntries: [],
-        photos: [
+        memories: [
           {
             id: 'photo-1',
             placeId: 'place-1',
@@ -51,6 +51,7 @@ describe('SearchPage', () => {
             createdAt: '2026-08-07T00:00:00Z',
           },
         ],
+        bucketListItems: [],
       },
       isLoading: false,
       error: null,
@@ -69,7 +70,7 @@ describe('SearchPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Search results' }),
     ).toBeTruthy();
-    expect(screen.getByText('Photos')).toBeTruthy();
+    expect(screen.getByText('Memories')).toBeTruthy();
     expect(screen.getByAltText('Photo: Beach sunset')).toBeTruthy();
   });
 });
