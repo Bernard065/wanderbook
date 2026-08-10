@@ -1,17 +1,7 @@
 import { Link } from 'react-router';
 import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Calendar,
-  Layers,
-  MapPin,
-  Sparkles,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, Layers, MapPin, Sparkles, DollarSign } from 'lucide-react';
 import type { Trip } from '@org/types';
 
 interface TripCardProps {
@@ -39,32 +29,21 @@ function formatDate(dateString?: string | null): string | null {
 
   const date = new Date(dateString);
 
-  return Number.isNaN(date.getTime())
-    ? null
-    : formatter.format(date);
+  return Number.isNaN(date.getTime()) ? null : formatter.format(date);
 }
 
-function getDuration(
-  start?: string | null,
-  end?: string | null,
-): string {
+function getDuration(start?: string | null, end?: string | null): string {
   if (!start || !end) return 'TBD';
 
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  if (
-    Number.isNaN(startDate.getTime()) ||
-    Number.isNaN(endDate.getTime())
-  ) {
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
     return 'TBD';
   }
 
   const difference = endDate.getTime() - startDate.getTime();
-  const days = Math.max(
-    1,
-    Math.round(difference / 86_400_000) + 1,
-  );
+  const days = Math.max(1, Math.round(difference / 86_400_000) + 1);
 
   return `${days} day${days === 1 ? '' : 's'}`;
 }
@@ -80,9 +59,7 @@ export function TripCard({
   const locationLabel =
     destination ??
     (place
-      ? [place.city, place.country]
-          .filter(Boolean)
-          .join(', ')
+      ? [place.city, place.country].filter(Boolean).join(', ')
       : 'Unknown destination');
 
   const startLabel = formatDate(trip.startDate);
@@ -93,10 +70,7 @@ export function TripCard({
       ? `${startLabel ?? '?'} – ${endLabel ?? '?'}`
       : 'Dates TBD';
 
-  const durationLabel = getDuration(
-    trip.startDate,
-    trip.endDate,
-  );
+  const durationLabel = getDuration(trip.startDate, trip.endDate);
 
   return (
     <Link
@@ -123,74 +97,59 @@ export function TripCard({
           )}
 
           <div className="absolute right-3 top-3">
-            <Badge
-              className={statusStyles[trip.status]}
-              variant="secondary"
-            >
+            <Badge className={statusStyles[trip.status]} variant="secondary">
               {trip.status}
             </Badge>
           </div>
         </div>
 
         <CardHeader className="px-4 pb-2 pt-4">
-          <CardTitle className="line-clamp-1 text-lg">
-            {trip.name}
-          </CardTitle>
+          <CardTitle className="line-clamp-1 text-lg">{trip.name}</CardTitle>
         </CardHeader>
 
         <CardContent className="px-4 pb-4 pt-0">
           <div className="space-y-2 text-sm text-slate-500">
             <div className="flex items-center gap-2">
-              <MapPin
-                className="h-4 w-4 shrink-0"
-                aria-hidden="true"
-              />
-              <span className="truncate">
-                {locationLabel}
-              </span>
+              <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="truncate">{locationLabel}</span>
             </div>
 
             <div className="flex items-center gap-2">
-              <Calendar
-                className="h-4 w-4 shrink-0"
-                aria-hidden="true"
-              />
+              <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{dateLabel}</span>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-2 text-sm text-slate-500 sm:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-2 text-sm text-slate-500 sm:grid-cols-4">
             <div className="inline-flex items-center gap-2">
-              <Calendar
-                className="h-4 w-4 shrink-0"
-                aria-hidden="true"
-              />
+              <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{durationLabel}</span>
             </div>
 
             <div className="inline-flex items-center gap-2">
-              <Layers
-                className="h-4 w-4 shrink-0"
-                aria-hidden="true"
-              />
+              <Layers className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>
                 {trip.places.length}{' '}
-                {trip.places.length === 1
-                  ? 'place'
-                  : 'places'}
+                {trip.places.length === 1 ? 'place' : 'places'}
               </span>
             </div>
 
             <div className="inline-flex items-center gap-2">
-              <Sparkles
-                className="h-4 w-4 shrink-0"
-                aria-hidden="true"
-              />
+              <DollarSign className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>
-                {memoriesCount}{' '}
-                {memoriesCount === 1
-                  ? 'memory'
-                  : 'memories'}
+                {trip.budget != null
+                  ? new Intl.NumberFormat(undefined, {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(trip.budget)
+                  : 'No budget'}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-2">
+              <Sparkles className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>
+                {memoriesCount} {memoriesCount === 1 ? 'memory' : 'memories'}
               </span>
             </div>
           </div>

@@ -6,6 +6,13 @@ export const tripSchema = z.object({
   description: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+  budget: z
+    .string()
+    .optional()
+    .refine(
+      (value) => !value || /^\d+(\.\d{1,2})?$/.test(value),
+      'Enter a valid budget amount',
+    ),
   status: z.enum(TRIP_STATUSES),
   placeIds: z.array(z.string()).min(1, 'Select at least one place'),
 });

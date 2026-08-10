@@ -54,6 +54,7 @@ const emptyValues: TripFormValues = {
   description: '',
   startDate: '',
   endDate: '',
+  budget: '',
   status: 'planning',
   placeIds: [],
 };
@@ -64,6 +65,7 @@ const tripToFormValues = (trip: Trip): TripFormValues => {
     description: trip.description ?? '',
     startDate: trip.startDate ?? '',
     endDate: trip.endDate ?? '',
+    budget: trip.budget?.toString() ?? '',
     status: trip.status,
     placeIds: trip.places.map((p) => p.id),
   };
@@ -113,6 +115,12 @@ export function AddTripDialog({
       description: values.description || undefined,
       startDate: values.startDate || undefined,
       endDate: values.endDate || undefined,
+      budget:
+        values.budget === ''
+          ? null
+          : values.budget
+            ? parseFloat(values.budget)
+            : undefined,
       status: values.status,
       placeIds: values.placeIds,
     };
@@ -299,6 +307,26 @@ export function AddTripDialog({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="budget"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 2500"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

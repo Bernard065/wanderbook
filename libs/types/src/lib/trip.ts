@@ -8,6 +8,7 @@ export interface Trip {
   description?: string;
   startDate?: string;
   endDate?: string;
+  budget?: number;
   status: TripStatus;
   places: Place[];
   createdAt: string;

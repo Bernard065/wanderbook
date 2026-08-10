@@ -3,12 +3,26 @@
 # pylint: disable=no-member,unused-import
 
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
 
 from alembic import context
-from api.config import settings
-from api.database import Base, engine
-from api.models import (  # noqa: F401
+
+# Ensure the application package is importable when Alembic runs from apps/api
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+SRC_DIR = os.path.join(ROOT_DIR, "src")
+
+if SRC_DIR not in sys.path:
+    sys.path.insert(0, SRC_DIR)
+
+# These imports must come after sys.path is configured.
+from api.config import settings  # noqa: E402  # pylint: disable=wrong-import-position
+from api.database import (  # noqa: E402  # pylint: disable=wrong-import-position
+    Base,
+    engine,
+)
+from api.models import (  # noqa: E402, F401  # pylint: disable=wrong-import-position
     BucketListItemModel,
     DocumentModel,
     ExpenseModel,
@@ -39,6 +53,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
     )
 
     with context.begin_transaction():
@@ -50,6 +65,7 @@ def do_run_migrations(connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
+        compare_type=True,
     )
 
     with context.begin_transaction():

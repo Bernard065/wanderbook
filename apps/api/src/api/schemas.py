@@ -112,6 +112,7 @@ class TripCreate(CamelModel):
     description: str | None = None
     start_date: date | None = None
     end_date: date | None = None
+    budget: float | None = None
     status: TripStatusLiteral = "planning"
     place_ids: list[str] = []
 
@@ -123,6 +124,7 @@ class TripUpdate(CamelModel):
     description: str | None = None
     start_date: date | None = None
     end_date: date | None = None
+    budget: float | None = None
     status: TripStatusLiteral | None = None
     place_ids: list[str] | None = None
 
@@ -135,6 +137,7 @@ class TripRead(CamelModel):
     description: str | None
     start_date: date | None
     end_date: date | None
+    budget: float | None
     status: str
     places: list[PlaceRead]
     created_at: datetime

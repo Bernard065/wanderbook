@@ -88,6 +88,7 @@ class TripModel(Base):
     start_date: Mapped[date | None] = mapped_column(nullable=True)
     end_date: Mapped[date | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(String, default="planning")
+    budget: Mapped[float | None] = mapped_column(nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

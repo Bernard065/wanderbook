@@ -51,7 +51,12 @@ export function useCreateExpense() {
         method: 'POST',
         body: JSON.stringify(input),
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueriesData<Expense[]>(['expenses'], (old) => {
+        if (!old) return [data];
+        if (old.some((expense) => expense.id === data.id)) return old;
+        return [data, ...old];
+      });
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
     },
   });

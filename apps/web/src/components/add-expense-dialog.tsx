@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -31,6 +31,9 @@ import {
 } from '@/components/ui/select';
 import { EXPENSE_CATEGORIES } from '@/constants/expense-categories';
 import { useCreateExpense } from '@/hooks/use-expenses';
+import { usePlaces } from '@/hooks/use-places';
+import { useTrips } from '@/hooks/use-trips';
+import { showToast, showErrorToast } from '@/lib/toast';
 import {
   extractMessageString,
   extractJsonFromMessage,
@@ -46,10 +49,14 @@ interface AddExpenseDialogProps {
   tripId?: string;
 }
 
+const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'] as const;
+
 const defaultValues: ExpenseFormValues = {
   amount: '',
   currency: 'USD',
   category: 'other',
+  placeId: undefined,
+  tripId: undefined,
   notes: '',
   expenseDate: new Date().toISOString().slice(0, 10),
 };
@@ -60,18 +67,30 @@ export function AddExpenseDialog({
   tripId,
 }: AddExpenseDialogProps) {
   const [open, setOpen] = useState(false);
+  const { data: places } = usePlaces();
+  const { data: trips } = useTrips();
   const { mutate, isPending, error } = useCreateExpense();
+
+  const initialValues = useMemo(
+    () => ({
+      ...defaultValues,
+      placeId: placeId ?? '',
+      tripId: tripId ?? '',
+    }),
+    [placeId, tripId],
+  );
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
-    defaultValues,
+    defaultValues: initialValues,
+    mode: 'onChange',
   });
 
   function onSubmit(values: ExpenseFormValues) {
     mutate(
       {
-        placeId,
-        tripId,
+        placeId: (placeId ?? values.placeId) || undefined,
+        tripId: (tripId ?? values.tripId) || undefined,
         amount: parseFloat(values.amount),
         currency: values.currency,
         category: values.category,
@@ -80,8 +99,9 @@ export function AddExpenseDialog({
       },
       {
         onSuccess: () => {
-          form.reset(defaultValues);
+          form.reset(initialValues);
           setOpen(false);
+          showToast('Expense saved.');
         },
         onError: (err: unknown) => {
           const msg = extractMessageString(err);
@@ -98,6 +118,8 @@ export function AddExpenseDialog({
                 // ignore
               }
             });
+          } else {
+            showErrorToast('Failed to save expense.');
           }
         },
       },
@@ -128,12 +150,20 @@ export function AddExpenseDialog({
                   <FormItem>
                     <FormLabel>Amount</FormLabel>
                     <FormControl>
-                      <Input placeholder="0.00" {...field} />
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputMode="decimal"
+                        placeholder="0.00"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="currency"
@@ -141,13 +171,103 @@ export function AddExpenseDialog({
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
                     <FormControl>
-                      <Input placeholder="USD" {...field} />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full h-9">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {CURRENCY_OPTIONS.map((currency) => (
+                            <SelectItem key={currency} value={currency}>
+                              {currency}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
+            {!placeId && (
+              <FormField
+                control={form.control}
+                name="placeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Place</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full h-9">
+                            <SelectValue placeholder="Select a place" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {places?.length === 0 && (
+                            <p className="px-3 py-2 text-sm text-gray-400">
+                              No places available.
+                            </p>
+                          )}
+                          {places?.map((place) => (
+                            <SelectItem key={place.id} value={place.id}>
+                              {place.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {!tripId && (
+              <FormField
+                control={form.control}
+                name="tripId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trip</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full h-9">
+                            <SelectValue placeholder="Select a trip" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {trips?.length === 0 && (
+                            <p className="px-3 py-2 text-sm text-gray-400">
+                              No trips available.
+                            </p>
+                          )}
+                          {trips?.map((trip) => (
+                            <SelectItem key={trip.id} value={trip.id}>
+                              {trip.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}

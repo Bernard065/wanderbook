@@ -85,20 +85,14 @@ async def list_shared_trips(db: DbSession, current_user: CurrentUser):
     return result.scalars().all()
 
 
-@router.get(
-    "/{trip_id}", response_model=TripRead, response_model_by_alias=True
-)
+@router.get("/{trip_id}", response_model=TripRead, response_model_by_alias=True)
 async def get_trip(trip_id: str, db: DbSession, current_user: CurrentUser):
     """Get a single trip, if owned by or shared with the current user."""
     return await _get_viewable_trip(db, current_user, trip_id)
 
 
-@router.post(
-    "", response_model=TripRead, status_code=201, response_model_by_alias=True
-)
-async def create_trip(
-    payload: TripCreate, db: DbSession, current_user: CurrentUser
-):
+@router.post("", response_model=TripRead, status_code=201, response_model_by_alias=True)
+async def create_trip(payload: TripCreate, db: DbSession, current_user: CurrentUser):
     """Create a new trip owned by the current user."""
     places = await _get_places_by_ids(db, current_user, payload.place_ids)
 
@@ -107,6 +101,7 @@ async def create_trip(
         description=payload.description,
         start_date=payload.start_date,
         end_date=payload.end_date,
+        budget=payload.budget,
         status=payload.status,
         user_id=current_user.id,
         places=places,
@@ -117,9 +112,7 @@ async def create_trip(
     return trip
 
 
-@router.patch(
-    "/{trip_id}", response_model=TripRead, response_model_by_alias=True
-)
+@router.patch("/{trip_id}", response_model=TripRead, response_model_by_alias=True)
 async def update_trip(
     trip_id: str,
     payload: TripUpdate,
@@ -136,16 +129,12 @@ async def update_trip(
     if trip is None or trip.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Trip not found")
 
-    update_data = payload.model_dump(
-        exclude_unset=True, exclude={"place_ids"}
-    )
+    update_data = payload.model_dump(exclude_unset=True, exclude={"place_ids"})
     for field, value in update_data.items():
         setattr(trip, field, value)
 
     if payload.place_ids is not None:
-        trip.places = await _get_places_by_ids(
-            db, current_user, payload.place_ids
-        )
+        trip.places = await _get_places_by_ids(db, current_user, payload.place_ids)
 
     await db.commit()
     await db.refresh(trip, attribute_names=["places"])
@@ -168,9 +157,7 @@ async def delete_trip(trip_id: str, db: DbSession, current_user: CurrentUser):
     response_model=list[TripShareRead],
     response_model_by_alias=True,
 )
-async def list_trip_shares(
-    trip_id: str, db: DbSession, current_user: CurrentUser
-):
+async def list_trip_shares(trip_id: str, db: DbSession, current_user: CurrentUser):
     """List who a trip is shared with. Only the owner may view this."""
     trip = await db.get(TripModel, trip_id)
     if trip is None or trip.user_id != current_user.id:
@@ -195,9 +182,7 @@ async def list_trip_shares(
     return reads
 
 
-@router.post(
-    "/{trip_id}/shares", status_code=201, response_model=TripShareRead
-)
+@router.post("/{trip_id}/shares", status_code=201, response_model=TripShareRead)
 async def share_trip(
     trip_id: str,
     payload: TripShareCreate,
@@ -222,9 +207,7 @@ async def share_trip(
             status_code=409, detail="Trip already shared with this user"
         )
 
-    share = TripShareModel(
-        trip_id=trip_id, shared_with_user_id=payload.user_id
-    )
+    share = TripShareModel(trip_id=trip_id, shared_with_user_id=payload.user_id)
     db.add(share)
     await db.commit()
 

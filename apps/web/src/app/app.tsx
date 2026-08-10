@@ -13,6 +13,7 @@ import { TimelinePage } from '@/pages/timeline-page';
 import { LoginPage } from '@/pages/login-page';
 import { RegisterPage } from '@/pages/register-page';
 import { GalleryPage } from '@/pages/gallery-page';
+import { ExpensesPage } from '@/pages/expenses-page';
 import { DocumentsPage } from '@/pages/documents-page';
 import { MapPage } from '@/pages/map-page';
 import { AchievementsPage } from '@/pages/achievements-page';
@@ -39,6 +40,7 @@ export function App() {
           <Route path="/bucket-list" element={<BucketListPage />} />
           <Route path="/timeline" element={<TimelinePage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />

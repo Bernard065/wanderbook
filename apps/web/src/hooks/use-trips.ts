@@ -24,6 +24,7 @@ export interface CreateTripInput {
   description?: string;
   startDate?: string;
   endDate?: string;
+  budget?: number;
   status: TripStatus;
   placeIds: string[];
 }
@@ -47,10 +48,7 @@ export function useUpdateTrip() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      ...input
-    }: Partial<CreateTripInput> & { id: string }) =>
+    mutationFn: ({ id, ...input }: Partial<CreateTripInput> & { id: string }) =>
       apiRequest<Trip>(`/trips/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(input),
