@@ -5,13 +5,13 @@ import { Edit2, Globe, Lock } from 'lucide-react';
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -35,7 +35,10 @@ import {
 import { ErrorMessage } from '@/components/ui/error-message';
 
 import { useTrips } from '@/hooks/use-trips';
-import { useUpdateJournalEntry } from '@/hooks/use-journal-entries';
+import {
+  useUpdateJournalEntry,
+  type JournalEntry,
+} from '@/hooks/use-journal-entries';
 import {
   journalEntrySchema,
   type JournalEntryFormValues,
@@ -44,7 +47,6 @@ import {
   extractMessageString,
   extractJsonFromMessage,
 } from '@/lib/error-utils';
-import type { JournalEntry } from '@/hooks/use-journal-entries';
 
 interface EditJournalEntryDialogProps {
   entry: JournalEntry;
@@ -63,9 +65,12 @@ const defaultValues: JournalEntryFormValues = {
   isPrivate: true,
 };
 
-export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
+export function EditJournalEntryDialog({
+  entry,
+}: EditJournalEntryDialogProps) {
   const [open, setOpen] = useState(false);
 
+  const { data: trips } = useTrips();
   const { mutate, isPending, error } = useUpdateJournalEntry();
 
   const form = useForm<JournalEntryFormValues>({
@@ -78,10 +83,10 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
     if (!open) return;
 
     form.reset({
-      title: entry.title,
-      content: entry.content,
+      title: entry.title ?? '',
+      content: entry.content ?? '',
       entryDate: entry.entryDate ?? '',
-      placeId: entry.placeId,
+      placeId: entry.placeId ?? '',
       tripId: entry.tripId ?? '',
       weather: entry.weather ?? '',
       tags: entry.tags?.join(', ') ?? '',
@@ -100,7 +105,12 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
         content: values.content,
         entryDate: values.entryDate || null,
         weather: values.weather || null,
-        tags: values.tags.length ? values.tags : null,
+        tags: values.tags
+          ? values.tags
+              .split(',')
+              .map((tag) => tag.trim())
+              .filter((tag) => tag.length > 0)
+          : null,
         coverUrl: values.coverUrl || null,
         mood: values.mood || undefined,
         isPrivate: values.isPrivate,
@@ -111,8 +121,8 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
           form.reset(values);
         },
         onError: (err: unknown) => {
-          const msg = extractMessageString(err);
-          const json = extractJsonFromMessage(msg);
+          const message = extractMessageString(err);
+          const json = extractJsonFromMessage(message);
 
           if (json && json.errors && typeof json.errors === 'object') {
             Object.entries(json.errors).forEach(([key, value]) => {
@@ -147,6 +157,7 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit entry</DialogTitle>
+
           <DialogDescription>
             Update the title, mood, privacy, or content of this journal entry.
           </DialogDescription>
@@ -164,9 +175,11 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date</FormLabel>
+
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -178,14 +191,22 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Trip</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(value === 'none' ? '' : value)
+                      }
+                      value={field.value || 'none'}
+                    >
                       <FormControl>
-                        <SelectTrigger className="w-full h-9">
+                        <SelectTrigger className="h-9 w-full">
                           <SelectValue placeholder="Select a trip" />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
-                        <SelectItem value="">No trip</SelectItem>
+                        <SelectItem value="none">No trip</SelectItem>
+
                         {trips?.map((trip) => (
                           <SelectItem key={trip.id} value={trip.id}>
                             {trip.name}
@@ -193,6 +214,7 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                         ))}
                       </SelectContent>
                     </Select>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -243,9 +265,14 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Weather</FormLabel>
+
                     <FormControl>
-                      <Input placeholder="Sunny, rainy, crisp" {...field} />
+                      <Input
+                        placeholder="Sunny, rainy, crisp"
+                        {...field}
+                      />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -278,12 +305,14 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
+
                     <FormControl>
                       <Input
                         placeholder="Separate tags with commas"
                         {...field}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -295,9 +324,11 @@ export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cover image URL</FormLabel>
+
                     <FormControl>
                       <Input placeholder="Paste an image URL" {...field} />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
