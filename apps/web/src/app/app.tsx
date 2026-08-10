@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { GuestRoute } from '@/components/auth/guest-route';
@@ -19,6 +19,7 @@ import { MapPage } from '@/pages/map-page';
 import { AchievementsPage } from '@/pages/achievements-page';
 import { FriendsPage } from '@/pages/friends-page';
 import { JournalPage } from '@/pages/journal-page';
+import { NotFoundPage } from '../pages/not-found-page';
 
 export function App() {
   return (
@@ -26,6 +27,7 @@ export function App() {
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
@@ -46,6 +48,7 @@ export function App() {
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/journal" element={<JournalPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
     </Routes>

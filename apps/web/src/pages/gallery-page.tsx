@@ -33,11 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-} from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
@@ -141,15 +137,13 @@ export function GalleryPage() {
       .sort((a, b) => {
         if (sortBy === 'newest') {
           return (
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
         }
 
         if (sortBy === 'oldest') {
           return (
-            new Date(a.createdAt).getTime() -
-            new Date(b.createdAt).getTime()
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
         }
 
@@ -168,8 +162,7 @@ export function GalleryPage() {
           }
 
           return (
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
         }
 
@@ -213,8 +206,7 @@ export function GalleryPage() {
   const hasPrevious = selectedMediaIndex > 0;
 
   const hasNext =
-    selectedMediaIndex >= 0 &&
-    selectedMediaIndex < filteredMedia.length - 1;
+    selectedMediaIndex >= 0 && selectedMediaIndex < filteredMedia.length - 1;
 
   const goPrevious = useCallback(() => {
     if (!hasPrevious || selectedMediaIndex < 1) return;
@@ -254,9 +246,9 @@ export function GalleryPage() {
     if (!selectedMedia) return;
 
     const nextId = hasNext
-      ? filteredMedia[selectedMediaIndex + 1]?.id ?? null
+      ? (filteredMedia[selectedMediaIndex + 1]?.id ?? null)
       : hasPrevious
-        ? filteredMedia[selectedMediaIndex - 1]?.id ?? null
+        ? (filteredMedia[selectedMediaIndex - 1]?.id ?? null)
         : null;
 
     deletePhoto(selectedMedia.id, {
@@ -283,9 +275,7 @@ export function GalleryPage() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
 
     const file = event.target.files?.[0];
@@ -293,9 +283,7 @@ export function GalleryPage() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setUploadError(
-        'Only photo uploads are supported in this gallery view.',
-      );
+      setUploadError('Only photo uploads are supported in this gallery view.');
       event.target.value = '';
       return;
     }
@@ -330,8 +318,7 @@ export function GalleryPage() {
     });
   };
 
-  const isEmptyState =
-    !isLoading && !error && filteredMedia.length === 0;
+  const isEmptyState = !isLoading && !error && filteredMedia.length === 0;
 
   const hasAnyItems = mediaItems.length > 0;
 
@@ -473,7 +460,7 @@ export function GalleryPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {Array.from({ length: 8 }).map((_, index) => (
             <div
-              key={index}
+              key={`skeleton-${index}`}
               className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
             >
               <div className="aspect-video animate-pulse bg-slate-100" />
@@ -521,8 +508,7 @@ export function GalleryPage() {
             const isFavorite = favoriteIds.has(item.id);
 
             const location =
-              placeNameById.get(item.placeId ?? '') ??
-              'Unknown location';
+              placeNameById.get(item.placeId ?? '') ?? 'Unknown location';
 
             const dateLabel = new Intl.DateTimeFormat(undefined, {
               dateStyle: 'medium',
@@ -578,9 +564,7 @@ export function GalleryPage() {
                 <button
                   type="button"
                   aria-label={
-                    isFavorite
-                      ? 'Remove from favorites'
-                      : 'Add to favorites'
+                    isFavorite ? 'Remove from favorites' : 'Add to favorites'
                   }
                   onClick={(event) => {
                     event.stopPropagation();
@@ -694,9 +678,8 @@ export function GalleryPage() {
                           <dt className="text-slate-400">Location</dt>
                           <dd className="mt-1 text-white">
                             {selectedMedia.placeId
-                              ? placeNameById.get(
-                                  selectedMedia.placeId,
-                                ) ?? 'Unknown place'
+                              ? (placeNameById.get(selectedMedia.placeId) ??
+                                'Unknown place')
                               : 'No related place'}
                           </dd>
                         </div>
@@ -712,17 +695,14 @@ export function GalleryPage() {
 
                         {selectedMedia.placeId ? (
                           <div>
-                            <dt className="text-slate-400">
-                              Related place
-                            </dt>
+                            <dt className="text-slate-400">Related place</dt>
                             <dd className="mt-1">
                               <Link
                                 to={`/places/${selectedMedia.placeId}`}
                                 className="font-medium text-blue-300 hover:underline"
                               >
-                                {placeNameById.get(
-                                  selectedMedia.placeId,
-                                ) ?? 'Open place'}
+                                {placeNameById.get(selectedMedia.placeId) ??
+                                  'Open place'}
                               </Link>
                             </dd>
                           </div>

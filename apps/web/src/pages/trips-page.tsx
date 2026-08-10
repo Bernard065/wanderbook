@@ -368,7 +368,7 @@ export function TripsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <div
-              key={index}
+              key={`skeleton-${index}`}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white"
             >
               <div className="aspect-video animate-pulse bg-slate-200" />

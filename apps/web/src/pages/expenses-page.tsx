@@ -484,7 +484,7 @@ export function ExpensesPage() {
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
-                  key={index}
+                  key={`skeleton-${index}`}
                   className="h-20 rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm animate-pulse"
                 />
               ))}

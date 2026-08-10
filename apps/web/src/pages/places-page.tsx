@@ -15,8 +15,7 @@ export function PlacesPage() {
           Places
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Explore the places you have visited and the memories attached to
-          them.
+          Explore the places you have visited and the memories attached to them.
         </p>
       </div>
 
@@ -24,7 +23,7 @@ export function PlacesPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <div
-              key={index}
+              key={`skeleton-${index}`}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white"
             >
               <div className="h-40 animate-pulse bg-slate-100" />
