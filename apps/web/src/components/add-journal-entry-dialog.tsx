@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type ReactNode, useEffect, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BookOpen } from 'lucide-react';
+
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -32,19 +32,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ErrorMessage } from '@/components/ui/error-message';
+
 import { usePlaces } from '@/hooks/use-places';
 import { useTrips } from '@/hooks/use-trips';
 import { useUploadPhoto } from '@/hooks/use-photos';
 import { useCreateJournalEntry } from '@/hooks/use-journal-entries';
+
 import {
   journalEntrySchema,
   type JournalEntryFormValues,
 } from '@/schemas/journal-schemas';
+
 import {
-  extractMessageString,
   extractJsonFromMessage,
+  extractMessageString,
 } from '@/lib/error-utils';
-import { showToast, showErrorToast } from '@/lib/toast';
+import { showErrorToast, showToast } from '@/lib/toast';
+
+const DRAFT_STORAGE_KEY = 'wanderbook-journal-entry-draft';
+const NO_TRIP_VALUE = '__none__';
 
 const defaultValues: JournalEntryFormValues = {
   title: '',
@@ -60,18 +66,24 @@ const defaultValues: JournalEntryFormValues = {
 };
 
 interface AddJournalEntryDialogProps {
-  children: React.ReactNode;
+  children: ReactNode;
+  dialogTitle?: string;
+  dialogDescription?: string;
 }
 
 export function AddJournalEntryDialog({
   children,
+  dialogTitle = 'Write a memory',
+  dialogDescription = 'Capture a moment from one of your places while it is still fresh.',
 }: AddJournalEntryDialogProps) {
   const [open, setOpen] = useState(false);
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const { data: places } = usePlaces();
-  const { data: trips } = useTrips();
+
+  const { data: places = [] } = usePlaces();
+  const { data: trips = [] } = useTrips();
+
   const uploadPhoto = useUploadPhoto();
-  const { mutate, isPending, error } = useCreateJournalEntry();
+  const createJournalEntry = useCreateJournalEntry();
 
   const form = useForm<JournalEntryFormValues>({
     resolver: zodResolver(journalEntrySchema),
@@ -79,86 +91,121 @@ export function AddJournalEntryDialog({
     mode: 'onChange',
   });
 
+  const watchedValues = useWatch({
+    control: form.control,
+  });
+
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!open || typeof window === 'undefined') {
+      return;
+    }
 
     try {
-      const stored = window.localStorage.getItem(
-        'wanderbook-journal-entry-draft',
+      const storedDraft = window.localStorage.getItem(
+        DRAFT_STORAGE_KEY,
       );
 
-      if (!stored) return;
-
-      const parsed = JSON.parse(stored) as Partial<JournalEntryFormValues>;
-      if (parsed) {
-        form.reset({
-          ...defaultValues,
-          ...parsed,
-        });
-      }
-    } catch {
-      // Ignore malformed draft data.
-    }
-  }, [form]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const subscription = form.watch((values) => {
-      const hasAnyValue = Object.values(values).some(
-        (value) =>
-          value !== '' &&
-          value !== false &&
-          value !== null &&
-          value !== undefined,
-      );
-
-      if (!hasAnyValue) {
-        window.localStorage.removeItem('wanderbook-journal-entry-draft');
+      if (!storedDraft) {
         return;
       }
 
-      window.localStorage.setItem(
-        'wanderbook-journal-entry-draft',
-        JSON.stringify(values),
+      const parsedDraft = JSON.parse(
+        storedDraft,
+      ) as Partial<JournalEntryFormValues>;
+
+      form.reset({
+        ...defaultValues,
+        ...parsedDraft,
+      });
+    } catch {
+      window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    }
+  }, [form, open]);
+
+  useEffect(() => {
+    if (!open || typeof window === 'undefined') {
+      return;
+    }
+
+    const values = watchedValues;
+
+    const hasAnyValue = Object.entries(values).some(([key, value]) => {
+      if (key === 'isPrivate') {
+        return value !== defaultValues.isPrivate;
+      }
+
+      return (
+        value !== '' &&
+        value !== null &&
+        value !== undefined
       );
     });
 
-    return () => subscription.unsubscribe();
-  }, [form]);
+    if (!hasAnyValue) {
+      window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+      return;
+    }
 
-  const onSubmit = async (values: JournalEntryFormValues) => {
-    let coverUrl = values.coverUrl || undefined;
+    window.localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify(values),
+    );
+  }, [open, watchedValues]);
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+
+    if (!nextOpen) {
+      setCoverFile(null);
+    }
+  }
+
+  function handleCancel() {
+    form.reset(defaultValues);
+    setCoverFile(null);
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    }
+
+    setOpen(false);
+  }
+
+  async function onSubmit(values: JournalEntryFormValues) {
+    const coverUrl = values.coverUrl?.trim() || undefined;
+
+    let finalCoverUrl = coverUrl;
 
     if (coverFile) {
       try {
-        const uploaded = await uploadPhoto.mutateAsync({
+        const uploadedPhoto = await uploadPhoto.mutateAsync({
           file: coverFile,
-          caption: values.title,
+          caption: values.title.trim(),
         });
-        coverUrl = uploaded.url;
+
+        finalCoverUrl = uploadedPhoto.url;
       } catch {
         showErrorToast('Failed to upload cover image.');
         return;
       }
     }
 
-    mutate(
+    createJournalEntry.mutate(
       {
         placeId: values.placeId,
-        tripId: values.tripId || undefined,
-        title: values.title,
-        content: values.content,
-        entryDate: values.entryDate || undefined,
-        weather: values.weather || undefined,
-        tags: values.tags
+        tripId: values.tripId?.trim() || undefined,
+        title: values.title.trim(),
+        content: values.content.trim(),
+        entryDate: values.entryDate?.trim() || undefined,
+        weather: values.weather?.trim() || undefined,
+        tags: values.tags?.trim()
           ? values.tags
               .split(',')
               .map((tag) => tag.trim())
               .filter(Boolean)
           : undefined,
-        coverUrl,
-        mood: values.mood || undefined,
+        coverUrl: finalCoverUrl,
+        mood: values.mood?.trim() || undefined,
         isPrivate: values.isPrivate,
       },
       {
@@ -166,49 +213,67 @@ export function AddJournalEntryDialog({
           form.reset(defaultValues);
           setCoverFile(null);
           setOpen(false);
-          window.localStorage.removeItem('wanderbook-journal-entry-draft');
+
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+          }
+
           showToast('Journal entry saved.');
         },
-        onError: (err: unknown) => {
-          const msg = extractMessageString(err);
-          const json = extractJsonFromMessage(msg);
-          if (json && json.errors && typeof json.errors === 'object') {
-            Object.entries(json.errors).forEach(([k, v]) => {
-              const m = Array.isArray(v) ? v.join(', ') : String(v);
-              try {
-                form.setError(k as keyof JournalEntryFormValues, {
+
+        onError: (error: unknown) => {
+          const message = extractMessageString(error);
+          const parsedError = extractJsonFromMessage(message);
+
+          if (
+            parsedError &&
+            parsedError.errors &&
+            typeof parsedError.errors === 'object'
+          ) {
+            Object.entries(parsedError.errors).forEach(
+              ([key, value]) => {
+                if (!(key in defaultValues)) {
+                  return;
+                }
+
+                const fieldName =
+                  key as keyof JournalEntryFormValues;
+
+                const fieldMessage = Array.isArray(value)
+                  ? value.join(', ')
+                  : String(value);
+
+                form.setError(fieldName, {
                   type: 'server',
-                  message: m,
+                  message: fieldMessage,
                 });
-              } catch {
-                console.error(
-                  'Failed to set form error for key',
-                  k,
-                  'with message',
-                  m,
-                );
-              }
-            });
-          } else {
-            showErrorToast('Failed to save journal entry.');
+              },
+            );
+
+            return;
           }
+
+          showErrorToast('Failed to save journal entry.');
         },
       },
     );
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader className="space-y-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
             <BookOpen className="h-5 w-5" />
           </div>
+
           <div>
-            <DialogTitle>Write a memory</DialogTitle>
+            <DialogTitle>{dialogTitle}</DialogTitle>
+
             <DialogDescription>
-              Capture a moment from one of your places while it is still fresh.
+              {dialogDescription}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -216,7 +281,7 @@ export function AddJournalEntryDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 py-2"
+            className="space-y-5 py-2"
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
@@ -225,25 +290,35 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Place</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={field.onChange}
+                    >
                       <FormControl>
-                        <SelectTrigger className="w-full h-9">
+                        <SelectTrigger className="h-10 w-full">
                           <SelectValue placeholder="Select a place" />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
-                        {places?.length === 0 && (
-                          <p className="px-3 py-2 text-sm text-gray-400">
+                        {places.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-slate-500">
                             No places yet — add one first.
-                          </p>
+                          </div>
+                        ) : (
+                          places.map((place) => (
+                            <SelectItem
+                              key={place.id}
+                              value={place.id}
+                            >
+                              {place.name}
+                            </SelectItem>
+                          ))
                         )}
-                        {places?.map((place) => (
-                          <SelectItem key={place.id} value={place.id}>
-                            {place.name}
-                          </SelectItem>
-                        ))}
                       </SelectContent>
                     </Select>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -255,21 +330,37 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Trip (optional)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+
+                    <Select
+                      value={field.value || NO_TRIP_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(
+                          value === NO_TRIP_VALUE ? '' : value,
+                        )
+                      }
+                    >
                       <FormControl>
-                        <SelectTrigger className="w-full h-9">
+                        <SelectTrigger className="h-10 w-full">
                           <SelectValue placeholder="Select a trip" />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent>
-                        <SelectItem value="">No trip</SelectItem>
-                        {trips?.map((trip) => (
-                          <SelectItem key={trip.id} value={trip.id}>
+                        <SelectItem value={NO_TRIP_VALUE}>
+                          No trip
+                        </SelectItem>
+
+                        {trips.map((trip) => (
+                          <SelectItem
+                            key={trip.id}
+                            value={trip.id}
+                          >
                             {trip.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -283,12 +374,15 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Title</FormLabel>
+
                     <FormControl>
                       <Input
                         placeholder="e.g. Sunrise at the summit"
                         {...field}
+                        value={field.value ?? ''}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -300,9 +394,15 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date</FormLabel>
+
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input
+                        type="date"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -315,13 +415,16 @@ export function AddJournalEntryDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>What happened here?</FormLabel>
+
                   <FormControl>
                     <Textarea
-                      rows={5}
-                      placeholder="What happened here? What did you notice?"
+                      rows={6}
+                      placeholder="What happened here? What did you notice, feel, or want to remember?"
                       {...field}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -334,12 +437,15 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Weather</FormLabel>
+
                     <FormControl>
                       <Input
-                        placeholder="e.g. Sunny, Rainy, Crisp"
+                        placeholder="e.g. Sunny, rainy, crisp"
                         {...field}
+                        value={field.value ?? ''}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -351,12 +457,15 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Mood</FormLabel>
+
                     <FormControl>
                       <Input
-                        placeholder="e.g. Peaceful, Excited, Reflective"
+                        placeholder="e.g. Peaceful, excited, reflective"
                         {...field}
+                        value={field.value ?? ''}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -370,85 +479,125 @@ export function AddJournalEntryDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tags</FormLabel>
+
                     <FormControl>
                       <Input
-                        placeholder="Separate tags with commas"
+                        placeholder="Family, beach, summer"
                         {...field}
+                        value={field.value ?? ''}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="coverUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cover image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Paste an image URL" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="coverUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover image URL</FormLabel>
 
-                <FormItem>
-                  <FormLabel>Upload cover image</FormLabel>
-                  <FormControl>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0] ?? null;
-                        setCoverFile(file);
-                      }}
-                      className="block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm file:mr-3 file:rounded-full file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:text-slate-700"
-                    />
-                  </FormControl>
-                  {coverFile ? (
-                    <p className="mt-2 text-xs text-slate-500">
-                      Selected file: {coverFile.name}
-                    </p>
-                  ) : null}
-                </FormItem>
-              </div>
+                    <FormControl>
+                      <Input
+                        type="url"
+                        placeholder="Paste an image URL"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
+            <FormItem>
+              <FormLabel>Upload cover image</FormLabel>
+
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file =
+                      event.target.files?.[0] ?? null;
+
+                    setCoverFile(file);
+                  }}
+                  className="cursor-pointer"
+                />
+              </FormControl>
+
+              {coverFile ? (
+                <p className="text-xs text-slate-500">
+                  Selected: {coverFile.name}
+                </p>
+              ) : null}
+            </FormItem>
 
             <FormField
               control={form.control}
               name="isPrivate"
               render={({ field }) => (
-                <FormItem className="flex items-center gap-2 space-y-0">
+                <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-lg border border-slate-200 p-4">
                   <FormControl>
                     <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                      checked={field.value ?? false}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
                     />
                   </FormControl>
-                  <FormLabel className="mt-0!">
-                    Keep this entry private
-                  </FormLabel>
+
+                  <div className="space-y-1">
+                    <FormLabel className="cursor-pointer">
+                      Keep this entry private
+                    </FormLabel>
+
+                    <p className="text-sm text-slate-500">
+                      Private entries are only visible to you.
+                    </p>
+                  </div>
                 </FormItem>
               )}
             />
 
-            {error && <ErrorMessage error={error} />}
+            {createJournalEntry.error ? (
+              <ErrorMessage
+                error={createJournalEntry.error}
+              />
+            ) : null}
 
-            <DialogFooter className="pt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DialogClose>
+            <DialogFooter className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={
+                  createJournalEntry.isPending ||
+                  uploadPhoto.isPending
+                }
+              >
+                Cancel
+              </Button>
+
               <Button
                 type="submit"
-                disabled={isPending || !form.formState.isValid}
+                disabled={
+                  createJournalEntry.isPending ||
+                  uploadPhoto.isPending ||
+                  !form.formState.isValid
+                }
               >
-                {isPending ? 'Saving...' : 'Save Entry'}
+                {uploadPhoto.isPending
+                  ? 'Uploading image...'
+                  : createJournalEntry.isPending
+                    ? 'Saving...'
+                    : 'Save Entry'}
               </Button>
             </DialogFooter>
           </form>
@@ -457,3 +606,5 @@ export function AddJournalEntryDialog({
     </Dialog>
   );
 }
+
+export default AddJournalEntryDialog;

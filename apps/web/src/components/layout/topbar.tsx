@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import {
   Bell,
@@ -10,20 +14,25 @@ import {
   X,
 } from 'lucide-react';
 
-import { AddFlightDialog } from '@/components/add-flight-dialog';
+import { AddExpenseDialog } from '@/components/add-expense-dialog';
 import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
 import { AddPlaceDialog } from '@/components/add-place-dialog';
 import { AddTripDialog } from '@/components/add-trip-dialog';
 import { SearchDropdown } from '@/components/layout/search-dropdown';
+import { UploadDocumentDialog } from '@/components/upload-document-dialog';
+import { UploadMediaDialog } from '@/components/upload-media-dialog';
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
 import { getInitials } from '@/lib/get-initials';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -71,10 +80,9 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       setMobileSearchOpen(true);
 
       window.requestAnimationFrame(() => {
-        const input =
-          document.querySelector<HTMLInputElement>(
-            '[data-global-search-input]',
-          );
+        const input = document.querySelector<HTMLInputElement>(
+          '[data-global-search-input]',
+        );
 
         input?.focus();
       });
@@ -89,7 +97,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
   if (mobileSearchOpen) {
     return (
-      <header className="flex h-16 items-center gap-2 border-b bg-white px-3 md:px-6">
+      <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6">
         <SearchDropdown
           className="flex-1"
           autoFocus
@@ -102,25 +110,33 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Close search"
           className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
-          <X className="size-5" aria-hidden="true" />
+          <X
+            className="size-5"
+            aria-hidden="true"
+          />
         </button>
       </header>
     );
   }
 
   return (
-    <header className="flex h-16 items-center justify-between gap-3 border-b bg-white px-3 md:px-6">
-      {/* Left */}
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+    <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6">
+      {/* Left side */}
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        {/* Mobile menu */}
         <button
           type="button"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
-          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
+          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
         >
-          <Menu className="size-5" aria-hidden="true" />
+          <Menu
+            className="size-5"
+            aria-hidden="true"
+          />
         </button>
 
+        {/* Desktop search */}
         <SearchDropdown className="hidden max-w-xl flex-1 md:block" />
       </div>
 
@@ -131,10 +147,13 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         aria-label="Search"
         className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
       >
-        <Search className="size-5" aria-hidden="true" />
+        <Search
+          className="size-5"
+          aria-hidden="true"
+        />
       </button>
 
-      {/* Right */}
+      {/* Right side */}
       <div className="flex shrink-0 items-center gap-1 md:gap-3">
         {/* Add New */}
         <DropdownMenu>
@@ -144,9 +163,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               className="gap-1 md:h-9 md:px-4"
               aria-label="Add new"
             >
-              <Plus className="size-4" aria-hidden="true" />
+              <Plus
+                className="size-4"
+                aria-hidden="true"
+              />
 
-              <span className="hidden sm:inline">Add New</span>
+              <span className="hidden sm:inline">
+                Add New
+              </span>
 
               <ChevronDown
                 className="size-4"
@@ -168,27 +192,55 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               <DropdownMenuItem
                 onSelect={(event) => event.preventDefault()}
               >
-                Add Trip
+                Create Trip
               </DropdownMenuItem>
             </AddTripDialog>
 
-            <AddFlightDialog>
+            <AddJournalEntryDialog
+              dialogTitle="Write a Journal Entry"
+              dialogDescription="Capture your thoughts, notes, and travel stories."
+            >
               <DropdownMenuItem
                 onSelect={(event) => event.preventDefault()}
               >
-                Log Flight
-              </DropdownMenuItem>
-            </AddFlightDialog>
-
-            <AddJournalEntryDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
-                Add Journal Entry
+                Write Journal Entry
               </DropdownMenuItem>
             </AddJournalEntryDialog>
 
-            <DropdownMenuItem>Add Expense</DropdownMenuItem>
+            <AddJournalEntryDialog
+              dialogTitle="Add Memory"
+              dialogDescription="Capture a new travel memory in your journal."
+            >
+              <DropdownMenuItem
+                onSelect={(event) => event.preventDefault()}
+              >
+                Add Memory
+              </DropdownMenuItem>
+            </AddJournalEntryDialog>
+
+            <AddExpenseDialog>
+              <DropdownMenuItem
+                onSelect={(event) => event.preventDefault()}
+              >
+                Add Expense
+              </DropdownMenuItem>
+            </AddExpenseDialog>
+
+            <UploadMediaDialog>
+              <DropdownMenuItem
+                onSelect={(event) => event.preventDefault()}
+              >
+                Upload Media
+              </DropdownMenuItem>
+            </UploadMediaDialog>
+
+            <UploadDocumentDialog>
+              <DropdownMenuItem
+                onSelect={(event) => event.preventDefault()}
+              >
+                Add Document
+              </DropdownMenuItem>
+            </UploadDocumentDialog>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -198,7 +250,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Notifications"
           className="relative hidden rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:inline-flex"
         >
-          <Bell className="size-5" aria-hidden="true" />
+          <Bell
+            className="size-5"
+            aria-hidden="true"
+          />
 
           <Badge
             aria-label="3 unread notifications"
@@ -215,7 +270,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Settings"
           className="hidden rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:inline-flex"
         >
-          <Settings className="size-5" aria-hidden="true" />
+          <Settings
+            className="size-5"
+            aria-hidden="true"
+          />
         </button>
 
         {/* User Menu */}
@@ -239,8 +297,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
-            {user && (
+          <DropdownMenuContent
+            align="end"
+            className="w-56"
+          >
+            {user ? (
               <div className="border-b px-3 py-2">
                 <p className="truncate text-sm font-medium text-slate-900">
                   {user.fullName}
@@ -250,7 +311,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   {user.email}
                 </p>
               </div>
-            )}
+            ) : null}
 
             <DropdownMenuItem
               onClick={() => navigate('/profile')}
@@ -273,3 +334,5 @@ export function Topbar({ onMenuClick }: TopbarProps) {
     </header>
   );
 }
+
+export default Topbar;
