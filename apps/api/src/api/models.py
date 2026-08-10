@@ -5,7 +5,7 @@
 import uuid
 from datetime import date, datetime, timezone
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import JSON, Date, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from api.database import Base
@@ -49,9 +49,7 @@ class PlaceModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     country: Mapped[str] = mapped_column(String, nullable=False)
@@ -84,9 +82,7 @@ class TripModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     start_date: Mapped[date | None] = mapped_column(nullable=True)
@@ -136,9 +132,7 @@ class JournalEntryModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     place_id: Mapped[str] = mapped_column(
         String,
         ForeignKey("places.id", ondelete="CASCADE"),
@@ -146,6 +140,15 @@ class JournalEntryModel(Base):
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
+    entry_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    trip_id: Mapped[str | None] = mapped_column(
+        String,
+        ForeignKey("trips.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    weather: Mapped[str | None] = mapped_column(String, nullable=True)
+    tags: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    cover_url: Mapped[str | None] = mapped_column(String, nullable=True)
     mood: Mapped[str | None] = mapped_column(String, nullable=True)
     is_private: Mapped[bool] = mapped_column(default=True)
 
@@ -170,9 +173,7 @@ class ExpenseModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     place_id: Mapped[str | None] = mapped_column(
         String,
         ForeignKey("places.id", ondelete="CASCADE"),
@@ -210,9 +211,7 @@ class BucketListItemModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     place_id: Mapped[str | None] = mapped_column(
         String,
         ForeignKey("places.id", ondelete="SET NULL"),
@@ -244,9 +243,7 @@ class PhotoModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     place_id: Mapped[str | None] = mapped_column(
         String,
         ForeignKey("places.id", ondelete="CASCADE"),
@@ -270,9 +267,7 @@ class DocumentModel(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    user_id: Mapped[str] = mapped_column(
-        String, ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False)
     place_id: Mapped[str | None] = mapped_column(
         String,
         ForeignKey("places.id", ondelete="CASCADE"),
@@ -292,6 +287,8 @@ class DocumentModel(Base):
         default=utc_now,
         nullable=False,
     )
+
+
 class FriendshipModel(Base):
     """Database model for a friendship/connection between two users."""
 
@@ -330,6 +327,7 @@ class FriendshipModel(Base):
         nullable=False,
     )
 
+
 class TripShareModel(Base):
     """Database model for sharing a Trip with a friend (read-only access)."""
 
@@ -351,6 +349,7 @@ class TripShareModel(Base):
         default=utc_now,
         nullable=False,
     )
+
 
 class FlightModel(Base):
     """Database model for a Flight."""

@@ -28,6 +28,7 @@ interface AddJournalEntryFormProps {
 }
 
 const defaultValues: JournalEntryFormValues = {
+  placeId: '',
   title: '',
   content: '',
   mood: '',
@@ -39,7 +40,7 @@ export function AddJournalEntryForm({ placeId }: AddJournalEntryFormProps) {
 
   const form = useForm<JournalEntryFormValues>({
     resolver: zodResolver(journalEntrySchema),
-    defaultValues,
+    defaultValues: { ...defaultValues, placeId },
   });
 
   function onSubmit(values: JournalEntryFormValues) {

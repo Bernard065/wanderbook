@@ -4,8 +4,13 @@ import { apiRequest } from '@/lib/api-client';
 export interface JournalEntry {
   id: string;
   placeId: string;
+  tripId?: string | null;
   title: string;
   content: string;
+  entryDate?: string | null;
+  weather?: string | null;
+  tags?: string[] | null;
+  coverUrl?: string | null;
   mood: string | null;
   isPrivate: boolean;
   createdAt: string;
@@ -14,8 +19,13 @@ export interface JournalEntry {
 
 export interface CreateJournalEntryInput {
   placeId: string;
+  tripId?: string;
   title: string;
   content: string;
+  entryDate?: string;
+  weather?: string;
+  tags?: string[];
+  coverUrl?: string;
   mood?: string;
   isPrivate?: boolean;
 }
@@ -38,8 +48,13 @@ export function useAllJournalEntries() {
 
 export interface UpdateJournalEntryInput {
   id: string;
+  tripId?: string | null;
   title?: string;
   content?: string;
+  entryDate?: string | null;
+  weather?: string | null;
+  tags?: string[] | null;
+  coverUrl?: string | null;
   mood?: string;
   isPrivate?: boolean;
 }

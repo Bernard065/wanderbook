@@ -145,8 +145,13 @@ class JournalEntryCreate(CamelModel):
     """Schema for creating a new journal entry."""
 
     place_id: str
+    trip_id: str | None = None
     title: str
     content: str
+    entry_date: date | None = None
+    weather: str | None = None
+    tags: list[str] | None = None
+    cover_url: str | None = None
     mood: str | None = None
     is_private: bool = True
 
@@ -156,6 +161,11 @@ class JournalEntryUpdate(CamelModel):
 
     title: str | None = None
     content: str | None = None
+    entry_date: date | None = None
+    trip_id: str | None = None
+    weather: str | None = None
+    tags: list[str] | None = None
+    cover_url: str | None = None
     mood: str | None = None
     is_private: bool | None = None
 
@@ -165,8 +175,13 @@ class JournalEntryRead(CamelModel):
 
     id: str
     place_id: str
+    trip_id: str | None
     title: str
     content: str
+    entry_date: date | None
+    weather: str | None
+    tags: list[str] | None
+    cover_url: str | None
     mood: str | None
     is_private: bool
     created_at: datetime

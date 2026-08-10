@@ -24,6 +24,7 @@ import {
 } from '@/hooks/use-journal-entries';
 
 import { usePlaces } from '@/hooks/use-places';
+import { useTrips } from '@/hooks/use-trips';
 import type { Place } from '@org/types';
 
 interface PlaceWithCover extends Place {
@@ -38,7 +39,7 @@ const formatDate = (value: string) => {
     month: 'long',
     day: 'numeric',
   });
-}
+};
 
 interface JournalSidebarItemProps {
   entry: JournalEntry;
@@ -58,7 +59,7 @@ const JournalSidebarItem = ({
   isFavorite,
   onSelect,
   onToggleFavorite,
-}: JournalSidebarItemProps) =>{
+}: JournalSidebarItemProps) => {
   return (
     <div
       role="button"
@@ -98,9 +99,7 @@ const JournalSidebarItem = ({
           event.stopPropagation();
           onToggleFavorite();
         }}
-        aria-label={
-          isFavorite ? 'Remove from favorites' : 'Add to favorites'
-        }
+        aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-500 shadow-sm transition hover:scale-105 hover:text-amber-500"
       >
         {isFavorite ? (
@@ -117,9 +116,7 @@ const JournalSidebarItem = ({
           </h3>
         </div>
 
-        <p className="text-xs text-slate-500">
-          {formatDate(entry.createdAt)}
-        </p>
+        <p className="text-xs text-slate-500">{formatDate(entry.createdAt)}</p>
 
         <p className="line-clamp-3 text-sm leading-6 text-slate-600">
           {entry.content}
@@ -142,11 +139,12 @@ const JournalSidebarItem = ({
       </div>
     </div>
   );
-}
+};
 
 export function JournalPage() {
   const { data: entries, isLoading, error } = useAllJournalEntries();
   const { data: places } = usePlaces();
+  const { data: trips } = useTrips();
 
   const { mutate: deleteEntry, isPending: isDeleting } =
     useDeleteJournalEntry();
@@ -160,10 +158,7 @@ export function JournalPage() {
   const placeById = useMemo(
     () =>
       new Map(
-        (places ?? []).map((place) => [
-          place.id,
-          place as PlaceWithCover,
-        ]),
+        (places ?? []).map((place) => [place.id, place as PlaceWithCover]),
       ),
     [places],
   );
@@ -180,11 +175,14 @@ export function JournalPage() {
     return entries.filter((entry) => {
       const place = placeById.get(entry.placeId);
       const placeName = place?.name ?? '';
+      const tags = entry.tags?.join(' ') ?? '';
 
       return [
         entry.title,
         entry.content,
         entry.mood ?? '',
+        entry.weather ?? '',
+        tags,
         placeName,
       ]
         .join(' ')
@@ -200,9 +198,7 @@ export function JournalPage() {
     if (typeof window === 'undefined') return;
 
     try {
-      const stored = window.localStorage.getItem(
-        FAVORITES_STORAGE_KEY,
-      );
+      const stored = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
 
       if (!stored) return;
 
@@ -263,9 +259,7 @@ export function JournalPage() {
 
     const selectedIsVisible =
       selectedEntryId &&
-      filteredEntries.some(
-        (entry) => entry.id === selectedEntryId,
-      );
+      filteredEntries.some((entry) => entry.id === selectedEntryId);
 
     if (!selectedIsVisible) {
       setSelectedEntryId(filteredEntries[0].id);
@@ -273,15 +267,21 @@ export function JournalPage() {
   }, [filteredEntries, selectedEntryId]);
 
   const selectedEntry = useMemo(
-    () =>
-      entries?.find(
-        (entry) => entry.id === selectedEntryId,
-      ),
+    () => entries?.find((entry) => entry.id === selectedEntryId),
     [entries, selectedEntryId],
   );
 
   const selectedPlace = selectedEntry
     ? placeById.get(selectedEntry.placeId)
+    : undefined;
+
+  const tripById = useMemo(
+    () => new Map((trips ?? []).map((trip) => [trip.id, trip.name])),
+    [trips],
+  );
+
+  const selectedTripName = selectedEntry
+    ? tripById.get(selectedEntry.tripId ?? '')
     : undefined;
 
   const toggleFavorite = (entryId: string) => {
@@ -359,9 +359,7 @@ export function JournalPage() {
             <BookOpen className="h-5 w-5 animate-pulse text-slate-400" />
           </div>
 
-          <p className="text-sm text-slate-500">
-            Loading journal...
-          </p>
+          <p className="text-sm text-slate-500">Loading journal...</p>
         </div>
       )}
 
@@ -394,9 +392,7 @@ export function JournalPage() {
 
                 <Input
                   value={searchTerm}
-                  onChange={(event) =>
-                    setSearchTerm(event.target.value)
-                  }
+                  onChange={(event) => setSearchTerm(event.target.value)}
                   placeholder="Search journal entries..."
                   className="h-auto border-0 bg-transparent p-0 text-sm placeholder:text-slate-400 focus-visible:ring-0"
                 />
@@ -405,10 +401,7 @@ export function JournalPage() {
               {searchTerm.trim() && (
                 <p className="mt-3 text-xs text-slate-500">
                   {filteredEntries.length}{' '}
-                  {filteredEntries.length === 1
-                    ? 'entry'
-                    : 'entries'}{' '}
-                  found
+                  {filteredEntries.length === 1 ? 'entry' : 'entries'} found
                 </p>
               )}
             </div>
@@ -432,22 +425,12 @@ export function JournalPage() {
                   <JournalSidebarItem
                     key={entry.id}
                     entry={entry}
-                    placeName={
-                      placeById.get(entry.placeId)?.name
-                    }
-                    coverUrl={
-                      placeById.get(entry.placeId)?.coverUrl
-                    }
-                    isSelected={
-                      entry.id === selectedEntryId
-                    }
+                    placeName={placeById.get(entry.placeId)?.name}
+                    coverUrl={placeById.get(entry.placeId)?.coverUrl}
+                    isSelected={entry.id === selectedEntryId}
                     isFavorite={favoriteEntryIds.has(entry.id)}
-                    onSelect={() =>
-                      setSelectedEntryId(entry.id)
-                    }
-                    onToggleFavorite={() =>
-                      toggleFavorite(entry.id)
-                    }
+                    onSelect={() => setSelectedEntryId(entry.id)}
+                    onToggleFavorite={() => toggleFavorite(entry.id)}
                   />
                 ))
               )}
@@ -505,9 +488,23 @@ export function JournalPage() {
                           </span>
                         )}
 
-                        <span>
-                          {formatDate(selectedEntry.createdAt)}
-                        </span>
+                        {selectedEntry.entryDate ? (
+                          <span>{formatDate(selectedEntry.entryDate)}</span>
+                        ) : (
+                          <span>{formatDate(selectedEntry.createdAt)}</span>
+                        )}
+
+                        {selectedTripName ? (
+                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                            {selectedTripName}
+                          </span>
+                        ) : null}
+
+                        {selectedEntry.weather ? (
+                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                            {selectedEntry.weather}
+                          </span>
+                        ) : null}
 
                         <span className="flex items-center gap-1.5">
                           {selectedEntry.isPrivate ? (
@@ -516,9 +513,7 @@ export function JournalPage() {
                             <Globe className="h-4 w-4" />
                           )}
 
-                          {selectedEntry.isPrivate
-                            ? 'Private'
-                            : 'Public'}
+                          {selectedEntry.isPrivate ? 'Private' : 'Public'}
                         </span>
 
                         {selectedEntry.mood && (
@@ -538,28 +533,20 @@ export function JournalPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
-                          toggleFavorite(selectedEntry.id)
-                        }
+                        onClick={() => toggleFavorite(selectedEntry.id)}
                       >
-                        {favoriteEntryIds.has(
-                          selectedEntry.id,
-                        ) ? (
+                        {favoriteEntryIds.has(selectedEntry.id) ? (
                           <Star className="mr-2 h-4 w-4 fill-amber-400 text-amber-500" />
                         ) : (
                           <StarOff className="mr-2 h-4 w-4 text-slate-500" />
                         )}
 
-                        {favoriteEntryIds.has(
-                          selectedEntry.id,
-                        )
+                        {favoriteEntryIds.has(selectedEntry.id)
                           ? 'Favorited'
                           : 'Favorite'}
                       </Button>
 
-                      <EditJournalEntryDialog
-                        entry={selectedEntry}
-                      />
+                      <EditJournalEntryDialog entry={selectedEntry} />
 
                       <Button
                         variant="ghost"

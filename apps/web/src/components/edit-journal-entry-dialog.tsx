@@ -25,14 +25,25 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ErrorMessage } from '@/components/ui/error-message';
 
+import { useTrips } from '@/hooks/use-trips';
 import { useUpdateJournalEntry } from '@/hooks/use-journal-entries';
 import {
   journalEntrySchema,
   type JournalEntryFormValues,
 } from '@/schemas/journal-schemas';
-import { extractJsonFromMessage } from '@/lib/error-utils';
+import {
+  extractMessageString,
+  extractJsonFromMessage,
+} from '@/lib/error-utils';
 import type { JournalEntry } from '@/hooks/use-journal-entries';
 
 interface EditJournalEntryDialogProps {
@@ -42,13 +53,17 @@ interface EditJournalEntryDialogProps {
 const defaultValues: JournalEntryFormValues = {
   title: '',
   content: '',
+  entryDate: '',
+  placeId: '',
+  tripId: '',
+  weather: '',
+  tags: '',
+  coverUrl: '',
   mood: '',
   isPrivate: true,
 };
 
-export function EditJournalEntryDialog({
-  entry,
-}: EditJournalEntryDialogProps) {
+export function EditJournalEntryDialog({ entry }: EditJournalEntryDialogProps) {
   const [open, setOpen] = useState(false);
 
   const { mutate, isPending, error } = useUpdateJournalEntry();
@@ -65,6 +80,12 @@ export function EditJournalEntryDialog({
     form.reset({
       title: entry.title,
       content: entry.content,
+      entryDate: entry.entryDate ?? '',
+      placeId: entry.placeId,
+      tripId: entry.tripId ?? '',
+      weather: entry.weather ?? '',
+      tags: entry.tags?.join(', ') ?? '',
+      coverUrl: entry.coverUrl ?? '',
       mood: entry.mood ?? '',
       isPrivate: entry.isPrivate,
     });
@@ -74,8 +95,13 @@ export function EditJournalEntryDialog({
     mutate(
       {
         id: entry.id,
+        tripId: values.tripId || null,
         title: values.title,
         content: values.content,
+        entryDate: values.entryDate || null,
+        weather: values.weather || null,
+        tags: values.tags.length ? values.tags : null,
+        coverUrl: values.coverUrl || null,
         mood: values.mood || undefined,
         isPrivate: values.isPrivate,
       },
@@ -85,41 +111,20 @@ export function EditJournalEntryDialog({
           form.reset(values);
         },
         onError: (err: unknown) => {
-          const maybeMessage = (err as { message?: unknown })?.message;
+          const msg = extractMessageString(err);
+          const json = extractJsonFromMessage(msg);
 
-          let message = '';
-
-          if (typeof maybeMessage === 'string') {
-            message = maybeMessage;
-          } else if (
-            typeof maybeMessage === 'object' &&
-            maybeMessage !== null
-          ) {
-            message = JSON.stringify(maybeMessage);
-          } else {
-            message = String(err);
-          }
-
-          const json = extractJsonFromMessage(message);
-
-          if (
-            json &&
-            json.errors &&
-            typeof json.errors === 'object'
-          ) {
+          if (json && json.errors && typeof json.errors === 'object') {
             Object.entries(json.errors).forEach(([key, value]) => {
               const fieldMessage = Array.isArray(value)
                 ? value.join(', ')
                 : String(value);
 
               try {
-                form.setError(
-                  key as keyof JournalEntryFormValues,
-                  {
-                    type: 'server',
-                    message: fieldMessage,
-                  },
-                );
+                form.setError(key as keyof JournalEntryFormValues, {
+                  type: 'server',
+                  message: fieldMessage,
+                });
               } catch {
                 // Ignore unknown server-side field keys.
               }
@@ -143,8 +148,7 @@ export function EditJournalEntryDialog({
         <DialogHeader>
           <DialogTitle>Edit entry</DialogTitle>
           <DialogDescription>
-            Update the title, mood, privacy, or content of this journal
-            entry.
+            Update the title, mood, privacy, or content of this journal entry.
           </DialogDescription>
         </DialogHeader>
 
@@ -153,6 +157,48 @@ export function EditJournalEntryDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 py-2"
           >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="entryDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tripId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trip</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full h-9">
+                          <SelectValue placeholder="Select a trip" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">No trip</SelectItem>
+                        {trips?.map((trip) => (
+                          <SelectItem key={trip.id} value={trip.id}>
+                            {trip.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="title"
@@ -161,10 +207,7 @@ export function EditJournalEntryDialog({
                   <FormLabel>Title</FormLabel>
 
                   <FormControl>
-                    <Input
-                      placeholder="Entry title"
-                      {...field}
-                    />
+                    <Input placeholder="Entry title" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -193,24 +236,73 @@ export function EditJournalEntryDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="mood"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mood</FormLabel>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="weather"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Weather</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Sunny, rainy, crisp" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                  <FormControl>
-                    <Input
-                      placeholder="Peaceful, excited, reflective"
-                      {...field}
-                    />
-                  </FormControl>
+              <FormField
+                control={form.control}
+                name="mood"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mood</FormLabel>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormControl>
+                      <Input
+                        placeholder="Peaceful, excited, reflective"
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Separate tags with commas"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="coverUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Paste an image URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
