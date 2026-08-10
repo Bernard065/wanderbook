@@ -52,11 +52,14 @@ export function useCreateExpense() {
         body: JSON.stringify(input),
       }),
     onSuccess: (data) => {
-      queryClient.setQueriesData<Expense[]>(['expenses'], (old) => {
-        if (!old) return [data];
-        if (old.some((expense) => expense.id === data.id)) return old;
-        return [data, ...old];
-      });
+      queryClient.setQueriesData<Expense[] | undefined>(
+        { queryKey: ['expenses'] },
+        (old) => {
+          if (!old) return [data];
+          if (old.some((expense) => expense.id === data.id)) return old;
+          return [data, ...old];
+        },
+      );
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
     },
   });

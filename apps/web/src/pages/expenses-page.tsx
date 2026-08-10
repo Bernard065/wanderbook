@@ -5,7 +5,6 @@ import {
   DollarSign,
   MapPin,
   Package,
-  Tag,
   List,
   Plus,
 } from 'lucide-react';
@@ -269,7 +268,9 @@ export function ExpensesPage() {
               <div className="mt-3">
                 <Select
                   value={categoryFilter}
-                  onValueChange={setCategoryFilter}
+                  onValueChange={(value) =>
+                    setCategoryFilter(value as ExpensePageCategory)
+                  }
                 >
                   <SelectTrigger className="w-full h-9">
                     <SelectValue placeholder="All categories" />

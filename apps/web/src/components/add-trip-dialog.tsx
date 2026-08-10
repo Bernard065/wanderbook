@@ -115,12 +115,7 @@ export function AddTripDialog({
       description: values.description || undefined,
       startDate: values.startDate || undefined,
       endDate: values.endDate || undefined,
-      budget:
-        values.budget === ''
-          ? null
-          : values.budget
-            ? parseFloat(values.budget)
-            : undefined,
+      budget: values.budget ? parseFloat(values.budget) : undefined,
       status: values.status,
       placeIds: values.placeIds,
     };

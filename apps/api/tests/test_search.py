@@ -153,6 +153,7 @@ def test_search_returns_all_result_types() -> None:
         description="Coastal drive",
         start_date=None,
         end_date=None,
+        budget=None,
         status="planning",
         places=[place],
         created_at=datetime(2026, 8, 7, tzinfo=UTC),
