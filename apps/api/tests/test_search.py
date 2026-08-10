@@ -162,8 +162,13 @@ def test_search_returns_all_result_types() -> None:
     journal_entry = SimpleNamespace(
         id="entry-1",
         place_id="place-1",
+        trip_id=None,
         title="Beach day",
         content="Sunny and bright.",
+        entry_date=None,
+        weather=None,
+        tags=None,
+        cover_url=None,
         mood="happy",
         is_private=False,
         created_at=datetime(2026, 8, 7, tzinfo=UTC),
