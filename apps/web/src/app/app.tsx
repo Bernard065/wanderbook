@@ -19,6 +19,7 @@ import { MapPage } from '@/pages/map-page';
 import { AchievementsPage } from '@/pages/achievements-page';
 import { FriendsPage } from '@/pages/friends-page';
 import { JournalPage } from '@/pages/journal-page';
+import { ProfilePage } from '@/pages/profile-page';
 import { NotFoundPage } from '../pages/not-found-page';
 
 export function App() {
@@ -34,6 +35,7 @@ export function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/places" element={<PlacesPage />} />
           <Route path="/places/:placeId" element={<PlaceDetailPage />} />
           <Route path="/trips" element={<TripsPage />} />

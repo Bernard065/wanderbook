@@ -1,18 +1,6 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import {
-  Bell,
-  ChevronDown,
-  Menu,
-  Plus,
-  Search,
-  Settings,
-  X,
-} from 'lucide-react';
+import { ChevronDown, Menu, Plus, Search, X } from 'lucide-react';
 
 import { AddExpenseDialog } from '@/components/add-expense-dialog';
 import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
@@ -23,7 +11,6 @@ import { UploadDocumentDialog } from '@/components/upload-document-dialog';
 import { UploadMediaDialog } from '@/components/upload-media-dialog';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -48,9 +35,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const user = useAuthStore((state) => state.user);
 
-  const initials = user
-    ? getInitials(user.fullName, user.email)
-    : '?';
+  const initials = user ? getInitials(user.fullName, user.email) : '?';
 
   const openMobileSearch = useCallback(() => {
     setMobileSearchOpen(true);
@@ -68,8 +53,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   useEffect(() => {
     const handleShortcut = (event: globalThis.KeyboardEvent) => {
       const isSearchShortcut =
-        event.key.toLowerCase() === 'k' &&
-        (event.metaKey || event.ctrlKey);
+        event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey);
 
       if (!isSearchShortcut) {
         return;
@@ -110,10 +94,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Close search"
           className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
-          <X
-            className="size-5"
-            aria-hidden="true"
-          />
+          <X className="size-5" aria-hidden="true" />
         </button>
       </header>
     );
@@ -130,10 +111,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Open navigation menu"
           className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
         >
-          <Menu
-            className="size-5"
-            aria-hidden="true"
-          />
+          <Menu className="size-5" aria-hidden="true" />
         </button>
 
         {/* Desktop search */}
@@ -147,10 +125,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         aria-label="Search"
         className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
       >
-        <Search
-          className="size-5"
-          aria-hidden="true"
-        />
+        <Search className="size-5" aria-hidden="true" />
       </button>
 
       {/* Right side */}
@@ -163,35 +138,23 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               className="gap-1 md:h-9 md:px-4"
               aria-label="Add new"
             >
-              <Plus
-                className="size-4"
-                aria-hidden="true"
-              />
+              <Plus className="size-4" aria-hidden="true" />
 
-              <span className="hidden sm:inline">
-                Add New
-              </span>
+              <span className="hidden sm:inline">Add New</span>
 
-              <ChevronDown
-                className="size-4"
-                aria-hidden="true"
-              />
+              <ChevronDown className="size-4" aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
             <AddPlaceDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Add Place
               </DropdownMenuItem>
             </AddPlaceDialog>
 
             <AddTripDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Create Trip
               </DropdownMenuItem>
             </AddTripDialog>
@@ -200,9 +163,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               dialogTitle="Write a Journal Entry"
               dialogDescription="Capture your thoughts, notes, and travel stories."
             >
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Write Journal Entry
               </DropdownMenuItem>
             </AddJournalEntryDialog>
@@ -211,70 +172,30 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               dialogTitle="Add Memory"
               dialogDescription="Capture a new travel memory in your journal."
             >
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Add Memory
               </DropdownMenuItem>
             </AddJournalEntryDialog>
 
             <AddExpenseDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Add Expense
               </DropdownMenuItem>
             </AddExpenseDialog>
 
             <UploadMediaDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Upload Media
               </DropdownMenuItem>
             </UploadMediaDialog>
 
             <UploadDocumentDialog>
-              <DropdownMenuItem
-                onSelect={(event) => event.preventDefault()}
-              >
+              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
                 Add Document
               </DropdownMenuItem>
             </UploadDocumentDialog>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {/* Notifications */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative hidden rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:inline-flex"
-        >
-          <Bell
-            className="size-5"
-            aria-hidden="true"
-          />
-
-          <Badge
-            aria-label="3 unread notifications"
-            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full p-0 text-[10px]"
-          >
-            3
-          </Badge>
-        </button>
-
-        {/* Settings */}
-        <button
-          type="button"
-          onClick={() => navigate('/settings')}
-          aria-label="Settings"
-          className="hidden rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:inline-flex"
-        >
-          <Settings
-            className="size-5"
-            aria-hidden="true"
-          />
-        </button>
 
         {/* User Menu */}
         <DropdownMenu>
@@ -297,37 +218,22 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent
-            align="end"
-            className="w-56"
-          >
+          <DropdownMenuContent align="end" className="w-56">
             {user ? (
               <div className="border-b px-3 py-2">
                 <p className="truncate text-sm font-medium text-slate-900">
                   {user.fullName}
                 </p>
 
-                <p className="truncate text-xs text-slate-500">
-                  {user.email}
-                </p>
+                <p className="truncate text-xs text-slate-500">{user.email}</p>
               </div>
             ) : null}
 
-            <DropdownMenuItem
-              onClick={() => navigate('/profile')}
-            >
+            <DropdownMenuItem onClick={() => navigate('/profile')}>
               Profile
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={() => navigate('/settings')}
-            >
-              Settings
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={handleLogout}>
-              Log out
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
