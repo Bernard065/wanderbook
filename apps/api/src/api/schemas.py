@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
 from pydantic.alias_generators import to_camel
 
 from api.constants import (
@@ -15,6 +15,7 @@ from api.constants import (
     PlaceCategory,
     TripStatusLiteral,
 )
+from api.storage import get_file_url
 
 
 class CamelModel(BaseModel):
@@ -94,7 +95,22 @@ class UserRead(CamelModel):
     id: str
     email: str
     full_name: str | None
+    profile_photo_key: str | None = None
     created_at: datetime
+
+    @computed_field
+    @property
+    def profile_photo_url(self) -> str | None:
+        """Generate URL for profile photo if it exists."""
+        if self.profile_photo_key:
+            return get_file_url(self.profile_photo_key)
+        return None
+
+
+class UserUpdate(CamelModel):
+    """Schema for updating a user profile."""
+
+    full_name: str | None = None
 
 
 class TokenResponse(CamelModel):

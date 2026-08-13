@@ -29,7 +29,7 @@ export default defineConfig(() => ({
     host: 'localhost',
   },
   optimizeDeps: {
-    exclude: ['maplibre-gl'],
+    include: ['maplibre-gl'],
   },
   plugins: [
     react(),

@@ -10,7 +10,7 @@ import { SearchDropdown } from '@/components/layout/search-dropdown';
 import { UploadDocumentDialog } from '@/components/upload-document-dialog';
 import { UploadMediaDialog } from '@/components/upload-media-dialog';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -36,6 +36,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   const user = useAuthStore((state) => state.user);
 
   const initials = user ? getInitials(user.fullName, user.email) : '?';
+  const avatarUrl = user?.profilePhotoUrl || undefined;
 
   const openMobileSearch = useCallback(() => {
     setMobileSearchOpen(true);
@@ -206,6 +207,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               className="flex items-center gap-1 rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               <Avatar className="size-8">
+                <AvatarImage
+                  src={avatarUrl}
+                  alt={user?.fullName || user?.email || 'User avatar'}
+                />
                 <AvatarFallback className="bg-blue-600 font-medium text-white">
                   {initials}
                 </AvatarFallback>

@@ -23,6 +23,7 @@ from api.routers import (
     places,
     search,
     trips,
+    users,
 )
 
 app = FastAPI(title="WanderBook API")
@@ -73,6 +74,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(places.router)
 app.include_router(trips.router)
 app.include_router(journal.router)

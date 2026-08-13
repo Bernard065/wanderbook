@@ -28,12 +28,25 @@ def upload_file(file_bytes: bytes, content_type: str, extension: str) -> str:
 
 
 def get_file_url(key: str) -> str:
-    """Generate a presigned URL for reading a stored file."""
-    return _s3_client.generate_presigned_url(
+    """Generate a presigned URL for reading a stored file.
+
+    Returns a URL that the browser can access by replacing the internal
+    Docker container URL with the external localhost URL.
+    """
+    url = _s3_client.generate_presigned_url(
         "get_object",
         Params={"Bucket": settings.s3_bucket_name, "Key": key},
         ExpiresIn=3600,
     )
+
+    # Replace internal container URL with external URL for browser access
+    endpoint_url = settings.s3_endpoint_url
+    if endpoint_url and endpoint_url.find("minio") >= 0:
+        # Replace minio hostname with localhost for browser access
+        url = url.replace("minio:9000", "localhost:9000")
+        url = url.replace("//minio", "//localhost")
+
+    return url
 
 
 def delete_file(key: str) -> None:

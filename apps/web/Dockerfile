@@ -23,7 +23,7 @@ RUN npm ci
 COPY . .
 
 # Build frontend
-RUN npx nx build @org/web
+RUN npx nx build web
 
 # ============================
 # Production stage

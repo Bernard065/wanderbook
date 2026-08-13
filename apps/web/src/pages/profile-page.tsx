@@ -1,7 +1,8 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Camera } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
+import { apiRequest } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { SurfaceCard } from '@/components/ui/surface-card';
@@ -13,6 +14,13 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth/login', { replace: true });
+    }
+  }, [user, navigate]);
+
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [email] = useState(user?.email || '');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -20,6 +28,9 @@ export function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const initials = getInitials(fullName, email);
+
+  // Use preview if available, otherwise use the stored profile photo URL
+  const displayAvatarUrl = avatarPreview || user?.profilePhotoUrl;
 
   const handleAvatarClick = useCallback(() => {
     fileInputRef.current?.click();
@@ -62,31 +73,45 @@ export function ProfilePage() {
 
     setIsSaving(true);
     try {
-      // Here you would typically make an API call to update the user profile
-      // including avatar upload if present
-      const updates: { fullName: string; avatar?: string } = { fullName };
+      // Create FormData for multipart request
+      const formData = new FormData();
 
-      if (avatarFile) {
-        // In a real app, you would upload the file to your server/storage
-        // For now, we'll just store the preview
-        updates.avatar = avatarPreview || undefined;
+      if (fullName) {
+        formData.append('full_name', fullName);
       }
 
+      if (avatarFile) {
+        formData.append('profile_photo', avatarFile);
+      }
+
+      // Call API to update profile
+      const updatedUser = await apiRequest<typeof user>('/users/me', {
+        method: 'PUT',
+        body: formData,
+      });
+
+      // Update auth store with new user data
       useAuthStore.setState((state) => ({
-        user: state.user ? { ...state.user, ...updates } : null,
+        user: updatedUser,
       }));
 
       // Reset avatar file after successful save
       setAvatarFile(null);
+      setAvatarPreview(null);
 
       alert('Profile updated successfully');
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile. Please try again.');
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to update profile: ${message}`);
     } finally {
       setIsSaving(false);
     }
-  }, [fullName, avatarFile, avatarPreview]);
+  }, [fullName, avatarFile]);
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -104,7 +129,7 @@ export function ProfilePage() {
                 onClick={handleAvatarClick}
               >
                 <Avatar className="size-16">
-                  <AvatarImage src={avatarPreview || undefined} />
+                  <AvatarImage src={displayAvatarUrl || undefined} />
                   <AvatarFallback className="bg-blue-600 text-lg font-medium text-white">
                     {initials}
                   </AvatarFallback>

@@ -5,6 +5,8 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName: string | null;
+  profilePhotoKey?: string | null;
+  profilePhotoUrl?: string | null;
   createdAt: string;
 }
 
@@ -22,10 +24,8 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isAuthenticated: false,
-      setAuth: (token, user) =>
-        set({ token, user, isAuthenticated: true }),
-      clearAuth: () =>
-        set({ token: null, user: null, isAuthenticated: false }),
+      setAuth: (token, user) => set({ token, user, isAuthenticated: true }),
+      clearAuth: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
       name: 'wanderbook-auth',
