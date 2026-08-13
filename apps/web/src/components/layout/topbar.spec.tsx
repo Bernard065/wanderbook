@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,6 +12,7 @@ vi.mock('@/components/layout/search-dropdown', () => ({
 
 describe('Topbar', () => {
   beforeEach(() => {
+    useAuthStore.persist.clearStorage();
     useAuthStore.setState({
       token: 'token',
       user: {
@@ -32,10 +33,6 @@ describe('Topbar', () => {
       </MemoryRouter>,
     );
 
-    const avatarImage = document.querySelector(
-      'img[src="https://cdn.example.com/bob.png"]',
-    );
-
-    expect(avatarImage).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Bob One' })).toBeTruthy();
   });
 });

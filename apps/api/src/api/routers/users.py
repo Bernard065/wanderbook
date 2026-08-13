@@ -1,5 +1,6 @@
 """Routes for user profile management."""
 
+from contextlib import suppress
 from typing import Annotated
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -48,7 +49,9 @@ async def update_profile(
         if profile_photo.content_type not in ALLOWED_CONTENT_TYPES:
             raise HTTPException(
                 status_code=400,
-                detail="Invalid image format. Only JPEG, PNG, and WebP images are allowed",
+                detail=(
+                    "Invalid image format. Only JPEG, PNG, and WebP images are allowed"
+                ),
             )
 
         file_bytes = await profile_photo.read()
@@ -56,16 +59,16 @@ async def update_profile(
             file_size_mb = len(file_bytes) / (1024 * 1024)
             raise HTTPException(
                 status_code=400,
-                detail=f"Profile photo is too large ({file_size_mb:.1f}MB). Maximum size is 5MB",
+                detail=(
+                    f"Profile photo is too large ({file_size_mb:.1f}MB). "
+                    "Maximum size is 5MB"
+                ),
             )
 
         # Delete old profile photo if it exists
         if user.profile_photo_key:
-            try:
+            with suppress(OSError):
                 delete_file(user.profile_photo_key)
-            except OSError:
-                # Continue even if deletion fails
-                pass
 
         # Upload new profile photo
         extension = profile_photo.content_type.split("/")[-1]
