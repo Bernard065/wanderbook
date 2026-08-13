@@ -14,6 +14,10 @@ export interface CreatePlaceRequest {
   gpsLat?: number | null;
   gpsLng?: number | null;
   rating?: number | null;
+  visitDate?: string | null;
+  notes?: string | null;
+  favorite?: boolean | null;
+  coverUrl?: string | null;
 }
 
 export interface UpdatePlaceRequest {
@@ -26,6 +30,10 @@ export interface UpdatePlaceRequest {
   gpsLat?: number | null;
   gpsLng?: number | null;
   rating?: number | null;
+  visitDate?: string | null;
+  notes?: string | null;
+  favorite?: boolean | null;
+  coverUrl?: string | null;
 }
 
 export type PlaceResponse = Place;
@@ -39,9 +47,7 @@ export function getPlace(placeId: string): Promise<PlaceResponse> {
   return apiRequest<PlaceResponse>(`/places/${placeId}`);
 }
 
-export function createPlace(
-  input: CreatePlaceRequest,
-): Promise<PlaceResponse> {
+export function createPlace(input: CreatePlaceRequest): Promise<PlaceResponse> {
   return apiRequest<PlaceResponse>('/places', {
     method: 'POST',
     body: JSON.stringify(input),

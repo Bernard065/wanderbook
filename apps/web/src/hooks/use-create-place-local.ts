@@ -19,7 +19,8 @@ export function useCreatePlaceLocal() {
   return useMutation({
     mutationFn: async (input: CreatePlaceInput) => {
       // simulate network latency
-      await new Promise((r) => setTimeout(r, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const newPlace: LocalPlace = {
         id: `local-${Date.now()}`,
         name: input.name,
@@ -34,22 +35,29 @@ export function useCreatePlaceLocal() {
         favorite: !!input.favorite,
         coverUrl: input.coverUrl ?? null,
         visitCount: 0,
-        // optional fields for local UI
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      // update local cache
-      queryClient.setQueryData(PLACES_KEY, (old: Place[] | undefined) => {
-        const list = old ? [...old] : [];
-        list.unshift(newPlace as unknown as Place);
-        return list;
-      });
+      // Update local cache
+      queryClient.setQueryData(
+        PLACES_KEY,
+        (old: Place[] | undefined) => {
+          const list = old ? [...old] : [];
+
+          list.unshift(newPlace as unknown as Place);
+
+          return list;
+        },
+      );
 
       return newPlace;
     },
-    onSuccess: (_data, _vars) => {
-      queryClient.invalidateQueries({ queryKey: PLACES_KEY });
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: PLACES_KEY,
+      });
     },
   });
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
+
 import {
   Form,
   FormControl,
@@ -19,10 +21,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+
 import {
   Select,
   SelectContent,
@@ -30,17 +34,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
 import { PLACE_CATEGORIES } from '@/constants/place-categories';
-import { useUpdatePlace, type CreatePlaceInput } from '@/hooks/use-places';
+import {
+  useUpdatePlace,
+  type CreatePlaceInput,
+} from '@/hooks/use-places';
 import { useCreatePlaceLocal } from '@/hooks/use-create-place-local';
 import { useUploadPhoto } from '@/hooks/use-photos';
-import { placeSchema, type PlaceFormValues } from '@/schemas/place-schemas';
+
+import {
+  placeSchema,
+  type PlaceFormValues,
+} from '@/schemas/place-schemas';
+
 import {
   extractJsonFromMessage,
   extractMessageString,
 } from '@/lib/error-utils';
+
 import { ErrorMessage } from '@/components/ui/error-message';
 import { showToast, showErrorToast } from '@/lib/toast';
+
 import type { Place } from '@org/types';
 
 type PlaceWithExtras = Place & {
@@ -71,7 +86,9 @@ const emptyValues: PlaceFormValues = {
   coverUrl: '',
 };
 
-const placeToFormValues = (place: PlaceWithExtras): PlaceFormValues => {
+const placeToFormValues = (
+  place: PlaceWithExtras,
+): PlaceFormValues => {
   return {
     name: place.name,
     country: place.country,
@@ -94,18 +111,27 @@ export function AddPlaceDialog({
   onOpenChange,
 }: AddPlaceDialogProps) {
   const isEditMode = !!place;
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+
+  const [uncontrolledOpen, setUncontrolledOpen] =
+    useState(false);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
   const createPlaceMutation = useCreatePlaceLocal();
-  const { isPending: isCreating, error: createError } = createPlaceMutation;
+
+  const {
+    isPending: isCreating,
+    error: createError,
+  } = createPlaceMutation;
+
   const {
     mutate: updatePlace,
     isPending: isUpdating,
     error: updateError,
   } = useUpdatePlace();
+
   const uploadPhoto = useUploadPhoto();
 
   const isPending = isEditMode ? isUpdating : isCreating;
@@ -113,12 +139,16 @@ export function AddPlaceDialog({
 
   const form = useForm<PlaceFormValues>({
     resolver: zodResolver(placeSchema),
-    defaultValues: place ? placeToFormValues(place) : emptyValues,
+    defaultValues: place
+      ? placeToFormValues(place)
+      : emptyValues,
   });
 
   useEffect(() => {
     if (open) {
-      form.reset(place ? placeToFormValues(place) : emptyValues);
+      form.reset(
+        place ? placeToFormValues(place) : emptyValues,
+      );
     }
   }, [open, place, form]);
 
@@ -129,46 +159,64 @@ export function AddPlaceDialog({
       region: values.region || null,
       city: values.city || null,
       category: values.category,
-      gpsLat: values.gpsLat ? parseFloat(values.gpsLat) : null,
-      gpsLng: values.gpsLng ? parseFloat(values.gpsLng) : null,
+      gpsLat: values.gpsLat
+        ? parseFloat(values.gpsLat)
+        : null,
+      gpsLng: values.gpsLng
+        ? parseFloat(values.gpsLng)
+        : null,
       visitDate: values.visitDate || undefined,
       notes: values.notes || undefined,
       favorite: !!values.favorite,
       coverUrl: values.coverUrl || undefined,
     };
 
-    // If a file was selected, upload it to the server and use the returned URL.
     if (coverFile) {
       try {
         const uploaded = await uploadPhoto.mutateAsync({
           file: coverFile,
           caption: values.name,
         });
+
         payload.coverUrl = uploaded.url;
       } catch {
         showErrorToast('Failed to upload cover image');
-        // proceed without cover
       }
     }
 
     if (isEditMode) {
       updatePlace(
-        { id: place.id, ...payload },
+        {
+          id: place.id,
+          ...payload,
+        },
         {
           onSuccess: () => setOpen(false),
+
           onError: (err: unknown) => {
             const msg = extractMessageString(err);
             const json = extractJsonFromMessage(msg);
-            if (json && json.errors && typeof json.errors === 'object') {
-              Object.entries(json.errors).forEach(([k, v]) => {
-                const m = Array.isArray(v) ? v.join(', ') : String(v);
+
+            if (
+              json &&
+              json.errors &&
+              typeof json.errors === 'object'
+            ) {
+              Object.entries(json.errors).forEach(([key, value]) => {
+                const message = Array.isArray(value)
+                  ? value.join(', ')
+                  : String(value);
+
                 try {
-                  form.setError(k as keyof PlaceFormValues, {
-                    type: 'server',
-                    message: m,
-                  });
+                  form.setError(
+                    key as keyof PlaceFormValues,
+                    {
+                      type: 'server',
+                      message,
+                    },
+                  );
                 } catch {
-                  // ignore
+                  // Ignore unknown form fields.
                 }
               });
             }
@@ -178,26 +226,40 @@ export function AddPlaceDialog({
     } else {
       try {
         await createPlaceMutation.mutateAsync(payload);
+
         form.reset(emptyValues);
         setOpen(false);
         setCoverFile(null);
+
         showToast('Place added');
       } catch (err: unknown) {
         const msg = extractMessageString(err);
         const json = extractJsonFromMessage(msg);
-        if (json && json.errors && typeof json.errors === 'object') {
-          Object.entries(json.errors).forEach(([k, v]) => {
-            const m = Array.isArray(v) ? v.join(', ') : String(v);
+
+        if (
+          json &&
+          json.errors &&
+          typeof json.errors === 'object'
+        ) {
+          Object.entries(json.errors).forEach(([key, value]) => {
+            const message = Array.isArray(value)
+              ? value.join(', ')
+              : String(value);
+
             try {
-              form.setError(k as keyof PlaceFormValues, {
-                type: 'server',
-                message: m,
-              });
+              form.setError(
+                key as keyof PlaceFormValues,
+                {
+                  type: 'server',
+                  message,
+                },
+              );
             } catch {
-              // ignore
+              // Ignore unknown form fields.
             }
           });
         }
+
         showErrorToast('Failed to add place');
       }
     }
@@ -205,10 +267,16 @@ export function AddPlaceDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Place' : 'Add a Place'}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? 'Edit Place' : 'Add a Place'}
+          </DialogTitle>
+
           <DialogDescription>
             {isEditMode
               ? 'Update the details for this place.'
@@ -228,7 +296,10 @@ export function AddPlaceDialog({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Mt Kenya" {...field} />
+                    <Input
+                      placeholder="e.g. Mt Kenya"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -243,12 +314,16 @@ export function AddPlaceDialog({
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Kenya" {...field} />
+                      <Input
+                        placeholder="e.g. Kenya"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="region"
@@ -256,7 +331,10 @@ export function AddPlaceDialog({
                   <FormItem>
                     <FormLabel>Region</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Nyeri" {...field} />
+                      <Input
+                        placeholder="e.g. Nyeri"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -272,36 +350,46 @@ export function AddPlaceDialog({
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input placeholder="Optional" {...field} />
+                      <Input
+                        placeholder="Optional"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
                       <FormControl>
-                        <SelectTrigger className="w-full h-9">
+                        <SelectTrigger className="h-9 w-full">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
+
                       <SelectContent className="max-h-64">
-                        {PLACE_CATEGORIES.map((cat) => (
+                        {PLACE_CATEGORIES.map((category) => (
                           <SelectItem
-                            key={cat}
-                            value={cat}
+                            key={category}
+                            value={category}
                             className="capitalize"
                           >
-                            {cat.replace(/_/g, ' ')}
+                            {category.replace(/_/g, ' ')}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -316,12 +404,16 @@ export function AddPlaceDialog({
                   <FormItem>
                     <FormLabel>Latitude</FormLabel>
                     <FormControl>
-                      <Input placeholder="Optional" {...field} />
+                      <Input
+                        placeholder="Optional"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="gpsLng"
@@ -329,7 +421,10 @@ export function AddPlaceDialog({
                   <FormItem>
                     <FormLabel>Longitude</FormLabel>
                     <FormControl>
-                      <Input placeholder="Optional" {...field} />
+                      <Input
+                        placeholder="Optional"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -343,19 +438,27 @@ export function AddPlaceDialog({
                 name="coverUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover image (optional)</FormLabel>
+                    <FormLabel>
+                      Cover image (optional)
+                    </FormLabel>
+
                     <FormControl>
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => {
-                          const f = e.target.files && e.target.files[0];
-                          setCoverFile(f ?? null);
-                          // keep the underlying field value in sync with filename for validation/debug
-                          field.onChange(f ? f.name : '');
+                        onChange={(event) => {
+                          const file =
+                            event.target.files?.[0] ?? null;
+
+                          setCoverFile(file);
+
+                          field.onChange(
+                            file ? file.name : '',
+                          );
                         }}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -369,7 +472,10 @@ export function AddPlaceDialog({
                     <FormItem>
                       <FormLabel>Visit date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input
+                          type="date"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -387,7 +493,11 @@ export function AddPlaceDialog({
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
-                      <FormLabel className="m-0">Mark as favorite</FormLabel>
+
+                      <FormLabel className="m-0">
+                        Mark as favorite
+                      </FormLabel>
+
                       <FormMessage />
                     </FormItem>
                   )}
@@ -416,11 +526,18 @@ export function AddPlaceDialog({
 
             <DialogFooter className="pt-2">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                >
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending}>
+
+              <Button
+                type="submit"
+                disabled={isPending}
+              >
                 {isPending
                   ? 'Saving...'
                   : isEditMode
