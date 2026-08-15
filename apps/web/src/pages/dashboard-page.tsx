@@ -33,8 +33,18 @@ import { useExpenses } from '@/hooks/use-expenses';
 import { useAchievements } from '@/hooks/use-achievements';
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
-  const { data: places, isLoading: placesLoading } = usePlaces();
-  const { data: trips, isLoading: tripsLoading } = useTrips();
+  const {
+    data: places,
+    isLoading: placesLoading,
+    error: placesError,
+    refetch: refetchPlaces,
+  } = usePlaces();
+  const {
+    data: trips,
+    isLoading: tripsLoading,
+    error: tripsError,
+    refetch: refetchTrips,
+  } = useTrips();
   const { data: journalEntries } = useAllJournalEntries();
   const { data: photos, isLoading: photosLoading } = usePhotos();
   const { data: flights } = useFlights();
@@ -42,6 +52,7 @@ export function DashboardPage() {
   const { unlockedCount, totalCount } = useAchievements();
 
   const isLoading = placesLoading || tripsLoading;
+  const hasError = Boolean(placesError || tripsError);
 
   const countries = new Set((places ?? []).map((p) => p.country)).size;
   const cities = new Set(
@@ -201,6 +212,21 @@ export function DashboardPage() {
 
       {isLoading ? (
         <p className="text-sm text-slate-500">Loading dashboard...</p>
+      ) : hasError ? (
+        <div className="p-4 rounded-md border bg-red-50">
+          <p className="text-sm text-red-700">Unable to load dashboard data.</p>
+          <div className="mt-2">
+            <button
+              className="inline-flex items-center px-3 py-1 rounded bg-red-600 text-white text-sm"
+              onClick={() => {
+                refetchPlaces?.();
+                refetchTrips?.();
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">

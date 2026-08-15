@@ -2,7 +2,11 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "api:migration:generate": "cd apps/api && .\\.venv\\Scripts\\python.exe -m alembic revision --autogenerate -m \"schema update\"",
+    "api:migration:upgrade": "cd apps/api && .\\.venv\\Scripts\\python.exe -m alembic upgrade head",
+    "api:migration": "npm run api:migration:generate && npm run api:migration:upgrade"
+  },
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.8.0",
