@@ -30,7 +30,7 @@ const STATUS_STYLES: Record<BucketListItem['status'], string> = {
   dreaming:
     'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300',
   planning:
-    'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
+    'border-blue-200 bg-blue-50 text-primary dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
   booked:
     'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300',
   visited:

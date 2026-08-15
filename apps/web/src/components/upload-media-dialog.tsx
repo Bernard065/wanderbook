@@ -98,15 +98,15 @@ export function UploadMediaDialog({
               accept="image/*"
               onChange={handleFileChange}
               disabled={uploadPhoto.isPending}
-              className="w-full cursor-pointer rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full cursor-pointer rounded-md border border bg-card px-3 py-2 text-sm text-slate-700 shadow-sm file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             />
 
             {file ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Selected: {file.name}
               </p>
             ) : (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Select an image from your device.
               </p>
             )}
@@ -123,11 +123,11 @@ export function UploadMediaDialog({
               disabled={uploadPhoto.isPending}
               placeholder="Add a short caption (optional)"
               maxLength={500}
-              className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md border border bg-card px-3 py-2 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             />
 
             <div className="flex justify-end">
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-muted-foreground">
                 {caption.length}/500
               </span>
             </div>

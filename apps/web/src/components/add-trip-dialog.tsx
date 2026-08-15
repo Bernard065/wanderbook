@@ -222,7 +222,7 @@ export function AddTripDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-slate-700">
             <Compass className="h-5 w-5" />
           </div>
           <div>
@@ -358,16 +358,16 @@ export function AddTripDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Places</FormLabel>
-                  <div className="border rounded-md max-h-40 overflow-y-auto p-2 space-y-1 bg-slate-50/60">
+                  <div className="border rounded-md max-h-40 overflow-y-auto p-2 space-y-1 bg-muted/60">
                     {!places || places.length === 0 ? (
-                      <p className="text-sm text-gray-400 px-1 py-1">
+                      <p className="text-sm text-muted-foreground px-1 py-1">
                         No places yet — add one first.
                       </p>
                     ) : (
                       places.map((place) => (
                         <label
                           key={place.id}
-                          className="flex items-center gap-2 px-1 py-1.5 rounded hover:bg-gray-50 cursor-pointer"
+                          className="flex items-center gap-2 px-1 py-1.5 rounded hover:bg-muted cursor-pointer"
                         >
                           <Checkbox
                             checked={field.value.includes(place.id)}

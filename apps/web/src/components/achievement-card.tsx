@@ -17,8 +17,8 @@ export function AchievementCard({
       className={cn(
         'rounded-3xl border p-5 transition-all',
         unlocked
-          ? 'bg-white border-slate-200 shadow-sm hover:shadow-md'
-          : 'bg-slate-50 border-slate-200 text-slate-500 opacity-90',
+          ? 'bg-card border shadow-sm hover:shadow-md'
+          : 'bg-muted border text-muted-foreground opacity-90',
       )}
     >
       <div
@@ -26,7 +26,7 @@ export function AchievementCard({
           'mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl',
           unlocked
             ? 'bg-linear-to-br from-blue-500 to-cyan-500 text-white shadow-lg'
-            : 'bg-slate-200 text-slate-400',
+            : 'bg-muted text-muted-foreground',
         )}
       >
         <Icon className="h-6 w-6" />
@@ -36,7 +36,7 @@ export function AchievementCard({
         <p
           className={cn(
             'font-semibold text-sm',
-            unlocked ? 'text-slate-900' : 'text-slate-700',
+            unlocked ? 'text-foreground' : 'text-slate-700',
           )}
         >
           {achievement.name}
@@ -45,8 +45,8 @@ export function AchievementCard({
           className={cn(
             'rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]',
             unlocked
-              ? 'bg-blue-100 text-blue-700'
-              : 'bg-slate-100 text-slate-500',
+              ? 'bg-blue-100 text-primary'
+              : 'bg-muted text-muted-foreground',
           )}
         >
           {unlocked ? 'Unlocked' : 'Locked'}

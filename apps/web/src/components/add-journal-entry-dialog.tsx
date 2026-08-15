@@ -265,7 +265,7 @@ export function AddJournalEntryDialog({
 
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader className="space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-slate-700">
             <BookOpen className="h-5 w-5" />
           </div>
 
@@ -303,7 +303,7 @@ export function AddJournalEntryDialog({
 
                       <SelectContent>
                         {places.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-slate-500">
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
                             No places yet — add one first.
                           </div>
                         ) : (
@@ -533,7 +533,7 @@ export function AddJournalEntryDialog({
               </FormControl>
 
               {coverFile ? (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Selected: {coverFile.name}
                 </p>
               ) : null}
@@ -543,7 +543,7 @@ export function AddJournalEntryDialog({
               control={form.control}
               name="isPrivate"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-lg border border-slate-200 p-4">
+                <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-lg border border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value ?? false}
@@ -558,7 +558,7 @@ export function AddJournalEntryDialog({
                       Keep this entry private
                     </FormLabel>
 
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                       Private entries are only visible to you.
                     </p>
                   </div>

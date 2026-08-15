@@ -12,9 +12,9 @@ interface TripCardProps {
 }
 
 const statusStyles: Record<Trip['status'], string> = {
-  planning: 'bg-blue-50 text-blue-600',
+  planning: 'bg-blue-50 text-primary',
   ongoing: 'bg-green-50 text-green-600',
-  completed: 'bg-gray-100 text-gray-600',
+  completed: 'bg-muted text-muted-foreground',
   cancelled: 'bg-red-50 text-red-600',
 };
 
@@ -79,7 +79,7 @@ export function TripCard({
       aria-label={`View trip ${trip.name}`}
     >
       <Card className="h-full overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <div className="relative aspect-video overflow-hidden bg-slate-100">
+        <div className="relative aspect-video overflow-hidden bg-muted">
           {coverUrl ? (
             <img
               src={coverUrl}
@@ -92,7 +92,7 @@ export function TripCard({
               className="flex h-full w-full items-center justify-center bg-linear-to-br from-slate-100 to-slate-200"
               aria-hidden="true"
             >
-              <MapPin className="h-10 w-10 text-slate-400" />
+              <MapPin className="h-10 w-10 text-muted-foreground" />
             </div>
           )}
 
@@ -108,7 +108,7 @@ export function TripCard({
         </CardHeader>
 
         <CardContent className="px-4 pb-4 pt-0">
-          <div className="space-y-2 text-sm text-slate-500">
+          <div className="space-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="truncate">{locationLabel}</span>
@@ -120,7 +120,7 @@ export function TripCard({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-2 text-sm text-slate-500 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-4">
             <div className="inline-flex items-center gap-2">
               <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{durationLabel}</span>

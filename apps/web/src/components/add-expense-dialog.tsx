@@ -214,7 +214,7 @@ export function AddExpenseDialog({
                         </FormControl>
                         <SelectContent>
                           {places?.length === 0 && (
-                            <p className="px-3 py-2 text-sm text-gray-400">
+                            <p className="px-3 py-2 text-sm text-muted-foreground">
                               No places available.
                             </p>
                           )}
@@ -251,7 +251,7 @@ export function AddExpenseDialog({
                         </FormControl>
                         <SelectContent>
                           {trips?.length === 0 && (
-                            <p className="px-3 py-2 text-sm text-gray-400">
+                            <p className="px-3 py-2 text-sm text-muted-foreground">
                               No trips available.
                             </p>
                           )}
