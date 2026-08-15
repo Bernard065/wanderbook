@@ -1,5 +1,10 @@
 node_modules
-apps/api/.venv
+**/.venv
+**/.pytest_cache
+**/.ruff_cache
+**/__pycache__
+**/*.pyc
+**/*.pyo
 apps/web/dist
 libs/types/dist
 dist

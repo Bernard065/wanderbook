@@ -17,12 +17,9 @@ import { QuickActions } from '@/components/dashboard/quick-actions';
 import { BucketListPreview } from '@/components/dashboard/bucket-list-preview';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/ui/page-header';
 import { SectionHeader } from '@/components/ui/section-header';
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { AddTripDialog } from '@/components/add-trip-dialog';
-import { AddJournalEntryDialog } from '@/components/add-journal-entry-dialog';
-import { useAuthStore } from '@/stores/auth-store';
 import { usePlaces } from '@/hooks/use-places';
 import { useTrips } from '@/hooks/use-trips';
 import { useAllJournalEntries } from '@/hooks/use-journal-entries';
@@ -32,7 +29,6 @@ import { useFlights } from '@/hooks/use-flights';
 import { useExpenses } from '@/hooks/use-expenses';
 import { useAchievements } from '@/hooks/use-achievements';
 export function DashboardPage() {
-  const user = useAuthStore((s) => s.user);
   const {
     data: places,
     isLoading: placesLoading,
@@ -118,31 +114,8 @@ export function DashboardPage() {
   );
   const expenseCurrency = expenses?.[0]?.currency ?? 'USD';
 
-  const firstName = user?.fullName?.split(' ')[0] || 'there';
-
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Welcome back, ${firstName}`}
-        description="Capture every place, every moment and relive them forever."
-        action={
-          <div className="flex flex-wrap gap-2">
-            <AddTripDialog>
-              <Button size="sm">
-                <Compass className="h-4 w-4" />
-                New trip
-              </Button>
-            </AddTripDialog>
-            <AddJournalEntryDialog>
-              <Button variant="outline" size="sm">
-                <Sparkles className="h-4 w-4" />
-                Write memory
-              </Button>
-            </AddJournalEntryDialog>
-          </div>
-        }
-      />
-
       {/* Hero / Map Header */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -153,30 +126,6 @@ export function DashboardPage() {
               <div className="absolute inset-0 bg-linear-to-b from-black/50 via-transparent to-transparent pointer-events-none" />
 
               <div className="absolute inset-6 flex flex-col justify-between pointer-events-none">
-                <div className="pointer-events-auto flex justify-end mb-4">
-                  <AddTripDialog>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="bg-white text-slate-900 hover:bg-slate-100 mr-2"
-                    >
-                      <Compass className="h-4 w-4" />
-                      New trip
-                    </Button>
-                  </AddTripDialog>
-
-                  <AddJournalEntryDialog>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-white/40 bg-white/10 text-white hover:bg-white/20"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Write memory
-                    </Button>
-                  </AddJournalEntryDialog>
-                </div>
-
                 <div className="pointer-events-auto max-w-2xl">
                   <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
                     Your World, Your Stories.
