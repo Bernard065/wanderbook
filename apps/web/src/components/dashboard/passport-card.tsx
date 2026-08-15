@@ -12,10 +12,10 @@ export function PassportCard() {
   const { level, xp, unlockedCount } = useAchievements();
 
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-md">
+    <div className="bg-card border rounded-lg p-4 shadow-md">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">My Passport</h3>
-        <Link to="/documents" className="text-xs text-blue-600 font-medium">
+        <Link to="/documents" className="text-xs text-primary font-medium">
           View All
         </Link>
       </div>
@@ -27,13 +27,13 @@ export function PassportCard() {
 
         <div className="flex-1">
           <p className="text-sm font-medium">{user?.fullName ?? 'Your Name'}</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Explorer Level {level ?? '—'}
           </p>
         </div>
         <div className="flex flex-col items-end">
           <p className="text-sm font-semibold text-slate-800">{xp ?? 0} XP</p>
-          <p className="text-xs text-slate-500">{unlockedCount ?? 0} badges</p>
+          <p className="text-xs text-muted-foreground">{unlockedCount ?? 0} badges</p>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ export function PassportCard() {
         ))}
 
         {passportDocs.length === 0 && (
-          <div className="text-sm text-slate-500">No passport stamps yet.</div>
+          <div className="text-sm text-muted-foreground">No passport stamps yet.</div>
         )}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { MapPin, Camera, DollarSign, BookOpen } from 'lucide-react';
 
 export function QuickActions() {
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm">
+    <div className="bg-card border rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">Quick Actions</h3>
       </div>

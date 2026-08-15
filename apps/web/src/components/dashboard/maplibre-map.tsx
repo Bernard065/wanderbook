@@ -225,7 +225,7 @@ export default function MapLibreMap({
   return (
     <div
       ref={mapContainerRef}
-      className={className ?? 'h-full w-full rounded-lg bg-slate-100'}
+      className={className ?? 'h-full w-full rounded-lg bg-muted'}
       style={{ minHeight: '100%', overflow: 'hidden' }}
     />
   );

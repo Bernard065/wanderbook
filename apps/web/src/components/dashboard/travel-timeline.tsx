@@ -9,16 +9,16 @@ export function TravelTimeline() {
   );
 
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm">
+    <div className="bg-card border rounded-lg p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">Travel Timeline</h3>
-        <Link to="/timeline" className="text-xs text-blue-600 font-medium">
+        <Link to="/timeline" className="text-xs text-primary font-medium">
           View Full Timeline
         </Link>
       </div>
 
       {years.length === 0 ? (
-        <p className="text-sm text-slate-500">No timeline events yet.</p>
+        <p className="text-sm text-muted-foreground">No timeline events yet.</p>
       ) : (
         <div className="space-y-4">
           {years.map((year) => (
@@ -28,19 +28,19 @@ export function TravelTimeline() {
               </div>
 
               <div className="relative pl-4">
-                <div className="absolute left-1 top-0 bottom-0 w-px bg-slate-100" />
+                <div className="absolute left-1 top-0 bottom-0 w-px bg-muted" />
                 <div className="space-y-3 pl-3">
                   {(eventsByYear[year] ?? []).map((ev) => (
                     <div
                       key={`${ev.type}-${ev.id}`}
                       className="flex items-start gap-3"
                     >
-                      <div className="mt-1 h-3 w-3 rounded-full bg-blue-600 shrink-0" />
+                      <div className="mt-1 h-3 w-3 rounded-full bg-primary shrink-0" />
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">
                           {ev.title}
                         </p>
-                        <p className="text-xs text-slate-500">{ev.date}</p>
+                        <p className="text-xs text-muted-foreground">{ev.date}</p>
                       </div>
                     </div>
                   ))}

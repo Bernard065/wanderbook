@@ -21,25 +21,25 @@ export const StatCard: React.FC<StatCardProps> = ({
   isLoading = false,
 }) => {
   return (
-    <div className="flex min-w-0 flex-col gap-3 rounded-3xl border border-slate-200/80 bg-white/95 p-4 shadow-[0_16px_40px_-22px_rgba(15,23,42,0.24)]">
+    <div className="flex min-w-0 flex-col gap-3 rounded-3xl border border/80 bg-card/95 p-4 shadow-[0_16px_40px_-22px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
-            iconClassName ?? 'bg-blue-50 text-blue-600'
+            iconClassName ?? 'bg-blue-50 text-primary'
           }`}
         >
           <Icon className="h-5 w-5" />
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-2xl font-semibold leading-none text-slate-900">
+          <p className="text-2xl font-semibold leading-none text-foreground">
             {isLoading ? (
-              <span className="inline-block h-8 w-24 rounded-full bg-slate-200 animate-pulse" />
+              <span className="inline-block h-8 w-24 rounded-full bg-muted animate-pulse" />
             ) : (
               <>
                 <span>{value}</span>
                 {unit ? (
-                  <span className="ml-2 text-base font-medium text-slate-500">
+                  <span className="ml-2 text-base font-medium text-muted-foreground">
                     {unit}
                   </span>
                 ) : null}
@@ -48,7 +48,7 @@ export const StatCard: React.FC<StatCardProps> = ({
           </p>
           <p className="mt-1 text-sm leading-tight text-slate-600 wrap-break-word">
             {isLoading ? (
-              <span className="inline-block h-3 w-28 rounded-full bg-slate-200 animate-pulse" />
+              <span className="inline-block h-3 w-28 rounded-full bg-muted animate-pulse" />
             ) : (
               label
             )}
@@ -58,12 +58,12 @@ export const StatCard: React.FC<StatCardProps> = ({
 
       {isLoading ? (
         <div className="space-y-2">
-          <span className="block h-3 w-full rounded-full bg-slate-200 animate-pulse" />
-          <span className="block h-3 w-3/4 rounded-full bg-slate-200 animate-pulse" />
+          <span className="block h-3 w-full rounded-full bg-muted animate-pulse" />
+          <span className="block h-3 w-3/4 rounded-full bg-muted animate-pulse" />
         </div>
       ) : (
         supportingText && (
-          <p className="text-sm text-slate-500">{supportingText}</p>
+          <p className="text-sm text-muted-foreground">{supportingText}</p>
         )
       )}
     </div>

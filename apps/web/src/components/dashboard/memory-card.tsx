@@ -19,12 +19,12 @@ interface MemoryCardProps {
 export function MemoryCard({ memory, isLoading, to }: MemoryCardProps) {
   if (isLoading) {
     return (
-      <div className="group block overflow-hidden rounded-lg border border-slate-200 bg-white p-0 shadow-sm">
-        <div className="h-40 bg-slate-100 animate-pulse" />
+      <div className="group block overflow-hidden rounded-lg border border bg-card p-0 shadow-sm">
+        <div className="h-40 bg-muted animate-pulse" />
         <div className="p-3">
-          <div className="h-4 w-3/4 rounded bg-slate-200 animate-pulse mb-2" />
-          <div className="h-3 w-1/2 rounded bg-slate-200 animate-pulse mb-2" />
-          <div className="h-3 w-1/4 rounded bg-slate-200 animate-pulse" />
+          <div className="h-4 w-3/4 rounded bg-muted animate-pulse mb-2" />
+          <div className="h-3 w-1/2 rounded bg-muted animate-pulse mb-2" />
+          <div className="h-3 w-1/4 rounded bg-muted animate-pulse" />
         </div>
       </div>
     );
@@ -34,10 +34,10 @@ export function MemoryCard({ memory, isLoading, to }: MemoryCardProps) {
 
   const content = (
     <article
-      className="group block overflow-hidden rounded-lg border border-slate-200 bg-white hover:shadow-md transition-shadow"
+      className="group block overflow-hidden rounded-lg border border bg-card hover:shadow-md transition-shadow"
       aria-labelledby={`memory-${memory.id}-title`}
     >
-      <div className="relative h-40 bg-slate-100">
+      <div className="relative h-40 bg-muted">
         {memory.coverUrl ? (
           <img
             src={memory.coverUrl}
@@ -45,15 +45,15 @@ export function MemoryCard({ memory, isLoading, to }: MemoryCardProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center text-slate-400">
+          <div className="h-full w-full flex items-center justify-center text-muted-foreground">
             No cover
           </div>
         )}
-        <div className="absolute top-2 right-2 rounded-full bg-white/80 p-1">
+        <div className="absolute top-2 right-2 rounded-full bg-card/80 p-1">
           {memory.favorite ? (
             <Heart className="h-4 w-4 text-rose-500" />
           ) : (
-            <Star className="h-4 w-4 text-slate-400" />
+            <Star className="h-4 w-4 text-muted-foreground" />
           )}
         </div>
       </div>
@@ -62,11 +62,11 @@ export function MemoryCard({ memory, isLoading, to }: MemoryCardProps) {
         <h3 id={`memory-${memory.id}-title`} className="font-medium truncate">
           {memory.title}
         </h3>
-        <p className="text-xs text-slate-500 mt-1 truncate">
+        <p className="text-xs text-muted-foreground mt-1 truncate">
           {memory.location ?? 'Unknown location'}
         </p>
         {memory.date && (
-          <p className="text-xs text-slate-400 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             {new Date(memory.date).toLocaleDateString()}
           </p>
         )}
