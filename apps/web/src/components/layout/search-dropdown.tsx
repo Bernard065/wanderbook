@@ -19,6 +19,7 @@ interface SearchDropdownProps {
   className?: string;
   autoFocus?: boolean;
   onNavigate?: () => void;
+  onClose?: () => void;
 }
 
 interface FlatResult {
@@ -45,6 +46,7 @@ export function SearchDropdown({
   className,
   autoFocus = false,
   onNavigate,
+  onClose,
 }: SearchDropdownProps) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -147,6 +149,14 @@ export function SearchDropdown({
   const showLoadingSkeletons = isFetching && trimmedQuery.length > 0;
 
   useEffect(() => {
+    if (!autoFocus) {
+      return;
+    }
+
+    inputRef.current?.focus();
+  }, [autoFocus]);
+
+  useEffect(() => {
     setActiveIndex((current) => {
       if (current < 0) {
         return current;
@@ -206,7 +216,9 @@ export function SearchDropdown({
           clearQuery();
         } else {
           inputRef.current?.blur();
-          closeDropdown();
+          setFocused(false);
+          setActiveIndex(-1);
+          onClose?.();
         }
 
         return;
@@ -219,7 +231,9 @@ export function SearchDropdown({
 
         event.preventDefault();
 
-        setActiveIndex((current) => (current + 1) % flatResults.length);
+        setActiveIndex(
+          (current) => (current + 1) % flatResults.length,
+        );
 
         return;
       }
@@ -279,9 +293,13 @@ export function SearchDropdown({
       ? `search-option-${flatResults[activeIndex].id}`
       : undefined;
 
-  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputBlur = (
+    event: React.FocusEvent<HTMLInputElement>,
+  ) => {
     const nextFocusTarget =
-      event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
+      event.relatedTarget instanceof HTMLElement
+        ? event.relatedTarget
+        : null;
 
     const isMovingWithinDropdown = nextFocusTarget?.closest(
       '[data-search-dropdown-root]',
@@ -373,7 +391,11 @@ export function SearchDropdown({
           className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-md border bg-white shadow-lg sm:max-h-80"
         >
           {showLoadingSkeletons && (
-            <div className="px-4 py-3" role="status" aria-live="polite">
+            <div
+              className="px-4 py-3"
+              role="status"
+              aria-live="polite"
+            >
               <div className="mb-3 text-sm text-gray-400">
                 Searching for "{trimmedQuery}"...
               </div>
@@ -397,7 +419,10 @@ export function SearchDropdown({
           )}
 
           {isError && !isFetching && (
-            <div className="px-4 py-3 text-sm text-red-600" role="alert">
+            <div
+              className="px-4 py-3 text-sm text-red-600"
+              role="alert"
+            >
               Something went wrong while searching. Please try again.
             </div>
           )}
@@ -412,16 +437,21 @@ export function SearchDropdown({
             </div>
           )}
 
-          {!isFetching && !isError && !isStaleQuery && totalResults === 0 && (
-            <div className="px-4 py-3 text-sm text-gray-500">
-              <p className="font-medium text-slate-700">No results found</p>
+          {!isFetching &&
+            !isError &&
+            !isStaleQuery &&
+            totalResults === 0 && (
+              <div className="px-4 py-3 text-sm text-gray-500">
+                <p className="font-medium text-slate-700">
+                  No results found
+                </p>
 
-              <p className="mt-1 text-gray-500">
-                Try a broader term or search for places, trips, journal entries,
-                or photos.
-              </p>
-            </div>
-          )}
+                <p className="mt-1 text-gray-500">
+                  Try a broader term or search for places, trips,
+                  journal entries, or photos.
+                </p>
+              </div>
+            )}
 
           {!isFetching &&
             !isError &&
@@ -462,3 +492,5 @@ export function SearchDropdown({
     </div>
   );
 }
+
+export default SearchDropdown;

@@ -30,11 +30,22 @@ export function ProfilePage() {
   const initials = getInitials(fullName, email);
 
   // Use preview if available, otherwise use the stored profile photo URL
-  const displayAvatarUrl = avatarPreview || user?.profilePhotoUrl;
+  const displayAvatarUrl =
+    avatarPreview || user?.profilePhotoUrl?.trim() || undefined;
 
   const handleAvatarClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
+
+  const handleAvatarKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleAvatarClick();
+      }
+    },
+    [handleAvatarClick],
+  );
 
   const handleAvatarChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,12 +55,14 @@ export function ProfilePage() {
       // Validate file type
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file');
+        event.target.value = '';
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
+        event.target.value = '';
         return;
       }
 
@@ -61,6 +74,9 @@ export function ProfilePage() {
         setAvatarPreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Reset so selecting the same file again still fires onChange
+      event.target.value = '';
     },
     [],
   );
@@ -85,10 +101,13 @@ export function ProfilePage() {
       }
 
       // Call API to update profile
-      const updatedUser = await apiRequest<typeof user>('/users/me', {
-        method: 'PUT',
-        body: formData,
-      });
+      const updatedUser = await apiRequest<NonNullable<typeof user>>(
+        '/users/me',
+        {
+          method: 'PUT',
+          body: formData,
+        },
+      );
 
       // Update auth store with new user data
       useAuthStore.setState((state) => ({
@@ -125,16 +144,25 @@ export function ProfilePage() {
           <SurfaceCard>
             <div className="flex flex-col items-center text-center">
               <div
+                role="button"
+                tabIndex={0}
+                aria-label="Change profile picture"
                 className="relative mb-4 group cursor-pointer"
                 onClick={handleAvatarClick}
+                onKeyDown={handleAvatarKeyDown}
               >
                 <Avatar className="size-16">
-                  <AvatarImage src={displayAvatarUrl || undefined} />
+                  {displayAvatarUrl ? (
+                    <AvatarImage
+                      src={displayAvatarUrl}
+                      alt={fullName || email || 'User avatar'}
+                    />
+                  ) : null}
                   <AvatarFallback className="bg-blue-600 text-lg font-medium text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center">
                   <Camera className="size-5 text-white" />
                 </div>
               </div>

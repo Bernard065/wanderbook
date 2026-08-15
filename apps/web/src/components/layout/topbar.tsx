@@ -27,16 +27,145 @@ interface TopbarProps {
   onMenuClick: () => void;
 }
 
-export function Topbar({ onMenuClick }: TopbarProps) {
-  const navigate = useNavigate();
+function AddNewMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size="sm"
+          className="gap-1 md:h-9 md:px-4"
+          aria-label="Add new"
+        >
+          <Plus className="size-4" aria-hidden="true" />
 
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+          <span className="hidden sm:inline">Add New</span>
+
+          <ChevronDown className="size-4" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end">
+        <AddPlaceDialog>
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Add Place
+          </DropdownMenuItem>
+        </AddPlaceDialog>
+
+        <AddTripDialog>
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Create Trip
+          </DropdownMenuItem>
+        </AddTripDialog>
+
+        <AddJournalEntryDialog
+          dialogTitle="Write a Journal Entry"
+          dialogDescription="Capture your thoughts, notes, and travel stories."
+        >
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Write Journal Entry
+          </DropdownMenuItem>
+        </AddJournalEntryDialog>
+
+        <AddJournalEntryDialog
+          dialogTitle="Add Memory"
+          dialogDescription="Capture a new travel memory in your journal."
+        >
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Add Memory
+          </DropdownMenuItem>
+        </AddJournalEntryDialog>
+
+        <AddExpenseDialog>
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Add Expense
+          </DropdownMenuItem>
+        </AddExpenseDialog>
+
+        <UploadMediaDialog>
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Upload Media
+          </DropdownMenuItem>
+        </UploadMediaDialog>
+
+        <UploadDocumentDialog>
+          <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+            Add Document
+          </DropdownMenuItem>
+        </UploadDocumentDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function UserMenu() {
+  const navigate = useNavigate();
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const user = useAuthStore((state) => state.user);
 
   const initials = user ? getInitials(user.fullName, user.email) : '?';
-  const avatarUrl = user?.profilePhotoUrl || undefined;
+  const avatarUrl = user?.profilePhotoUrl?.trim() || undefined;
+
+  const handleLogout = useCallback(() => {
+    clearAuth();
+    navigate('/login');
+  }, [clearAuth, navigate]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Open account menu"
+          className="flex items-center gap-1 rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <Avatar className="size-8">
+            {avatarUrl ? (
+              <AvatarImage
+                src={avatarUrl}
+                alt={user?.fullName || user?.email || 'User avatar'}
+              />
+            ) : null}
+
+            <AvatarFallback className="bg-blue-600 font-medium text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+
+          <ChevronDown
+            className="hidden size-4 text-slate-400 sm:block"
+            aria-hidden="true"
+          />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-56">
+        {user ? (
+          <div className="border-b px-3 py-2">
+            <p className="truncate text-sm font-medium text-slate-900">
+              {user.fullName}
+            </p>
+
+            <p className="truncate text-xs text-slate-500">
+              {user.email}
+            </p>
+          </div>
+        ) : null}
+
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
+          Profile
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={handleLogout}>
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function Topbar({ onMenuClick }: TopbarProps) {
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const openMobileSearch = useCallback(() => {
     setMobileSearchOpen(true);
@@ -46,31 +175,18 @@ export function Topbar({ onMenuClick }: TopbarProps) {
     setMobileSearchOpen(false);
   }, []);
 
-  const handleLogout = useCallback(() => {
-    clearAuth();
-    navigate('/login');
-  }, [clearAuth, navigate]);
-
   useEffect(() => {
-    const handleShortcut = (event: globalThis.KeyboardEvent) => {
+    const handleShortcut = (event: KeyboardEvent) => {
       const isSearchShortcut =
-        event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey);
+        event.key.toLowerCase() === 'k' &&
+        (event.metaKey || event.ctrlKey);
 
       if (!isSearchShortcut) {
         return;
       }
 
       event.preventDefault();
-
       setMobileSearchOpen(true);
-
-      window.requestAnimationFrame(() => {
-        const input = document.querySelector<HTMLInputElement>(
-          '[data-global-search-input]',
-        );
-
-        input?.focus();
-      });
     };
 
     window.addEventListener('keydown', handleShortcut);
@@ -84,9 +200,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
     return (
       <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6">
         <SearchDropdown
-          className="flex-1"
+          className="min-w-0 flex-1"
           autoFocus
           onNavigate={closeMobileSearch}
+          onClose={closeMobileSearch}
         />
 
         <button
@@ -119,7 +236,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         <SearchDropdown className="hidden max-w-xl flex-1 md:block" />
       </div>
 
-      {/* Mobile Search */}
+      {/* Mobile search */}
       <button
         type="button"
         onClick={openMobileSearch}
@@ -131,116 +248,8 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
       {/* Right side */}
       <div className="flex shrink-0 items-center gap-1 md:gap-3">
-        {/* Add New */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              size="sm"
-              className="gap-1 md:h-9 md:px-4"
-              aria-label="Add new"
-            >
-              <Plus className="size-4" aria-hidden="true" />
-
-              <span className="hidden sm:inline">Add New</span>
-
-              <ChevronDown className="size-4" aria-hidden="true" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end">
-            <AddPlaceDialog>
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Add Place
-              </DropdownMenuItem>
-            </AddPlaceDialog>
-
-            <AddTripDialog>
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Create Trip
-              </DropdownMenuItem>
-            </AddTripDialog>
-
-            <AddJournalEntryDialog
-              dialogTitle="Write a Journal Entry"
-              dialogDescription="Capture your thoughts, notes, and travel stories."
-            >
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Write Journal Entry
-              </DropdownMenuItem>
-            </AddJournalEntryDialog>
-
-            <AddJournalEntryDialog
-              dialogTitle="Add Memory"
-              dialogDescription="Capture a new travel memory in your journal."
-            >
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Add Memory
-              </DropdownMenuItem>
-            </AddJournalEntryDialog>
-
-            <AddExpenseDialog>
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Add Expense
-              </DropdownMenuItem>
-            </AddExpenseDialog>
-
-            <UploadMediaDialog>
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Upload Media
-              </DropdownMenuItem>
-            </UploadMediaDialog>
-
-            <UploadDocumentDialog>
-              <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
-                Add Document
-              </DropdownMenuItem>
-            </UploadDocumentDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label="Open account menu"
-              className="flex items-center gap-1 rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            >
-              <Avatar className="size-8">
-                <AvatarImage
-                  src={avatarUrl}
-                  alt={user?.fullName || user?.email || 'User avatar'}
-                />
-                <AvatarFallback className="bg-blue-600 font-medium text-white">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-
-              <ChevronDown
-                className="hidden size-4 text-slate-400 sm:block"
-                aria-hidden="true"
-              />
-            </button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="w-56">
-            {user ? (
-              <div className="border-b px-3 py-2">
-                <p className="truncate text-sm font-medium text-slate-900">
-                  {user.fullName}
-                </p>
-
-                <p className="truncate text-xs text-slate-500">{user.email}</p>
-              </div>
-            ) : null}
-
-            <DropdownMenuItem onClick={() => navigate('/profile')}>
-              Profile
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AddNewMenu />
+        <UserMenu />
       </div>
     </header>
   );

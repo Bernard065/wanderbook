@@ -38,7 +38,7 @@ export function useAchievements() {
 
   const stats: AchievementStats = {
     placesCount: places?.length ?? 0,
-    countriesCount: new Set(places?.map((p) => p.country)).size,
+    countriesCount: new Set(places?.map((p) => p.country) ?? []).size,
     tripsCount: trips?.length ?? 0,
     journalEntriesCount: journalEntries?.length ?? 0,
     photosCount: photos?.length ?? 0,
