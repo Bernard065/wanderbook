@@ -22,7 +22,7 @@ export function UserProfileCard() {
     <div className="flex items-center gap-3 px-3 md:px-2 lg:px-3 py-4 border-t">
       <Avatar className="h-9 w-9 shrink-0">
         {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
-        <AvatarFallback className="bg-blue-600 text-sm font-medium text-white">
+        <AvatarFallback className="bg-primary text-sm font-medium text-white">
           {initials}
         </AvatarFallback>
       </Avatar>
@@ -33,22 +33,22 @@ export function UserProfileCard() {
 
         {isLoading ? (
           <>
-            <div className="mt-1 h-3 w-24 animate-pulse rounded bg-gray-200" />
-            <div className="mt-1.5 h-1.5 w-full animate-pulse rounded-full bg-gray-200" />
+            <div className="mt-1 h-3 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-1.5 h-1.5 w-full animate-pulse rounded-full bg-muted" />
           </>
         ) : (
           <>
-            <p className="text-xs text-gray-500">Explorer Level {level}</p>
+            <p className="text-xs text-muted-foreground">Explorer Level {level}</p>
             <div
               role="progressbar"
               aria-valuenow={xpPercent}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label={`XP progress: ${xpPercent}%`}
-              className="mt-1 h-1.5 w-full rounded-full bg-gray-200"
+              className="mt-1 h-1.5 w-full rounded-full bg-muted"
             >
               <div
-                className="h-1.5 rounded-full bg-blue-600 transition-all"
+                className="h-1.5 rounded-full bg-primary transition-all"
                 style={{ width: `${xpPercent}%` }}
               />
             </div>

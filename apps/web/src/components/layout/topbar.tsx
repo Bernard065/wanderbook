@@ -117,7 +117,7 @@ function UserMenu() {
         <button
           type="button"
           aria-label="Open account menu"
-          className="flex items-center gap-1 rounded-md p-1 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="flex items-center gap-1 rounded-md p-1 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <Avatar className="size-8">
             {avatarUrl ? (
@@ -127,13 +127,13 @@ function UserMenu() {
               />
             ) : null}
 
-            <AvatarFallback className="bg-blue-600 font-medium text-white">
+            <AvatarFallback className="bg-primary font-medium text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
 
           <ChevronDown
-            className="hidden size-4 text-slate-400 sm:block"
+            className="hidden size-4 text-muted-foreground sm:block"
             aria-hidden="true"
           />
         </button>
@@ -142,11 +142,11 @@ function UserMenu() {
       <DropdownMenuContent align="end" className="w-56">
         {user ? (
           <div className="border-b px-3 py-2">
-            <p className="truncate text-sm font-medium text-slate-900">
+            <p className="truncate text-sm font-medium text-foreground">
               {user.fullName}
             </p>
 
-            <p className="truncate text-xs text-slate-500">
+            <p className="truncate text-xs text-muted-foreground">
               {user.email}
             </p>
           </div>
@@ -198,7 +198,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
   if (mobileSearchOpen) {
     return (
-      <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6">
+      <header className="flex h-16 items-center gap-3 border-b border bg-card px-4 md:px-6">
         <SearchDropdown
           className="min-w-0 flex-1"
           autoFocus
@@ -210,7 +210,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           type="button"
           onClick={closeMobileSearch}
           aria-label="Close search"
-          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <X className="size-5" aria-hidden="true" />
         </button>
@@ -219,7 +219,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   }
 
   return (
-    <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6">
+    <header className="flex h-16 items-center gap-3 border-b border bg-card px-4 md:px-6">
       {/* Left side */}
       <div className="flex min-w-0 flex-1 items-center gap-3">
         {/* Mobile menu */}
@@ -227,7 +227,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           type="button"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
-          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
+          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
         >
           <Menu className="size-5" aria-hidden="true" />
         </button>
@@ -241,7 +241,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         type="button"
         onClick={openMobileSearch}
         aria-label="Search"
-        className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
+        className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
       >
         <Search className="size-5" aria-hidden="true" />
       </button>

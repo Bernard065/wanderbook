@@ -335,7 +335,7 @@ export function SearchDropdown({
       >
         <Search
           aria-hidden="true"
-          className="absolute left-3 top-1/2 h-4 w-4 shrink-0 -translate-y-1/2 text-gray-400"
+          className="absolute left-3 top-1/2 h-4 w-4 shrink-0 -translate-y-1/2 text-muted-foreground"
         />
 
         <input
@@ -352,7 +352,7 @@ export function SearchDropdown({
           autoComplete="off"
           value={query}
           placeholder="Search places, trips, memories, journal..."
-          className="w-full rounded-md border bg-gray-50 py-2.5 pl-9 pr-9 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 md:py-2 md:text-sm"
+          className="w-full rounded-md border bg-muted py-2.5 pl-9 pr-9 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 md:py-2 md:text-sm"
           onChange={(event) => {
             setQuery(event.target.value);
             setActiveIndex(-1);
@@ -368,7 +368,7 @@ export function SearchDropdown({
           <button
             type="button"
             aria-label="Clear search"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-gray-200"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-muted"
             onMouseDown={(event) => {
               event.preventDefault();
             }}
@@ -376,7 +376,7 @@ export function SearchDropdown({
           >
             <X
               aria-hidden="true"
-              className="h-4 w-4 text-gray-400 md:h-3.5 md:w-3.5"
+              className="h-4 w-4 text-muted-foreground md:h-3.5 md:w-3.5"
             />
           </button>
         )}
@@ -388,7 +388,7 @@ export function SearchDropdown({
           ref={listRef}
           role="listbox"
           aria-label="Search results"
-          className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-md border bg-white shadow-lg sm:max-h-80"
+          className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[60vh] overflow-y-auto rounded-md border bg-card shadow-lg sm:max-h-80"
         >
           {showLoadingSkeletons && (
             <div
@@ -396,22 +396,22 @@ export function SearchDropdown({
               role="status"
               aria-live="polite"
             >
-              <div className="mb-3 text-sm text-gray-400">
+              <div className="mb-3 text-sm text-muted-foreground">
                 Searching for "{trimmedQuery}"...
               </div>
 
-              <div className="mb-3 h-2.5 w-32 animate-pulse rounded bg-slate-200" />
+              <div className="mb-3 h-2.5 w-32 animate-pulse rounded bg-muted" />
 
               <div className="space-y-2">
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={`skeleton-${index}`}
                     data-testid="search-skeleton"
-                    className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2"
+                    className="flex items-center gap-2 rounded-md bg-muted px-3 py-2"
                   >
-                    <div className="h-4 w-4 animate-pulse rounded-full bg-slate-200" />
+                    <div className="h-4 w-4 animate-pulse rounded-full bg-muted" />
 
-                    <div className="h-3 flex-1 animate-pulse rounded bg-slate-200" />
+                    <div className="h-3 flex-1 animate-pulse rounded bg-muted" />
                   </div>
                 ))}
               </div>
@@ -428,7 +428,7 @@ export function SearchDropdown({
           )}
 
           {!isFetching && !isError && totalResults > 0 && (
-            <div className="grid gap-2 border-b px-4 py-3 text-xs text-slate-500 sm:grid-cols-2">
+            <div className="grid gap-2 border-b px-4 py-3 text-xs text-muted-foreground sm:grid-cols-2">
               {resultsSummary.map((item) => (
                 <span key={item.label} className="truncate">
                   {item.label}: {item.count}
@@ -441,12 +441,12 @@ export function SearchDropdown({
             !isError &&
             !isStaleQuery &&
             totalResults === 0 && (
-              <div className="px-4 py-3 text-sm text-gray-500">
+              <div className="px-4 py-3 text-sm text-muted-foreground">
                 <p className="font-medium text-slate-700">
                   No results found
                 </p>
 
-                <p className="mt-1 text-gray-500">
+                <p className="mt-1 text-muted-foreground">
                   Try a broader term or search for places, trips,
                   journal entries, or photos.
                 </p>
@@ -478,7 +478,7 @@ export function SearchDropdown({
           {!isFetching && !isError && totalResults > 0 && (
             <button
               type="button"
-              className="w-full border-t px-4 py-3 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 md:py-2.5"
+              className="w-full border-t px-4 py-3 text-left text-sm font-medium text-primary hover:bg-blue-50 md:py-2.5"
               onMouseDown={(event) => {
                 event.preventDefault();
                 goToResults();
