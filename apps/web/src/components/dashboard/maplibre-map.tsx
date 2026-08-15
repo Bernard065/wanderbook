@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import type { StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import maplibreglWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import type { Place } from '@org/types';
 
 interface MapLibreMapProps {
@@ -94,6 +95,8 @@ export default function MapLibreMap({
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
+
+    maplibregl.setWorkerUrl(maplibreglWorkerUrl);
 
     mapRef.current = new maplibregl.Map({
       container: mapContainerRef.current,

@@ -5,7 +5,9 @@
   "scripts": {
     "api:migration:generate": "cd apps/api && .\\.venv\\Scripts\\python.exe -m alembic revision --autogenerate -m \"schema update\"",
     "api:migration:upgrade": "cd apps/api && .\\.venv\\Scripts\\python.exe -m alembic upgrade head",
-    "api:migration": "npm run api:migration:generate && npm run api:migration:upgrade"
+    "api:migration": "npm run api:migration:generate && npm run api:migration:upgrade",
+    "lint": "npx nx run api:lint",
+    "lint:fix": "npx nx run api:lint --fix"
   },
   "private": true,
   "devDependencies": {

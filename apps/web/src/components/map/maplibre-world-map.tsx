@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import type { StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import maplibreglWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 
 import type { MapMarker } from '@/hooks/use-map-data';
 
@@ -19,18 +20,15 @@ const DEFAULT_ZOOM = 2;
 const MARKER_CONFIG = {
   country: {
     size: 30,
-    background:
-      'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
+    background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
   },
   city: {
     size: 24,
-    background:
-      'linear-gradient(135deg, #2563eb 0%, #38bdf8 100%)',
+    background: 'linear-gradient(135deg, #2563eb 0%, #38bdf8 100%)',
   },
   place: {
     size: 18,
-    background:
-      'linear-gradient(135deg, #14b8a6 0%, #22c55e 100%)',
+    background: 'linear-gradient(135deg, #14b8a6 0%, #22c55e 100%)',
   },
 } as const;
 
@@ -46,9 +44,7 @@ function getMapStyle(): string | StyleSpecification {
     sources: {
       osm: {
         type: 'raster',
-        tiles: [
-          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        ],
+        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
         tileSize: 256,
         attribution: '© OpenStreetMap contributors',
       },
@@ -69,16 +65,12 @@ function createMarkerElement(
 ): HTMLButtonElement {
   const element = document.createElement('button');
 
-  const config =
-    MARKER_CONFIG[marker.type] ?? MARKER_CONFIG.place;
+  const config = MARKER_CONFIG[marker.type] ?? MARKER_CONFIG.place;
 
   element.type = 'button';
   element.className = 'custom-map-marker';
   element.title = marker.label;
-  element.setAttribute(
-    'aria-label',
-    `Select ${marker.label}`,
-  );
+  element.setAttribute('aria-label', `Select ${marker.label}`);
 
   Object.assign(element.style, {
     display: 'inline-flex',
@@ -98,8 +90,7 @@ function createMarkerElement(
     boxShadow: selected
       ? '0 0 0 4px rgba(59, 130, 246, 0.35), 0 16px 40px rgba(15, 23, 42, 0.15)'
       : '0 16px 24px rgba(15, 23, 42, 0.14)',
-    transition:
-      'transform 150ms ease, box-shadow 150ms ease',
+    transition: 'transform 150ms ease, box-shadow 150ms ease',
   });
 
   const inner = document.createElement('span');
@@ -109,8 +100,7 @@ function createMarkerElement(
     height: '50%',
     borderRadius: '50%',
     background: 'rgba(255, 255, 255, 0.9)',
-    boxShadow:
-      'inset 0 0 0 1px rgba(15, 23, 42, 0.1)',
+    boxShadow: 'inset 0 0 0 1px rgba(15, 23, 42, 0.1)',
     pointerEvents: 'none',
   });
 
@@ -126,18 +116,13 @@ export function MapLibreWorldMap({
   className,
   initialZoom = DEFAULT_ZOOM,
 }: MapLibreWorldMapProps) {
-  const mapContainerRef =
-    useRef<HTMLDivElement | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const mapRef =
-    useRef<maplibregl.Map | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
 
-  const markerInstancesRef = useRef<
-    maplibregl.Marker[]
-  >([]);
+  const markerInstancesRef = useRef<maplibregl.Marker[]>([]);
 
-  const onSelectMarkerRef =
-    useRef(onSelectMarker);
+  const onSelectMarkerRef = useRef(onSelectMarker);
 
   const initialZoomRef = useRef(initialZoom);
 
@@ -158,6 +143,8 @@ export function MapLibreWorldMap({
     if (!container || mapRef.current) {
       return;
     }
+
+    maplibregl.setWorkerUrl(maplibreglWorkerUrl);
 
     const map = new maplibregl.Map({
       container,
@@ -182,9 +169,7 @@ export function MapLibreWorldMap({
     mapRef.current = map;
 
     return () => {
-      markerInstancesRef.current.forEach(
-        (marker) => marker.remove(),
-      );
+      markerInstancesRef.current.forEach((marker) => marker.remove());
 
       markerInstancesRef.current = [];
 
@@ -205,9 +190,7 @@ export function MapLibreWorldMap({
     }
 
     const renderMarkers = () => {
-      markerInstancesRef.current.forEach(
-        (marker) => marker.remove(),
-      );
+      markerInstancesRef.current.forEach((marker) => marker.remove());
 
       markerInstancesRef.current = [];
 
@@ -218,13 +201,9 @@ export function MapLibreWorldMap({
       const bounds = new maplibregl.LngLatBounds();
 
       markers.forEach((marker) => {
-        const isSelected =
-          marker.id === selectedMarkerId;
+        const isSelected = marker.id === selectedMarkerId;
 
-        const element = createMarkerElement(
-          marker,
-          isSelected,
-        );
+        const element = createMarkerElement(marker, isSelected);
 
         const popup = new maplibregl.Popup({
           offset: 18,
@@ -232,30 +211,22 @@ export function MapLibreWorldMap({
           closeOnClick: false,
         }).setText(marker.label);
 
-        const markerInstance =
-          new maplibregl.Marker({
-            element,
-            anchor: 'center',
-          })
-            .setLngLat(marker.coordinates)
-            .setPopup(popup)
-            .addTo(map);
+        const markerInstance = new maplibregl.Marker({
+          element,
+          anchor: 'center',
+        })
+          .setLngLat(marker.coordinates)
+          .setPopup(popup)
+          .addTo(map);
 
-        const handleClick = (
-          event: MouseEvent,
-        ) => {
+        const handleClick = (event: MouseEvent) => {
           event.stopPropagation();
 
           onSelectMarkerRef.current(marker.id);
         };
 
-        const handleKeyDown = (
-          event: KeyboardEvent,
-        ) => {
-          if (
-            event.key !== 'Enter' &&
-            event.key !== ' '
-          ) {
+        const handleKeyDown = (event: KeyboardEvent) => {
+          if (event.key !== 'Enter' && event.key !== ' ') {
             return;
           }
 
@@ -273,45 +244,27 @@ export function MapLibreWorldMap({
           popup.remove();
         };
 
-        element.addEventListener(
-          'click',
-          handleClick,
-        );
+        element.addEventListener('click', handleClick);
 
-        element.addEventListener(
-          'keydown',
-          handleKeyDown,
-        );
+        element.addEventListener('keydown', handleKeyDown);
 
-        element.addEventListener(
-          'mouseenter',
-          handleMouseEnter,
-        );
+        element.addEventListener('mouseenter', handleMouseEnter);
 
-        element.addEventListener(
-          'mouseleave',
-          handleMouseLeave,
-        );
+        element.addEventListener('mouseleave', handleMouseLeave);
 
-        markerInstancesRef.current.push(
-          markerInstance,
-        );
+        markerInstancesRef.current.push(markerInstance);
 
         bounds.extend(marker.coordinates);
       });
 
       const selectedMarker = markers.find(
-        (marker) =>
-          marker.id === selectedMarkerId,
+        (marker) => marker.id === selectedMarkerId,
       );
 
       if (selectedMarker) {
         map.easeTo({
           center: selectedMarker.coordinates,
-          zoom:
-            selectedMarker.type === 'place'
-              ? 6
-              : 3,
+          zoom: selectedMarker.type === 'place' ? 6 : 3,
           duration: 600,
         });
 
@@ -321,10 +274,7 @@ export function MapLibreWorldMap({
       if (markers.length === 1) {
         map.easeTo({
           center: markers[0].coordinates,
-          zoom: Math.max(
-            initialZoomRef.current,
-            4,
-          ),
+          zoom: Math.max(initialZoomRef.current, 4),
           duration: 600,
         });
 
@@ -355,8 +305,7 @@ export function MapLibreWorldMap({
     <div
       ref={mapContainerRef}
       className={
-        className ??
-        'h-full w-full overflow-hidden rounded-[1.75rem] bg-muted'
+        className ?? 'h-full w-full overflow-hidden rounded-[1.75rem] bg-muted'
       }
       role="region"
       aria-label="Interactive travel map"

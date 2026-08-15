@@ -5,17 +5,14 @@ Revises: 6d7cfee35fa0
 Create Date: 2026-08-15 22:17:52.492382
 
 """
-from typing import Sequence, Union
 
-from alembic import op
-import sqlalchemy as sa
-
+from collections.abc import Sequence
 
 # revision identifiers, used by Alembic.
-revision: str = '6d5fc615fa31'
-down_revision: Union[str, Sequence[str], None] = '6d7cfee35fa0'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "6d5fc615fa31"
+down_revision: str | Sequence[str] | None = "6d7cfee35fa0"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
