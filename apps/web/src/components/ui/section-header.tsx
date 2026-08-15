@@ -17,7 +17,7 @@ export function SectionHeader({
   return (
     <div className={cn('flex items-start justify-between gap-3', className)}>
       <div className="min-w-0">
-        <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
           {title}
         </h2>
         {description ? (

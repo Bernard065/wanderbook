@@ -72,7 +72,7 @@ export function ToastContainer() {
             ? 'border border-rose-300 bg-rose-50 text-rose-700'
             : t.intent === 'success'
               ? 'border border-emerald-300 bg-emerald-50 text-emerald-700'
-              : 'border border-slate-200 bg-white text-slate-800';
+              : 'border border bg-card text-slate-800';
 
         const visibleClasses = t.visible
           ? 'opacity-100 translate-y-0 scale-100'

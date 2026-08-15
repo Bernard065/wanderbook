@@ -18,7 +18,7 @@ export function SurfaceCard({
   return (
     <div
       className={cn(
-        'rounded-3xl border border-slate-200/80 bg-white/95 text-slate-900 shadow-[0_12px_32px_-18px_rgba(15,23,42,0.22)]',
+        'rounded-3xl border border/80 bg-card/95 text-foreground shadow-[0_12px_32px_-18px_rgba(15,23,42,0.22)]',
         elevated && 'shadow-[0_16px_40px_-22px_rgba(15,23,42,0.24)]',
         padded ? 'p-5 sm:p-6' : 'p-0',
         className,
