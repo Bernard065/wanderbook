@@ -16,7 +16,7 @@ export function ExpenseRow({ expense }: ExpenseRowProps) {
         <p className="font-medium capitalize">
           {expense.category.replace(/_/g, ' ')}
         </p>
-        <p className="text-xs text-gray-400 mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5">
           {new Date(expense.expenseDate).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'short',
@@ -36,7 +36,7 @@ export function ExpenseRow({ expense }: ExpenseRowProps) {
           disabled={isPending}
           onClick={() => deleteExpense(expense.id)}
         >
-          <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+          <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
         </Button>
       </div>
     </div>

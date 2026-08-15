@@ -100,18 +100,18 @@ export function MapPreviewCard({
     return (
       <SurfaceCard>
         <div className="flex min-h-48 flex-col items-center justify-center px-6 py-8 text-center">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-slate-100">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-muted">
             <MapPin
-              className="size-5 text-slate-500"
+              className="size-5 text-muted-foreground"
               aria-hidden="true"
             />
           </div>
 
-          <h2 className="mt-4 text-base font-semibold text-slate-900">
+          <h2 className="mt-4 text-base font-semibold text-foreground">
             Select a marker
           </h2>
 
-          <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
             Tap any marker to see the place preview and
             trip details.
           </p>
@@ -144,7 +144,7 @@ export function MapPreviewCard({
     <SurfaceCard>
       <div className="space-y-5">
         <header className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-primary">
             <Icon
               className="size-5"
               aria-hidden="true"
@@ -152,15 +152,15 @@ export function MapPreviewCard({
           </div>
 
           <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {getMarkerTypeLabel(marker)}
             </p>
 
-            <h2 className="mt-1 truncate text-lg font-semibold text-slate-900">
+            <h2 className="mt-1 truncate text-lg font-semibold text-foreground">
               {headline}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               {subtitle}
             </p>
           </div>
@@ -175,22 +175,22 @@ export function MapPreviewCard({
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+              <div className="rounded-3xl border border bg-muted p-4">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   Visited
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-slate-900">
+                <p className="mt-2 text-xl font-semibold text-foreground">
                   {selectedPlaces[0].visitCount ?? 1}
                 </p>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+              <div className="rounded-3xl border border bg-muted p-4">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   Trips
                 </p>
 
-                <p className="mt-2 text-xl font-semibold text-slate-900">
+                <p className="mt-2 text-xl font-semibold text-foreground">
                   {markerTrips.length}
                 </p>
               </div>
@@ -207,8 +207,8 @@ export function MapPreviewCard({
             </p>
 
             <div className="space-y-3">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 text-slate-900">
+              <div className="rounded-3xl border border bg-muted p-4">
+                <div className="flex items-center gap-2 text-foreground">
                   <Sparkles
                     className="size-4"
                     aria-hidden="true"
@@ -238,14 +238,14 @@ export function MapPreviewCard({
                       ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-slate-500">
+                  <p className="mt-3 text-sm text-muted-foreground">
                     No places recorded yet.
                   </p>
                 )}
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 text-slate-900">
+              <div className="rounded-3xl border border bg-muted p-4">
+                <div className="flex items-center gap-2 text-foreground">
                   <MapPin
                     className="size-4"
                     aria-hidden="true"
@@ -264,8 +264,8 @@ export function MapPreviewCard({
                 </p>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-2 text-slate-900">
+              <div className="rounded-3xl border border bg-muted p-4">
+                <div className="flex items-center gap-2 text-foreground">
                   <Layers
                     className="size-4"
                     aria-hidden="true"

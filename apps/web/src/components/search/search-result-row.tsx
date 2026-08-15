@@ -34,7 +34,7 @@ const getRowClassName = (active: boolean) =>
     'transition-colors',
     'focus-visible:outline-none focus-visible:ring-2',
     'focus-visible:ring-inset focus-visible:ring-blue-500',
-    active ? 'bg-blue-50' : 'hover:bg-gray-50',
+    active ? 'bg-blue-50' : 'hover:bg-muted',
   ].join(' ');
 
 export function SearchResultRow({
@@ -56,16 +56,16 @@ export function SearchResultRow({
     <>
       <Icon
         aria-hidden="true"
-        className="size-4 shrink-0 text-slate-500"
+        className="size-4 shrink-0 text-muted-foreground"
       />
 
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-slate-900">
+        <p className="truncate font-medium text-foreground">
           {label}
         </p>
 
         {subtitle && (
-          <p className="mt-0.5 truncate text-xs text-slate-500">
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {subtitle}
           </p>
         )}

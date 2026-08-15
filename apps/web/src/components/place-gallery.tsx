@@ -203,11 +203,11 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
   };
 
   return (
-    <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="mt-8 rounded-2xl border border bg-card p-4 shadow-sm">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Gallery</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
+          <p className="text-sm text-muted-foreground">
             Capture memories from this place and keep them easy to revisit.
           </p>
         </div>
@@ -249,13 +249,13 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
       )}
 
       {isUploading && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-primary">
           <Sparkles className="h-4 w-4" />
           Uploading your photo…
         </div>
       )}
 
-      <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="mb-4 rounded-xl border border bg-muted p-3">
         <label
           htmlFor="photo-caption"
           className="mb-2 block text-sm font-medium text-slate-700"
@@ -270,7 +270,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
           placeholder="Add a short memory for this photo"
         />
 
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-muted-foreground">
           Captions are optional, but they make the gallery easier to revisit
           later.
         </p>
@@ -281,20 +281,20 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
           {pendingFiles.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm"
+              className="flex items-center gap-2 rounded-full border border bg-card px-3 py-2 text-sm text-slate-600 shadow-sm"
             >
               {item.status === 'success' ? (
                 <Check className="h-4 w-4 text-green-600" />
               ) : item.status === 'error' ? (
                 <AlertCircle className="h-4 w-4 text-red-500" />
               ) : (
-                <UploadCloud className="h-4 w-4 text-blue-600" />
+                <UploadCloud className="h-4 w-4 text-primary" />
               )}
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="max-w-36 truncate">{item.file.name}</span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-muted-foreground">
                     {item.status === 'uploading'
                       ? `${item.progress}%`
                       : item.status === 'success'
@@ -303,7 +303,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
                   </span>
                 </div>
 
-                <div className="mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full transition-all ${
                       item.status === 'success'
@@ -320,7 +320,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
               {item.status === 'error' && (
                 <button
                   type="button"
-                  className="ml-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                  className="ml-1 text-xs font-medium text-primary hover:text-primary"
                   onClick={() => uploadFile(item.file, item.id)}
                 >
                   Retry
@@ -332,7 +332,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
       )}
 
       {isLoading && (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-500">
+        <div className="rounded-lg border border bg-muted px-3 py-3 text-sm text-muted-foreground">
           Loading photos…
         </div>
       )}
@@ -344,7 +344,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
         photos?.length === 0 &&
         pendingFiles.length > 0 && (
           <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-6 text-center">
-            <Sparkles className="mx-auto mb-3 h-6 w-6 text-blue-600" />
+            <Sparkles className="mx-auto mb-3 h-6 w-6 text-primary" />
             <p className="font-medium text-blue-800">
               Your first photo is uploading...
             </p>
@@ -359,7 +359,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
             className={`rounded-xl border border-dashed p-6 text-center transition-colors ${
               isDragging
                 ? 'border-blue-400 bg-blue-50'
-                : 'border-slate-300 bg-slate-50'
+                : 'border-input bg-muted'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -369,7 +369,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
               No photos in this place yet
             </p>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               Drag and drop or browse to add your first photo.
             </p>
 
@@ -423,7 +423,7 @@ export function PlaceGallery({ placeId }: PlaceGalleryProps) {
           <button
             type="button"
             aria-label="Close preview"
-            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 hover:bg-white/20"
+            className="absolute right-4 top-4 rounded-full bg-card/10 p-2 hover:bg-card/20"
             onClick={(e) => {
               e.stopPropagation();
               setPreviewPhoto(null);

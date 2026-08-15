@@ -24,14 +24,14 @@ export function SearchSection({
 
         <h2
           id={`${title}-search-section`}
-          className="text-lg font-semibold text-slate-900"
+          className="text-lg font-semibold text-foreground"
         >
           {title}
         </h2>
 
         <span
           aria-label={`${count} ${count === 1 ? 'result' : 'results'}`}
-          className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600"
+          className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-slate-600"
         >
           {count}
         </span>

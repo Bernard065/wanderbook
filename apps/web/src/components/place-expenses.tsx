@@ -20,7 +20,7 @@ export function PlaceExpenses({ placeId }: PlaceExpensesProps) {
         <h2 className="text-lg font-semibold">
           Expenses
           {expenses && expenses.length > 0 && (
-            <span className="text-gray-400 font-normal text-base ml-2">
+            <span className="text-muted-foreground font-normal text-base ml-2">
               Total: {expenses[0].currency} {total.toFixed(2)}
             </span>
           )}
@@ -36,7 +36,7 @@ export function PlaceExpenses({ placeId }: PlaceExpensesProps) {
       {isLoading && <p>Loading expenses...</p>}
       {error && <ErrorMessage error={error} />}
       {expenses?.length === 0 && (
-        <p className="text-gray-500">No expenses recorded yet.</p>
+        <p className="text-muted-foreground">No expenses recorded yet.</p>
       )}
 
       <div className="space-y-2">

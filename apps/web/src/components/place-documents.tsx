@@ -27,7 +27,7 @@ export function PlaceDocuments({ placeId }: PlaceDocumentsProps) {
       {isLoading && <p>Loading documents...</p>}
       {error && <ErrorMessage error={error} />}
       {documents?.length === 0 && (
-        <p className="text-gray-500">No documents uploaded yet.</p>
+        <p className="text-muted-foreground">No documents uploaded yet.</p>
       )}
 
       <div className="space-y-2">

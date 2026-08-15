@@ -45,7 +45,7 @@ export function MapFilters({
       <div className="space-y-2">
         <label
           htmlFor="map-country-filter"
-          className="text-sm font-semibold text-slate-900"
+          className="text-sm font-semibold text-foreground"
         >
           Country
         </label>
@@ -85,7 +85,7 @@ export function MapFilters({
       <div className="space-y-2">
         <label
           htmlFor="map-trip-filter"
-          className="text-sm font-semibold text-slate-900"
+          className="text-sm font-semibold text-foreground"
         >
           Trip
         </label>
@@ -127,7 +127,7 @@ export function MapFilters({
       <div className="space-y-2">
         <label
           htmlFor="map-year-filter"
-          className="text-sm font-semibold text-slate-900"
+          className="text-sm font-semibold text-foreground"
         >
           Year
         </label>

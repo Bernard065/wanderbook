@@ -15,7 +15,7 @@ export function JournalEntryCard({ entry }: JournalEntryCardProps) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-semibold">{entry.title}</h3>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {new Date(entry.createdAt).toLocaleDateString(undefined, {
               year: 'numeric',
               month: 'long',
@@ -26,9 +26,9 @@ export function JournalEntryCard({ entry }: JournalEntryCardProps) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {entry.isPrivate ? (
-            <Lock className="h-3.5 w-3.5 text-gray-400" />
+            <Lock className="h-3.5 w-3.5 text-muted-foreground" />
           ) : (
-            <Globe className="h-3.5 w-3.5 text-gray-400" />
+            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
           )}
           <Button
             variant="ghost"
@@ -37,7 +37,7 @@ export function JournalEntryCard({ entry }: JournalEntryCardProps) {
             disabled={isPending}
             onClick={() => deleteEntry(entry.id)}
           >
-            <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+            <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
           </Button>
         </div>
       </div>

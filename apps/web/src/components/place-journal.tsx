@@ -21,7 +21,7 @@ export function PlaceJournal({ placeId }: PlaceJournalProps) {
       {isLoading && <p>Loading journal...</p>}
       {error && <ErrorMessage error={error} />}
       {entries?.length === 0 && (
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           No journal entries yet. Write about your experience above.
         </p>
       )}

@@ -19,7 +19,7 @@ export function JournalEntryListItem({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="font-semibold">{entry.title}</h3>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
             {placeName && (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
@@ -37,12 +37,12 @@ export function JournalEntryListItem({
           </div>
         </div>
         {entry.isPrivate ? (
-          <Lock className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         ) : (
-          <Globe className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+          <Globe className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         )}
       </div>
-      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
         {entry.content}
       </p>
     </Link>

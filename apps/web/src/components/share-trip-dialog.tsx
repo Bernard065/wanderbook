@@ -40,7 +40,7 @@ export function ShareTripDialog({ children, tripId }: ShareTripDialogProps) {
 
         <div className="space-y-2 py-2">
           {friends.length === 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               You don't have any friends yet. Add friends first from the
               Friends page.
             </p>
@@ -54,7 +54,7 @@ export function ShareTripDialog({ children, tripId }: ShareTripDialogProps) {
                 className="flex items-center justify-between border rounded-lg px-3 py-2"
               >
                 <div className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium">
+                  <div className="h-7 w-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-medium">
                     {getInitials(f.friend.fullName, f.friend.email)}
                   </div>
                   <span className="text-sm">

@@ -39,7 +39,7 @@ const typeMeta: Record<
   journal: {
     label: 'Journal',
     icon: BookOpen,
-    color: 'bg-amber-500 text-slate-900',
+    color: 'bg-amber-500 text-foreground',
   },
   memory: {
     label: 'Memory',
@@ -181,11 +181,11 @@ export function TimelineView({
             return (
               <section key={year} className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                     {year}
                   </span>
 
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-slate-600">
                     {totalEvents} event
                     {totalEvents === 1 ? '' : 's'}
                   </span>
@@ -195,25 +195,25 @@ export function TimelineView({
                   {monthKeys.map((month) => (
                     <div
                       key={`${year}-${month}`}
-                      className="rounded-3xl border border-slate-200 bg-slate-50 p-4"
+                      className="rounded-3xl border border bg-muted p-4"
                     >
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-foreground">
                             {month}
                           </p>
 
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             {months[month].length} item
                             {months[month].length === 1 ? '' : 's'}
                           </p>
                         </div>
 
-                        <span className="text-xs text-slate-500">{year}</span>
+                        <span className="text-xs text-muted-foreground">{year}</span>
                       </div>
 
                       <div className="relative pl-6">
-                        <div className="absolute bottom-0 left-3 top-0 w-px bg-slate-200" />
+                        <div className="absolute bottom-0 left-3 top-0 w-px bg-muted" />
 
                         <div className="space-y-4">
                           {months[month].map((event) => {
@@ -233,7 +233,7 @@ export function TimelineView({
                               <Link
                                 key={event.id}
                                 to={event.path}
-                                className="group relative block overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/20 transition hover:-translate-y-0.5 hover:shadow-md"
+                                className="group relative block overflow-hidden rounded-3xl border border bg-card p-4 shadow-sm shadow-slate-200/20 transition hover:-translate-y-0.5 hover:shadow-md"
                               >
                                 <span
                                   className={cn(
@@ -255,12 +255,12 @@ export function TimelineView({
                                       </span>
 
                                       <div className="min-w-0">
-                                        <p className="truncate text-sm font-semibold text-slate-900">
+                                        <p className="truncate text-sm font-semibold text-foreground">
                                           {event.title}
                                         </p>
 
                                         {event.subtitle ? (
-                                          <p className="truncate text-xs text-slate-500">
+                                          <p className="truncate text-xs text-muted-foreground">
                                             {event.subtitle}
                                           </p>
                                         ) : null}
@@ -268,7 +268,7 @@ export function TimelineView({
                                     </div>
                                   </div>
 
-                                  <div className="shrink-0 rounded-2xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
+                                  <div className="shrink-0 rounded-2xl bg-muted px-3 py-2 text-xs font-medium text-slate-600">
                                     {new Date(
                                       event.date,
                                     ).toLocaleDateString(undefined, {
@@ -279,7 +279,7 @@ export function TimelineView({
                                   </div>
                                 </div>
 
-                                <div className="mt-2 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                                <div className="mt-2 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-muted-foreground">
                                   <span>{meta.label}</span>
                                   <span aria-hidden="true">·</span>
                                   <span>
@@ -313,7 +313,7 @@ export function TimelineView({
   }
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <div className="rounded-3xl border border bg-card p-4 shadow-sm sm:p-6">
       {content}
     </div>
   );
