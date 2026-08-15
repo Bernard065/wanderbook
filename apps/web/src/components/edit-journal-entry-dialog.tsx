@@ -339,14 +339,14 @@ export function EditJournalEntryDialog({
               control={form.control}
               name="isPrivate"
               render={({ field }) => (
-                <FormItem className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <FormItem className="rounded-2xl border border bg-muted px-4 py-3">
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-1">
                       <FormLabel className="text-sm font-medium">
                         Privacy
                       </FormLabel>
 
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         Choose whether this entry is private or public.
                       </p>
                     </div>
