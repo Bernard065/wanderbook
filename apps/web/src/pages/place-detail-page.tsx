@@ -166,8 +166,8 @@ export function PlaceDetailPage() {
 
   if (!place) {
     return (
-      <div className="rounded-4xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900">
+      <div className="rounded-4xl border border bg-card p-8 shadow-sm">
+        <h1 className="text-2xl font-semibold text-foreground">
           Place not found
         </h1>
         <p className="mt-3 text-sm text-slate-600">
@@ -175,7 +175,7 @@ export function PlaceDetailPage() {
         </p>
         <Link
           to="/places"
-          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-blue-600"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-primary"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to places
@@ -197,7 +197,7 @@ export function PlaceDetailPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/places"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to places
@@ -215,7 +215,7 @@ export function PlaceDetailPage() {
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-4xl border border-slate-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-4xl border border bg-card shadow-sm">
         <div className="relative h-72 sm:h-80">
           <img
             src={place.heroImage}
@@ -225,10 +225,10 @@ export function PlaceDetailPage() {
           <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-slate-900/20 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
             <div className="flex flex-wrap gap-2 text-sm">
-              <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 backdrop-blur">
+              <span className="rounded-full border border-white/25 bg-card/15 px-3 py-1 backdrop-blur">
                 {place.category}
               </span>
-              <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 backdrop-blur">
+              <span className="rounded-full border border-white/25 bg-card/15 px-3 py-1 backdrop-blur">
                 {place.visitCount} visits
               </span>
             </div>
@@ -249,7 +249,7 @@ export function PlaceDetailPage() {
         </div>
       </section>
 
-      <div className="flex flex-wrap gap-2 rounded-full border border-slate-200 bg-white p-2 shadow-sm">
+      <div className="flex flex-wrap gap-2 rounded-full border border bg-card p-2 shadow-sm">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -261,8 +261,8 @@ export function PlaceDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
                 isActive
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-dark-bg text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-muted hover:text-foreground'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -275,60 +275,60 @@ export function PlaceDetailPage() {
       {activeTab === 'overview' ? (
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-6">
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-medium text-blue-600">
+                  <p className="text-sm font-medium text-primary">
                     Place information
                   </p>
-                  <h2 className="mt-1 text-xl font-semibold text-slate-900">
+                  <h2 className="mt-1 text-xl font-semibold text-foreground">
                     About this stop
                   </h2>
                 </div>
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-primary">
                   {place.visitCount} visits
                 </span>
               </div>
 
               <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <dt className="text-sm font-medium text-slate-500">
+                <div className="rounded-2xl bg-muted p-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Location
                   </dt>
-                  <dd className="mt-1 text-sm text-slate-900">
+                  <dd className="mt-1 text-sm text-foreground">
                     {place.city}, {place.region}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <dt className="text-sm font-medium text-slate-500">
+                <div className="rounded-2xl bg-muted p-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Country
                   </dt>
-                  <dd className="mt-1 text-sm text-slate-900">
+                  <dd className="mt-1 text-sm text-foreground">
                     {place.country}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <dt className="text-sm font-medium text-slate-500">
+                <div className="rounded-2xl bg-muted p-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     First visit
                   </dt>
-                  <dd className="mt-1 text-sm text-slate-900">
+                  <dd className="mt-1 text-sm text-foreground">
                     {formatDate(place.firstVisitDate)}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <dt className="text-sm font-medium text-slate-500">
+                <div className="rounded-2xl bg-muted p-4">
+                  <dt className="text-sm font-medium text-muted-foreground">
                     Category
                   </dt>
-                  <dd className="mt-1 text-sm text-slate-900">
+                  <dd className="mt-1 text-sm text-foreground">
                     {place.category}
                   </dd>
                 </div>
               </dl>
             </section>
 
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-medium text-blue-600">Notes</p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+              <p className="text-sm font-medium text-primary">Notes</p>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
                 What stands out
               </h2>
               <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -339,22 +339,22 @@ export function PlaceDetailPage() {
               </p>
             </section>
 
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-medium text-blue-600">Visit history</p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+              <p className="text-sm font-medium text-primary">Visit history</p>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Recent visits
               </h2>
               <div className="mt-5 space-y-4">
                 {place.visitHistory.map((visit) => (
                   <div
                     key={visit.title}
-                    className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                    className="rounded-2xl border border-slate-100 bg-muted p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-slate-900">
+                      <h3 className="text-sm font-semibold text-foreground">
                         {visit.title}
                       </h3>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-muted-foreground">
                         {visit.date}
                       </span>
                     </div>
@@ -368,12 +368,12 @@ export function PlaceDetailPage() {
           </div>
 
           <div className="space-y-6">
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-medium text-blue-600">Map</p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+              <p className="text-sm font-medium text-primary">Map</p>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Area overview
               </h2>
-              <div className="mt-4 flex h-48 items-center justify-center rounded-[1.25rem] border border-dashed border-slate-200 bg-linear-to-br from-slate-50 to-blue-50 text-center text-sm text-slate-600">
+              <div className="mt-4 flex h-48 items-center justify-center rounded-[1.25rem] border border-dashed border bg-linear-to-br from-slate-50 to-blue-50 text-center text-sm text-slate-600">
                 <div>
                   <Compass className="mx-auto h-8 w-8 text-blue-500" />
                   <p className="mt-3 font-medium text-slate-800">
@@ -384,20 +384,20 @@ export function PlaceDetailPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-medium text-blue-600">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+              <p className="text-sm font-medium text-primary">
                 Related memories
               </p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900">
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Memories preview
               </h2>
               <div className="mt-5 space-y-3">
                 {place.relatedMemories.map((memory) => (
                   <div
                     key={memory.title}
-                    className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                    className="rounded-2xl border border-slate-100 bg-muted p-4"
                   >
-                    <h3 className="text-sm font-semibold text-slate-900">
+                    <h3 className="text-sm font-semibold text-foreground">
                       {memory.title}
                     </h3>
                     <p className="mt-1 text-sm text-slate-600">
@@ -408,21 +408,21 @@ export function PlaceDetailPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-medium text-blue-600">Related trips</p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-900">
+            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+              <p className="text-sm font-medium text-primary">Related trips</p>
+              <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Trips preview
               </h2>
               <div className="mt-5 space-y-3">
                 {place.relatedTrips.map((trip) => (
                   <div
                     key={trip.title}
-                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-muted p-4"
                   >
-                    <span className="text-sm font-semibold text-slate-900">
+                    <span className="text-sm font-semibold text-foreground">
                       {trip.title}
                     </span>
-                    <span className="text-sm text-slate-500">{trip.date}</span>
+                    <span className="text-sm text-muted-foreground">{trip.date}</span>
                   </div>
                 ))}
               </div>
@@ -430,8 +430,8 @@ export function PlaceDetailPage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-sm font-medium text-slate-500">
+        <div className="rounded-3xl border border bg-card p-8 text-center shadow-sm">
+          <p className="text-sm font-medium text-muted-foreground">
             The {activeTab} view is coming soon.
           </p>
         </div>

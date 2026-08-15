@@ -11,10 +11,10 @@ export function PlacesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Places
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Explore the places you have visited and the memories attached to them.
         </p>
       </div>
@@ -24,14 +24,14 @@ export function PlacesPage() {
           {Array.from({ length: 6 }).map((_, index) => (
             <div
               key={`skeleton-${index}`}
-              className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+              className="overflow-hidden rounded-xl border border bg-card"
             >
-              <div className="h-40 animate-pulse bg-slate-100" />
+              <div className="h-40 animate-pulse bg-muted" />
 
               <div className="space-y-3 p-4">
-                <div className="h-5 w-2/3 animate-pulse rounded bg-slate-100" />
-                <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
-                <div className="h-10 w-full animate-pulse rounded bg-slate-100" />
+                <div className="h-5 w-2/3 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+                <div className="h-10 w-full animate-pulse rounded bg-muted" />
               </div>
             </div>
           ))}

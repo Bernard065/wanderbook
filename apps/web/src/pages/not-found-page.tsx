@@ -11,10 +11,10 @@ export function NotFoundPage() {
         description="The page you are looking for does not exist or may have moved."
       />
 
-      <div className="rounded-4xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="rounded-4xl border border bg-card p-8 shadow-sm">
         <div className="flex flex-col items-center justify-center gap-4 text-center">
-          <MapPin className="h-12 w-12 text-slate-400" />
-          <h2 className="text-2xl font-semibold text-slate-900">404</h2>
+          <MapPin className="h-12 w-12 text-muted-foreground" />
+          <h2 className="text-2xl font-semibold text-foreground">404</h2>
           <p className="max-w-xl text-sm leading-6 text-slate-600">
             We couldn’t find the page you were looking for. Check the URL or
             return to the dashboard.

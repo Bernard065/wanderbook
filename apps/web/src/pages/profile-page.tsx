@@ -158,7 +158,7 @@ export function ProfilePage() {
                       alt={fullName || email || 'User avatar'}
                     />
                   ) : null}
-                  <AvatarFallback className="bg-blue-600 text-lg font-medium text-white">
+                  <AvatarFallback className="bg-primary text-lg font-medium text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -176,11 +176,11 @@ export function ProfilePage() {
                 aria-label="Upload profile picture"
               />
 
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-foreground">
                 {fullName || 'User'}
               </p>
 
-              <p className="text-xs text-slate-500">{email}</p>
+              <p className="text-xs text-muted-foreground">{email}</p>
             </div>
           </SurfaceCard>
         </div>
@@ -189,7 +189,7 @@ export function ProfilePage() {
           <SurfaceCard>
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 mb-4">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   Personal Information
                 </h2>
               </div>
@@ -202,12 +202,12 @@ export function ProfilePage() {
                   <button
                     type="button"
                     onClick={handleAvatarClick}
-                    className="w-full px-4 py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-600 hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium"
+                    className="w-full px-4 py-2 border-2 border-dashed border-input rounded-lg text-slate-600 hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium"
                   >
                     <Camera className="size-4 mx-auto mb-1" />
                     Click to upload a profile picture
                   </button>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     PNG, JPG, GIF up to 5MB
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export function ProfilePage() {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -241,9 +241,9 @@ export function ProfilePage() {
                     type="email"
                     value={email}
                     disabled
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
+                    className="w-full px-3 py-2 border border-input rounded-lg bg-muted text-muted-foreground cursor-not-allowed"
                   />
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Email cannot be changed
                   </p>
                 </div>

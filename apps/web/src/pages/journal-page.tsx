@@ -74,7 +74,7 @@ const JournalSidebarItem = ({
       className={`group relative cursor-pointer overflow-hidden rounded-3xl border transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
         isSelected
           ? 'border-blue-300 bg-blue-50 shadow-sm'
-          : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
+          : 'border bg-card hover:border-input hover:shadow-sm'
       }`}
     >
       {coverUrl ? (
@@ -88,7 +88,7 @@ const JournalSidebarItem = ({
           <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
         </div>
       ) : (
-        <div className="flex h-36 w-full items-center justify-center bg-slate-100 text-slate-300">
+        <div className="flex h-36 w-full items-center justify-center bg-muted text-dark-foreground">
           <BookOpen className="h-10 w-10" />
         </div>
       )}
@@ -100,7 +100,7 @@ const JournalSidebarItem = ({
           onToggleFavorite();
         }}
         aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-500 shadow-sm transition hover:scale-105 hover:text-amber-500"
+        className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-card/95 text-muted-foreground shadow-sm transition hover:scale-105 hover:text-amber-500"
       >
         {isFavorite ? (
           <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
@@ -111,12 +111,12 @@ const JournalSidebarItem = ({
 
       <div className="space-y-2 p-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 font-semibold text-slate-900">
+          <h3 className="line-clamp-2 font-semibold text-foreground">
             {entry.title}
           </h3>
         </div>
 
-        <p className="text-xs text-slate-500">{formatDate(entry.createdAt)}</p>
+        <p className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</p>
 
         <p className="line-clamp-3 text-sm leading-6 text-slate-600">
           {entry.content}
@@ -124,14 +124,14 @@ const JournalSidebarItem = ({
 
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {placeName ? (
-            <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+            <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-slate-600">
               <MapPin className="h-3 w-3 shrink-0" />
               <span className="truncate">{placeName}</span>
             </span>
           ) : null}
 
           {entry.mood ? (
-            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
+            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-primary">
               {entry.mood}
             </span>
           ) : null}
@@ -328,16 +328,16 @@ export function JournalPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-primary">
               <BookOpen className="h-5 w-5" />
             </div>
 
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
                 Journal
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Every story from every place you've visited.
               </p>
             </div>
@@ -354,12 +354,12 @@ export function JournalPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-            <BookOpen className="h-5 w-5 animate-pulse text-slate-400" />
+        <div className="rounded-3xl border border bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+            <BookOpen className="h-5 w-5 animate-pulse text-muted-foreground" />
           </div>
 
-          <p className="text-sm text-slate-500">Loading journal...</p>
+          <p className="text-sm text-muted-foreground">Loading journal...</p>
         </div>
       )}
 
@@ -386,20 +386,20 @@ export function JournalPage() {
           {/* Sidebar */}
           <aside className="space-y-4">
             {/* Search */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2.5 text-slate-500 shadow-inner">
+            <div className="rounded-3xl border border bg-card p-4 shadow-sm">
+              <div className="flex items-center gap-2 rounded-2xl bg-muted px-3 py-2.5 text-muted-foreground shadow-inner">
                 <Search className="h-4 w-4 shrink-0" />
 
                 <Input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   placeholder="Search journal entries..."
-                  className="h-auto border-0 bg-transparent p-0 text-sm placeholder:text-slate-400 focus-visible:ring-0"
+                  className="h-auto border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground focus-visible:ring-0"
                 />
               </div>
 
               {searchTerm.trim() && (
-                <p className="mt-3 text-xs text-slate-500">
+                <p className="mt-3 text-xs text-muted-foreground">
                   {filteredEntries.length}{' '}
                   {filteredEntries.length === 1 ? 'entry' : 'entries'} found
                 </p>
@@ -409,14 +409,14 @@ export function JournalPage() {
             {/* Entries */}
             <div className="space-y-3">
               {filteredEntries.length === 0 ? (
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-                  <Search className="mx-auto mb-3 h-8 w-8 text-slate-300" />
+                <div className="rounded-3xl border border bg-card p-6 text-center shadow-sm">
+                  <Search className="mx-auto mb-3 h-8 w-8 text-dark-foreground" />
 
                   <p className="text-sm font-medium text-slate-700">
                     No entries found
                   </p>
 
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Try a different search term.
                   </p>
                 </div>
@@ -440,17 +440,17 @@ export function JournalPage() {
           {/* Main journal */}
           <main className="min-w-0">
             {!selectedEntry ? (
-              <div className="flex min-h-125 items-center justify-center rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex min-h-125 items-center justify-center rounded-3xl border border bg-card p-6 shadow-sm">
                 <div className="text-center">
-                  <BookOpen className="mx-auto mb-3 h-10 w-10 text-slate-300" />
+                  <BookOpen className="mx-auto mb-3 h-10 w-10 text-dark-foreground" />
 
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     Select a journal entry to view the full story.
                   </p>
                 </div>
               </div>
             ) : (
-              <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <article className="overflow-hidden rounded-3xl border border bg-card shadow-sm">
                 {/* Cover */}
                 {selectedPlace?.coverUrl ? (
                   <div className="relative h-64 w-full sm:h-80">
@@ -470,7 +470,7 @@ export function JournalPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="flex h-64 items-center justify-center bg-slate-100 text-slate-300 sm:h-80">
+                  <div className="flex h-64 items-center justify-center bg-muted text-dark-foreground sm:h-80">
                     <BookOpen className="h-16 w-16" />
                   </div>
                 )}
@@ -480,7 +480,7 @@ export function JournalPage() {
                   {/* Header */}
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 space-y-3">
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                         {selectedPlace?.name && (
                           <span className="flex items-center gap-1.5">
                             <MapPin className="h-4 w-4" />
@@ -495,13 +495,13 @@ export function JournalPage() {
                         )}
 
                         {selectedTripName ? (
-                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-slate-600">
                             {selectedTripName}
                           </span>
                         ) : null}
 
                         {selectedEntry.weather ? (
-                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-slate-600">
                             {selectedEntry.weather}
                           </span>
                         ) : null}
@@ -517,13 +517,13 @@ export function JournalPage() {
                         </span>
 
                         {selectedEntry.mood && (
-                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-slate-600">
                             {selectedEntry.mood}
                           </span>
                         )}
                       </div>
 
-                      <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                      <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                         {selectedEntry.title}
                       </h2>
                     </div>
@@ -538,7 +538,7 @@ export function JournalPage() {
                         {favoriteEntryIds.has(selectedEntry.id) ? (
                           <Star className="mr-2 h-4 w-4 fill-amber-400 text-amber-500" />
                         ) : (
-                          <StarOff className="mr-2 h-4 w-4 text-slate-500" />
+                          <StarOff className="mr-2 h-4 w-4 text-muted-foreground" />
                         )}
 
                         {favoriteEntryIds.has(selectedEntry.id)
@@ -561,7 +561,7 @@ export function JournalPage() {
                     </div>
                   </div>
 
-                  <div className="h-px bg-slate-100" />
+                  <div className="h-px bg-muted" />
 
                   {/* Story */}
                   <div className="whitespace-pre-wrap text-[16px] leading-8 text-slate-700">

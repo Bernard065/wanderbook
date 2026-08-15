@@ -31,16 +31,16 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <MapPin className="h-7 w-7 text-blue-600" />
+          <MapPin className="h-7 w-7 text-primary" />
           <span className="font-semibold text-xl">WanderBook</span>
         </div>
 
-        <div className="bg-white border rounded-lg p-6 shadow-sm">
+        <div className="bg-card border rounded-lg p-6 shadow-sm">
           <h1 className="text-xl font-semibold mb-1">Welcome back</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Log in to continue your journey.
           </p>
 
@@ -91,9 +91,9 @@ export function LoginPage() {
           </Form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-6">
           Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-medium">
+          <Link to="/register" className="text-primary font-medium">
             Sign up
           </Link>
         </p>

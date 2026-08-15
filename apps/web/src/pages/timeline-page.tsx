@@ -13,7 +13,7 @@ return ( <div className="space-y-6"> <PageHeader
 ```
   <div className="grid gap-6">
     {isLoading ? (
-      <div className="rounded-4xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <div className="rounded-4xl border border bg-card p-8 text-center shadow-sm">
         <p className="text-sm text-slate-600">
           Loading timeline...
         </p>

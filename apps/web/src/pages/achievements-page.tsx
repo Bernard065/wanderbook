@@ -19,7 +19,7 @@ export function AchievementsPage() {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm">
+      <div className="rounded-3xl border border bg-card/95 p-6 shadow-sm">
         <p className="text-sm text-slate-600">Loading achievements...</p>
       </div>
     );
@@ -54,12 +54,12 @@ export function AchievementsPage() {
       />
 
       <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <div className="space-y-6 rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm">
+        <div className="space-y-6 rounded-3xl border border bg-card/95 p-6 shadow-sm">
           <div>
-            <p className="text-sm font-semibold text-slate-500 uppercase tracking-[0.24em]">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-[0.24em]">
               Explorer Progress
             </p>
-            <p className="mt-4 text-3xl font-semibold text-slate-900">
+            <p className="mt-4 text-3xl font-semibold text-foreground">
               Level {level}
             </p>
             <p className="mt-2 text-sm text-slate-600">
@@ -70,17 +70,17 @@ export function AchievementsPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-slate-700">Progress to next level</p>
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold text-foreground">
                 {progress}%
               </p>
             </div>
-            <div className="rounded-full bg-slate-100 h-3 overflow-hidden">
+            <div className="rounded-full bg-muted h-3 overflow-hidden">
               <div
                 className="h-3 rounded-full bg-linear-to-r from-blue-500 to-cyan-400 transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               {xpIntoLevel} / {xpForNextLevel} XP towards level {level + 1}
             </p>
           </div>
@@ -91,10 +91,10 @@ export function AchievementsPage() {
             <section key={category} className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2 className="text-lg font-semibold text-foreground">
                     {category}
                   </h2>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-muted-foreground">
                     {
                       groupedAchievements[category].filter((achievement) =>
                         unlockedIds.has(achievement.id),

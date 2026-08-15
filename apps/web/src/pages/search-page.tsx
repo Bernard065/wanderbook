@@ -97,7 +97,7 @@ export function SearchPage() {
     return (
       <div className="grid gap-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Search
           </h1>
 
@@ -113,23 +113,23 @@ export function SearchPage() {
   return (
     <div className="grid gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Search results
         </h1>
 
         <p className="mt-1 text-sm text-slate-600">
           Showing results for{' '}
-          <span className="font-medium text-slate-900">
+          <span className="font-medium text-foreground">
             &quot;{query}&quot;
           </span>
         </p>
 
-        <p className="mt-2 text-sm text-slate-500">{summary}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{summary}</p>
       </div>
 
       {isLoading && (
         <div
-          className="py-12 text-center text-sm text-slate-500"
+          className="py-12 text-center text-sm text-muted-foreground"
           role="status"
           aria-live="polite"
         >
@@ -140,12 +140,12 @@ export function SearchPage() {
       {error && <ErrorMessage error={error} />}
 
       {!isLoading && !error && totalResults === 0 && (
-        <div className="rounded-xl border border-dashed border-slate-300 p-12 text-center">
-          <h2 className="text-lg font-semibold text-slate-900">
+        <div className="rounded-xl border border-dashed border-input p-12 text-center">
+          <h2 className="text-lg font-semibold text-foreground">
             No results found
           </h2>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Try a different keyword or check your spelling.
           </p>
 
@@ -154,7 +154,7 @@ export function SearchPage() {
               <Link
                 key={suggestion}
                 to={`/search?q=${encodeURIComponent(suggestion)}`}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
+                className="rounded-full border border bg-card px-3 py-1.5 text-sm text-slate-600 transition-colors hover:border-input hover:text-foreground"
               >
                 {suggestion}
               </Link>
@@ -196,13 +196,13 @@ export function SearchPage() {
                   <Link
                     key={entry.id}
                     to={`/places/${entry.placeId}`}
-                    className="block rounded-xl border border-slate-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+                    className="block rounded-xl border border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <h3 className="font-medium text-slate-900">
+                    <h3 className="font-medium text-foreground">
                       {entry.title}
                     </h3>
 
-                    <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                       {entry.content}
                     </p>
                   </Link>
@@ -239,24 +239,24 @@ export function SearchPage() {
                           className="absolute inset-0 bg-linear-to-t from-slate-950/60 via-slate-950/10 to-transparent"
                         />
 
-                        <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2 py-1 text-[11px] font-medium text-slate-700">
+                        <span className="absolute bottom-2 left-2 rounded-full bg-card/90 px-2 py-1 text-[11px] font-medium text-slate-700">
                           {photo.placeId ? 'Memory' : 'Gallery'}
                         </span>
                       </div>
 
                       <div className="flex flex-1 flex-col p-3">
-                        <p className="truncate text-sm font-medium text-slate-900">
+                        <p className="truncate text-sm font-medium text-foreground">
                           {photo.caption ?? 'Photo memory'}
                         </p>
 
                         <time
                           dateTime={photo.createdAt}
-                          className="mt-1 text-xs text-slate-500"
+                          className="mt-1 text-xs text-muted-foreground"
                         >
                           {dateFormatter.format(new Date(photo.createdAt))}
                         </time>
 
-                        <p className="mt-2 text-xs font-medium text-blue-600">
+                        <p className="mt-2 text-xs font-medium text-primary">
                           {photo.placeId ? 'Open memory →' : 'Gallery photo'}
                         </p>
                       </div>
@@ -267,7 +267,7 @@ export function SearchPage() {
                     return (
                       <div
                         key={photo.id}
-                        className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                        className="overflow-hidden rounded-xl border border bg-card shadow-sm"
                       >
                         {content}
                       </div>
@@ -281,7 +281,7 @@ export function SearchPage() {
                       aria-label={`Open memory: ${
                         photo.caption ?? 'Photo memory'
                       }`}
-                      className="group block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                      className="group block overflow-hidden rounded-xl border border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                     >
                       {content}
                     </Link>
@@ -302,16 +302,16 @@ export function SearchPage() {
                   <Link
                     key={item.id}
                     to="/bucket-list"
-                    className="block rounded-xl border border-slate-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+                    className="block rounded-xl border border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <h3 className="font-medium text-slate-900">{item.name}</h3>
+                    <h3 className="font-medium text-foreground">{item.name}</h3>
 
-                    <p className="mt-1 text-sm capitalize text-slate-500">
+                    <p className="mt-1 text-sm capitalize text-muted-foreground">
                       {item.category.replace(/_/g, ' ')}
                     </p>
 
                     {item.notes && (
-                      <p className="mt-2 line-clamp-2 text-sm text-slate-500">
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                         {item.notes}
                       </p>
                     )}

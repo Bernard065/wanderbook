@@ -29,9 +29,9 @@ import { TripExpenses } from '@/components/trip-expenses';
 import type { Trip } from '@org/types';
 
 const statusStyles: Record<Trip['status'], string> = {
-  planning: 'bg-blue-50 text-blue-600',
+  planning: 'bg-blue-50 text-primary',
   ongoing: 'bg-green-50 text-green-600',
-  completed: 'bg-gray-100 text-gray-600',
+  completed: 'bg-muted text-muted-foreground',
   cancelled: 'bg-red-50 text-red-600',
 };
 
@@ -57,7 +57,7 @@ export function TripDetailPage() {
       <div className="flex items-center justify-between mb-4">
         <Link
           to="/trips"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-gray-700"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Trips
@@ -116,7 +116,7 @@ export function TripDetailPage() {
       </div>
 
       {(trip.startDate || trip.endDate) && (
-        <div className="flex items-center gap-1 text-gray-500 mt-2">
+        <div className="flex items-center gap-1 text-muted-foreground mt-2">
           <Calendar className="h-4 w-4" />
           <span>
             {trip.startDate ?? '?'} – {trip.endDate ?? '?'}
@@ -133,19 +133,19 @@ export function TripDetailPage() {
       </h2>
 
       {trip.places.length === 0 ? (
-        <p className="text-gray-500">No places attached to this trip yet.</p>
+        <p className="text-muted-foreground">No places attached to this trip yet.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {trip.places.map((place) => (
             <Link key={place.id} to={`/places/${place.id}`}>
               <div className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
                 <p className="font-medium">{place.name}</p>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                   <MapPin className="h-3.5 w-3.5" />
                   {place.city ? `${place.city}, ` : ''}
                   {place.country}
                 </p>
-                <p className="text-sm capitalize text-gray-500 mt-1">
+                <p className="text-sm capitalize text-muted-foreground mt-1">
                   {place.category}
                 </p>
               </div>

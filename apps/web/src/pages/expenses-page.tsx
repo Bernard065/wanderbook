@@ -227,7 +227,7 @@ export function ExpensesPage() {
         <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr] xl:grid-cols-[2fr_1fr]">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div>
-              <p className="text-sm font-medium text-slate-500">Date range</p>
+              <p className="text-sm font-medium text-muted-foreground">Date range</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <Input
                   type="date"
@@ -245,7 +245,7 @@ export function ExpensesPage() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-500">Trip</p>
+              <p className="text-sm font-medium text-muted-foreground">Trip</p>
               <div className="mt-3">
                 <Select value={tripFilter} onValueChange={setTripFilter}>
                   <SelectTrigger className="w-full h-9">
@@ -264,7 +264,7 @@ export function ExpensesPage() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-500">Category</p>
+              <p className="text-sm font-medium text-muted-foreground">Category</p>
               <div className="mt-3">
                 <Select
                   value={categoryFilter}
@@ -289,12 +289,12 @@ export function ExpensesPage() {
             <div className="hidden xl:block" />
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-3xl border border bg-muted p-4">
             <div className="flex items-center gap-3 text-slate-600">
               <CalendarDays className="h-5 w-5" />
               <div>
                 <p className="text-sm font-medium">Active filters</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {categoryFilter !== 'all' &&
                     `${CATEGORY_OPTIONS.find((option) => option.value === categoryFilter)?.label ?? ''}`}
                   {categoryFilter !== 'all' && tripFilter !== 'all'
@@ -315,19 +315,19 @@ export function ExpensesPage() {
         <SurfaceCard className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm text-slate-500">Total spent</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className="text-sm text-muted-foreground">Total spent</p>
+              <p className="mt-2 text-3xl font-semibold text-foreground">
                 {new Intl.NumberFormat(undefined, {
                   style: 'currency',
                   currency: expenseCurrency,
                 }).format(totalSpent)}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-slate-700">
               <DollarSign className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-sm leading-6 text-slate-500">
+          <p className="text-sm leading-6 text-muted-foreground">
             Total spending during the active filter period.
           </p>
         </SurfaceCard>
@@ -335,19 +335,19 @@ export function ExpensesPage() {
         <SurfaceCard className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm text-slate-500">Budget remaining</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className="text-sm text-muted-foreground">Budget remaining</p>
+              <p className="mt-2 text-3xl font-semibold text-foreground">
                 {new Intl.NumberFormat(undefined, {
                   style: 'currency',
                   currency: expenseCurrency,
                 }).format(budgetRemaining)}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-slate-700">
               <CreditCard className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-sm leading-6 text-slate-500">
+          <p className="text-sm leading-6 text-muted-foreground">
             {activeBudget > 0 ? (
               <>
                 Based on a total budget of{' '}
@@ -366,16 +366,16 @@ export function ExpensesPage() {
         <SurfaceCard className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm text-slate-500">Transactions</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-900">
+              <p className="text-sm text-muted-foreground">Transactions</p>
+              <p className="mt-2 text-3xl font-semibold text-foreground">
                 {filteredExpenses.length}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-slate-700">
               <List className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-sm leading-6 text-slate-500">
+          <p className="text-sm leading-6 text-muted-foreground">
             Expenses in the currently selected date, trip, and category filters.
           </p>
         </SurfaceCard>
@@ -397,16 +397,16 @@ export function ExpensesPage() {
                 <div key={category.category} className="space-y-2">
                   <div className="flex items-center justify-between text-sm text-slate-700">
                     <span>{category.label}</span>
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-foreground">
                       {new Intl.NumberFormat(undefined, {
                         style: 'currency',
                         currency: expenseCurrency,
                       }).format(category.amount)}
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <div
-                      className="h-full rounded-full bg-blue-600 transition-all duration-200"
+                      className="h-full rounded-full bg-primary transition-all duration-200"
                       style={{ width: `${width}%` }}
                     />
                   </div>
@@ -432,14 +432,14 @@ export function ExpensesPage() {
                   <div key={trip.tripId} className="space-y-2">
                     <div className="flex items-center justify-between text-sm text-slate-700">
                       <span className="truncate">{trip.name}</span>
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-foreground">
                         {new Intl.NumberFormat(undefined, {
                           style: 'currency',
                           currency: expenseCurrency,
                         }).format(trip.amount)}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div
                         className="h-full rounded-full bg-emerald-600 transition-all duration-200"
                         style={{ width: `${width}%` }}
@@ -449,7 +449,7 @@ export function ExpensesPage() {
                 );
               })
             ) : (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted-foreground">
                 No trip spending found for the current filter.
               </p>
             )}
@@ -466,13 +466,13 @@ export function ExpensesPage() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm text-slate-700">
+            <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-sm text-slate-700">
               <MapPin className="h-4 w-4" />
               {trips?.length
                 ? `${trips.length} trips available`
                 : 'Loading trips...'}
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm text-slate-700">
+            <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-sm text-slate-700">
               <Package className="h-4 w-4" />
               {filteredExpenses.length} expenses
             </div>
@@ -485,7 +485,7 @@ export function ExpensesPage() {
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={`skeleton-${index}`}
-                  className="h-20 rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm animate-pulse"
+                  className="h-20 rounded-3xl border border bg-muted p-4 shadow-sm animate-pulse"
                 />
               ))}
             </div>
@@ -496,7 +496,7 @@ export function ExpensesPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">
+            <div className="rounded-3xl border border-dashed border bg-muted p-8 text-center text-sm text-muted-foreground">
               No expenses match the selected filters.
             </div>
           )}

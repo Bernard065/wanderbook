@@ -23,7 +23,7 @@ export function DocumentsPage() {
       {isLoading && <p>Loading documents...</p>}
       {error && <ErrorMessage error={error} />}
       {documents?.length === 0 && (
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           No documents yet. Upload passports, tickets, or receipts to keep them
           all in one place.
         </p>

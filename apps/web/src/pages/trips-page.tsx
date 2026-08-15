@@ -369,22 +369,22 @@ export function TripsPage() {
           {Array.from({ length: 6 }).map((_, index) => (
             <div
               key={`skeleton-${index}`}
-              className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+              className="overflow-hidden rounded-xl border border bg-card"
             >
-              <div className="aspect-video animate-pulse bg-slate-200" />
+              <div className="aspect-video animate-pulse bg-muted" />
 
               <div className="space-y-4 p-4">
-                <div className="h-5 w-2/3 animate-pulse rounded-full bg-slate-200" />
+                <div className="h-5 w-2/3 animate-pulse rounded-full bg-muted" />
 
                 <div className="space-y-2">
-                  <div className="h-4 w-3/4 animate-pulse rounded-full bg-slate-200" />
-                  <div className="h-4 w-1/2 animate-pulse rounded-full bg-slate-200" />
+                  <div className="h-4 w-3/4 animate-pulse rounded-full bg-muted" />
+                  <div className="h-4 w-1/2 animate-pulse rounded-full bg-muted" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-4">
-                  <div className="h-5 animate-pulse rounded bg-slate-200" />
-                  <div className="h-5 animate-pulse rounded bg-slate-200" />
-                  <div className="h-5 animate-pulse rounded bg-slate-200" />
+                  <div className="h-5 animate-pulse rounded bg-muted" />
+                  <div className="h-5 animate-pulse rounded bg-muted" />
+                  <div className="h-5 animate-pulse rounded bg-muted" />
                 </div>
               </div>
             </div>
@@ -440,7 +440,7 @@ export function TripsPage() {
 
       {/* Result count */}
       {!isLoading && sortedTrips.length > 0 && trips?.length ? (
-        <div className="text-sm text-slate-500">
+        <div className="text-sm text-muted-foreground">
           Showing {sortedTrips.length} of {trips.length} trips
         </div>
       ) : null}

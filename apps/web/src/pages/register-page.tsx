@@ -34,16 +34,16 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <MapPin className="h-7 w-7 text-blue-600" />
+          <MapPin className="h-7 w-7 text-primary" />
           <span className="font-semibold text-xl">WanderBook</span>
         </div>
 
-        <div className="bg-white border rounded-lg p-6 shadow-sm">
+        <div className="bg-card border rounded-lg p-6 shadow-sm">
           <h1 className="text-xl font-semibold mb-1">Create your account</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Start preserving your journeys.
           </p>
 
@@ -106,9 +106,9 @@ export function RegisterPage() {
           </Form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-muted-foreground mt-6">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 font-medium">
+          <Link to="/login" className="text-primary font-medium">
             Log in
           </Link>
         </p>

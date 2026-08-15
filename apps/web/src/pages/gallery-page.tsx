@@ -355,8 +355,8 @@ export function GalleryPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2 rounded-full bg-slate-100 p-1">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border bg-card p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 rounded-full bg-muted p-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -368,8 +368,8 @@ export function GalleryPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-200'
+                    ? 'bg-dark-bg text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-muted'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -392,7 +392,7 @@ export function GalleryPage() {
 
       <div className="grid gap-3 lg:grid-cols-[1.2fr_auto_auto]">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
           <Input
             value={searchQuery}
@@ -461,13 +461,13 @@ export function GalleryPage() {
           {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={`skeleton-${index}`}
-              className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+              className="overflow-hidden rounded-3xl border border bg-card shadow-sm"
             >
-              <div className="aspect-video animate-pulse bg-slate-100" />
+              <div className="aspect-video animate-pulse bg-muted" />
 
               <div className="space-y-2 p-4">
-                <div className="h-3 w-3/4 animate-pulse rounded-full bg-slate-200" />
-                <div className="h-3 w-1/2 animate-pulse rounded-full bg-slate-200" />
+                <div className="h-3 w-3/4 animate-pulse rounded-full bg-muted" />
+                <div className="h-3 w-1/2 animate-pulse rounded-full bg-muted" />
               </div>
             </div>
           ))}
@@ -517,7 +517,7 @@ export function GalleryPage() {
             return (
               <div
                 key={item.id}
-                className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="group relative overflow-hidden rounded-3xl border border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <button
                   type="button"
@@ -535,9 +535,9 @@ export function GalleryPage() {
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
                 <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="rounded-3xl bg-slate-950/90 px-3 py-3 text-sm text-slate-100 backdrop-blur-sm">
+                  <div className="rounded-3xl bg-dark-bg/90 px-3 py-3 text-sm text-dark-foreground backdrop-blur-sm">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-300">
+                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-dark-foreground">
                         <Camera className="h-3.5 w-3.5" />
                         Photo
                       </span>
@@ -547,7 +547,7 @@ export function GalleryPage() {
                       {item.caption ?? 'Travel memory'}
                     </p>
 
-                    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-slate-300">
+                    <div className="mt-3 flex items-center justify-between gap-3 text-xs text-dark-foreground">
                       <span className="inline-flex min-w-0 items-center gap-1 truncate">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
                         {location}
@@ -570,7 +570,7 @@ export function GalleryPage() {
                     event.stopPropagation();
                     toggleFavorite(item.id);
                   }}
-                  className="absolute right-3 top-3 z-10 rounded-full border border-white/20 bg-slate-950/70 p-2 text-white"
+                  className="absolute right-3 top-3 z-10 rounded-full border border-white/20 bg-dark-bg/70 p-2 text-white"
                 >
                   {isFavorite ? (
                     <Heart className="h-4 w-4 fill-rose-400 text-rose-400" />
@@ -595,12 +595,12 @@ export function GalleryPage() {
           className="max-h-[90vh] w-full max-w-[90vw] overflow-hidden rounded-3xl p-0 sm:max-w-[80vw]"
         >
           {selectedMedia ? (
-            <div className="relative flex h-[80vh] flex-col overflow-hidden bg-slate-950 text-white lg:h-[75vh]">
+            <div className="relative flex h-[80vh] flex-col overflow-hidden bg-dark-bg text-white lg:h-[75vh]">
               <div className="absolute right-4 top-4 z-20">
                 <DialogClose asChild>
                   <button
                     type="button"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/80"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-dark-bg/80"
                     aria-label="Close viewer"
                   >
                     <X className="h-5 w-5" />
@@ -612,7 +612,7 @@ export function GalleryPage() {
                 type="button"
                 onClick={goPrevious}
                 disabled={!hasPrevious}
-                className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-slate-900/70 p-3 disabled:opacity-40"
+                className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-dark-bg/70 p-3 disabled:opacity-40"
                 aria-label="Previous media"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -622,7 +622,7 @@ export function GalleryPage() {
                 type="button"
                 onClick={goNext}
                 disabled={!hasNext}
-                className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-slate-900/70 p-3 disabled:opacity-40"
+                className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-dark-bg/70 p-3 disabled:opacity-40"
                 aria-label="Next media"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -641,7 +641,7 @@ export function GalleryPage() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm uppercase tracking-[0.25em] text-slate-400">
+                        <p className="text-sm uppercase tracking-[0.25em] text-muted-foreground">
                           Photo preview
                         </p>
 
@@ -653,7 +653,7 @@ export function GalleryPage() {
                       <button
                         type="button"
                         onClick={() => toggleFavorite(selectedMedia.id)}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm"
+                        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-card/5 px-4 py-2 text-sm"
                       >
                         {favoriteIds.has(selectedMedia.id) ? (
                           <Heart className="h-4 w-4 fill-rose-400 text-rose-400" />
@@ -667,15 +667,15 @@ export function GalleryPage() {
                       </button>
                     </div>
 
-                    <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
-                      <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                    <div className="rounded-3xl border border-white/10 bg-dark-bg/80 p-4">
+                      <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-muted-foreground">
                         <Sparkles className="h-4 w-4" />
                         Media details
                       </div>
 
                       <dl className="grid gap-4 text-sm">
                         <div>
-                          <dt className="text-slate-400">Location</dt>
+                          <dt className="text-muted-foreground">Location</dt>
                           <dd className="mt-1 text-white">
                             {selectedMedia.placeId
                               ? (placeNameById.get(selectedMedia.placeId) ??
@@ -685,7 +685,7 @@ export function GalleryPage() {
                         </div>
 
                         <div>
-                          <dt className="text-slate-400">Date</dt>
+                          <dt className="text-muted-foreground">Date</dt>
                           <dd className="mt-1 text-white">
                             {new Intl.DateTimeFormat(undefined, {
                               dateStyle: 'medium',
@@ -695,7 +695,7 @@ export function GalleryPage() {
 
                         {selectedMedia.placeId ? (
                           <div>
-                            <dt className="text-slate-400">Related place</dt>
+                            <dt className="text-muted-foreground">Related place</dt>
                             <dd className="mt-1">
                               <Link
                                 to={`/places/${selectedMedia.placeId}`}

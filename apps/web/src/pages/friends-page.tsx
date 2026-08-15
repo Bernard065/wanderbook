@@ -43,7 +43,7 @@ export function FriendsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Friends</h1>
-      <p className="text-gray-500 mb-6">
+      <p className="text-muted-foreground mb-6">
         Connect with friends to share your trips.
       </p>
 
@@ -75,7 +75,7 @@ export function FriendsPage() {
                 className="flex items-center justify-between border rounded-lg px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium">
+                  <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
                     {getInitials(f.friend.fullName, f.friend.email)}
                   </div>
                   <span className="text-sm">
@@ -118,10 +118,10 @@ export function FriendsPage() {
                 key={f.id}
                 className="flex items-center justify-between border rounded-lg px-4 py-3"
               >
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   {f.friend.fullName || f.friend.email}
                 </span>
-                <span className="text-xs text-gray-400">Pending</span>
+                <span className="text-xs text-muted-foreground">Pending</span>
               </div>
             ))}
           </div>
@@ -133,7 +133,7 @@ export function FriendsPage() {
           Friends ({accepted.length})
         </h2>
         {accepted.length === 0 && (
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             No friends yet. Add someone by email above.
           </p>
         )}
@@ -144,7 +144,7 @@ export function FriendsPage() {
               className="flex items-center justify-between border rounded-lg px-4 py-3"
             >
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium">
+                <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
                   {getInitials(f.friend.fullName, f.friend.email)}
                 </div>
                 <span className="text-sm">
@@ -157,7 +157,7 @@ export function FriendsPage() {
                 className="h-7 w-7"
                 onClick={() => remove(f.id)}
               >
-                <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+                <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </div>
           ))}

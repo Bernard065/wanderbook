@@ -127,25 +127,25 @@ export function DashboardPage() {
 
               <div className="absolute inset-6 flex flex-col justify-between pointer-events-none">
                 <div className="pointer-events-auto max-w-2xl">
-                  <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
+                  <p className="text-sm uppercase tracking-[0.24em] text-dark-foreground">
                     Your World, Your Stories.
                   </p>
                 </div>
 
                 <div className="flex gap-3 pointer-events-auto">
-                  <div className="rounded-full bg-white/10 px-3 py-2">
+                  <div className="rounded-full bg-card/10 px-3 py-2">
                     <p className="text-sm font-semibold">{countries}</p>
-                    <p className="text-xs text-slate-300">Countries</p>
+                    <p className="text-xs text-dark-foreground">Countries</p>
                   </div>
-                  <div className="rounded-full bg-white/10 px-3 py-2">
+                  <div className="rounded-full bg-card/10 px-3 py-2">
                     <p className="text-sm font-semibold">{cities}</p>
-                    <p className="text-xs text-slate-300">Cities</p>
+                    <p className="text-xs text-dark-foreground">Cities</p>
                   </div>
-                  <div className="rounded-full bg-white/10 px-3 py-2">
+                  <div className="rounded-full bg-card/10 px-3 py-2">
                     <p className="text-sm font-semibold">
                       {places?.length ?? 0}
                     </p>
-                    <p className="text-xs text-slate-300">Places</p>
+                    <p className="text-xs text-dark-foreground">Places</p>
                   </div>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export function DashboardPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Loading dashboard...</p>
+        <p className="text-sm text-muted-foreground">Loading dashboard...</p>
       ) : hasError ? (
         <div className="p-4 rounded-md border bg-red-50">
           <p className="text-sm text-red-700">Unable to load dashboard data.</p>
@@ -194,7 +194,7 @@ export function DashboardPage() {
                   label: 'Kilometers Traveled',
                   value: kilometersTraveled,
                   unit: 'km',
-                  iconClassName: 'bg-blue-50 text-blue-600',
+                  iconClassName: 'bg-blue-50 text-primary',
                   supportingText: 'Estimated distance from your journey',
                   isLoading,
                 },
@@ -243,7 +243,7 @@ export function DashboardPage() {
                     action={
                       <Link
                         to="/trips"
-                        className="text-sm font-medium text-blue-600"
+                        className="text-sm font-medium text-primary"
                       >
                         View all trips
                       </Link>
@@ -285,7 +285,7 @@ export function DashboardPage() {
                     action={
                       <Link
                         to="/gallery"
-                        className="text-xs font-medium text-blue-600"
+                        className="text-xs font-medium text-primary"
                       >
                         View all
                       </Link>
@@ -306,7 +306,7 @@ export function DashboardPage() {
                 action={
                   <Link
                     to="/trips"
-                    className="text-xs font-medium text-blue-600"
+                    className="text-xs font-medium text-primary"
                   >
                     View all
                   </Link>
@@ -314,23 +314,23 @@ export function DashboardPage() {
               />
 
               {upcomingTrips.length === 0 ? (
-                <p className="text-sm text-slate-500">No upcoming trips yet.</p>
+                <p className="text-sm text-muted-foreground">No upcoming trips yet.</p>
               ) : (
                 <div className="space-y-2">
                   {upcomingTrips.map((trip) => (
                     <Link
                       key={trip.id}
                       to={`/trips/${trip.id}`}
-                      className="flex items-center gap-3 rounded-lg border border-slate-100 p-2 transition-colors hover:bg-slate-50"
+                      className="flex items-center gap-3 rounded-lg border border-slate-100 p-2 transition-colors hover:bg-muted"
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-slate-600">
                         <Compass className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">
                           {trip.name}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                           {trip.startDate} – {trip.endDate}
                         </p>
                       </div>
