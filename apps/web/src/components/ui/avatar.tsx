@@ -25,14 +25,13 @@ function Avatar({
 
 function AvatarImage({
   className,
-  alt,
   ...props
-}: React.ImgHTMLAttributes<HTMLImageElement>) {
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
-    <img
-      alt={alt ?? ''}
+    <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn('aspect-square size-full object-cover', className)}
+      decoding="async"
       {...props}
     />
   );
