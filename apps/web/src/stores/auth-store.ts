@@ -29,6 +29,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'wanderbook-auth',
+      // No partialize: every field in AuthState is meant to persist.
+      // If a non-persisted field (e.g. a transient `isLoading` flag) is
+      // added later, reintroduce partialize to exclude it explicitly.
     },
   ),
 );

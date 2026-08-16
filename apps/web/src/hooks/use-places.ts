@@ -10,6 +10,8 @@ import {
   type CreatePlaceRequest,
   type UpdatePlaceRequest,
 } from '@/api/places';
+import { useAuthStore } from '@/stores/auth-store';
+import { useHasHydrated } from '@/hooks/use-has-hydrated';
 
 export type CreatePlaceInput = CreatePlaceRequest;
 
@@ -21,9 +23,13 @@ export interface UpdatePlaceInput extends UpdatePlaceRequest {
  * Fetch all places.
  */
 export function usePlaces() {
+  const hasHydrated = useHasHydrated();
+  const token = useAuthStore((s) => s.token);
+
   return useQuery({
     queryKey: PLACES_QUERY_KEY,
     queryFn: listPlaces,
+    enabled: hasHydrated && !!token,
   });
 }
 
@@ -31,6 +37,9 @@ export function usePlaces() {
  * Fetch a single place by ID.
  */
 export function usePlace(id: string | undefined) {
+  const hasHydrated = useHasHydrated();
+  const token = useAuthStore((s) => s.token);
+
   return useQuery({
     queryKey: [...PLACES_QUERY_KEY, id],
     queryFn: () => {
@@ -40,7 +49,7 @@ export function usePlace(id: string | undefined) {
 
       return getPlace(id);
     },
-    enabled: Boolean(id),
+    enabled: hasHydrated && !!token && Boolean(id),
   });
 }
 
@@ -68,8 +77,7 @@ export function useUpdatePlace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, ...input }: UpdatePlaceInput) =>
-      updatePlace(id, input),
+    mutationFn: ({ id, ...input }: UpdatePlaceInput) => updatePlace(id, input),
 
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({

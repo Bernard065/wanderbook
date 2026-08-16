@@ -1,21 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Trip, TripStatus } from '@org/types';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthStore } from '@/stores/auth-store';
+import { useHasHydrated } from '@/hooks/use-has-hydrated';
 
 const TRIPS_KEY = ['trips'];
 
 export function useTrips() {
+  const hasHydrated = useHasHydrated();
+  const token = useAuthStore((s) => s.token);
+
   return useQuery({
     queryKey: TRIPS_KEY,
     queryFn: () => apiRequest<Trip[]>('/trips'),
+    enabled: hasHydrated && !!token,
   });
 }
 
 export function useTrip(id: string | undefined) {
+  const hasHydrated = useHasHydrated();
+  const token = useAuthStore((s) => s.token);
+
   return useQuery({
     queryKey: ['trips', id],
-    queryFn: () => apiRequest<Trip>(`/trips/${id}`),
-    enabled: !!id,
+    queryFn: () => {
+      if (!id) {
+        throw new Error('Trip ID is required.');
+      }
+
+      return apiRequest<Trip>(`/trips/${id}`);
+    },
+    enabled: hasHydrated && !!token && !!id,
   });
 }
 
