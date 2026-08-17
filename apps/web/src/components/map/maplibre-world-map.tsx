@@ -17,6 +17,25 @@ interface MapLibreWorldMapProps {
 const DEFAULT_CENTER: [number, number] = [20, 0];
 const DEFAULT_ZOOM = 2;
 
+const FALLBACK_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    {
+      id: 'osm-tiles',
+      type: 'raster',
+      source: 'osm',
+    },
+  ],
+};
+
 const MARKER_CONFIG = {
   country: {
     size: 30,
@@ -39,24 +58,7 @@ function getMapStyle(): string | StyleSpecification {
     return `https://api.mapbox.com/styles/v1/mapbox/light-v11?access_token=${token}`;
   }
 
-  return {
-    version: 8,
-    sources: {
-      osm: {
-        type: 'raster',
-        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '© OpenStreetMap contributors',
-      },
-    },
-    layers: [
-      {
-        id: 'osm-tiles',
-        type: 'raster',
-        source: 'osm',
-      },
-    ],
-  };
+  return FALLBACK_STYLE;
 }
 
 function createMarkerElement(
@@ -146,6 +148,8 @@ export function MapLibreWorldMap({
 
     maplibregl.setWorkerUrl(maplibreglWorkerUrl);
 
+    let fallbackApplied = false;
+
     const map = new maplibregl.Map({
       container,
       style: getMapStyle(),
@@ -164,7 +168,17 @@ export function MapLibreWorldMap({
       map.resize();
     };
 
+    const handleMapError = () => {
+      if (fallbackApplied) {
+        return;
+      }
+
+      fallbackApplied = true;
+      map.setStyle(FALLBACK_STYLE);
+    };
+
     map.once('load', handleMapLoad);
+    map.on('error', handleMapError);
 
     mapRef.current = map;
 
@@ -173,6 +187,7 @@ export function MapLibreWorldMap({
 
       markerInstancesRef.current = [];
 
+      map.off('error', handleMapError);
       map.remove();
 
       mapRef.current = null;
