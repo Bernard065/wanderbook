@@ -3,13 +3,24 @@ import { Avatar as AvatarPrimitive } from 'radix-ui';
 
 import { cn } from '@/lib/utils';
 
+type AvatarContextValue = {
+  hasImageError: boolean;
+  setHasImageError: (value: boolean) => void;
+};
+
+const AvatarContext = React.createContext<AvatarContextValue | null>(null);
+
 function Avatar({
   className,
   size = 'default',
+  children,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: 'default' | 'sm' | 'lg';
+  children?: React.ReactNode;
 }) {
+  const [hasImageError, setHasImageError] = React.useState(false);
+
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
@@ -19,19 +30,38 @@ function Avatar({
         className,
       )}
       {...props}
-    />
+    >
+      <AvatarContext.Provider value={{ hasImageError, setHasImageError }}>
+        {children}
+      </AvatarContext.Provider>
+    </AvatarPrimitive.Root>
   );
 }
 
 function AvatarImage({
   className,
+  onError,
+  src,
+  alt,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: React.ImgHTMLAttributes<HTMLImageElement>) {
+  const context = React.useContext(AvatarContext);
+
+  if (!src || context?.hasImageError) {
+    return null;
+  }
+
   return (
-    <AvatarPrimitive.Image
+    <img
+      src={src}
+      alt={alt ?? ''}
       data-slot="avatar-image"
       className={cn('aspect-square size-full object-cover', className)}
       decoding="async"
+      onError={(event) => {
+        context?.setHasImageError(true);
+        onError?.(event);
+      }}
       {...props}
     />
   );
@@ -39,17 +69,26 @@ function AvatarImage({
 
 function AvatarFallback({
   className,
+  children,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+}: React.ComponentProps<'span'>) {
+  const context = React.useContext(AvatarContext);
+
+  if (!context?.hasImageError) {
+    return null;
+  }
+
   return (
-    <AvatarPrimitive.Fallback
+    <span
       data-slot="avatar-fallback"
       className={cn(
         'flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs',
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </span>
   );
 }
 

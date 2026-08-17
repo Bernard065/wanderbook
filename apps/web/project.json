@@ -6,7 +6,10 @@
   "tags": [],
   "targets": {
     "build": {
-      "outputs": ["{projectRoot}/{options.outDir}", "{projectRoot}/dist"],
+      "outputs": [
+        "{projectRoot}/{options.outDir}",
+        "{projectRoot}/dist"
+      ],
       "options": {
         "config": "vite.config.mts",
         "outDir": "./dist"
@@ -25,14 +28,16 @@
       }
     },
     "test": {
-      "executor": "@nx/vitest:test",
       "options": {
         "config": "vite.config.mts"
       }
     },
     "lint": {
       "options": {
-        "args": ["src/**/*.{ts,tsx,js,jsx}", "**/*.{ts,tsx,js,jsx}"]
+        "args": [
+          "src/**/*.{ts,tsx,js,jsx}",
+          "**/*.{ts,tsx,js,jsx}"
+        ]
       }
     }
   }
