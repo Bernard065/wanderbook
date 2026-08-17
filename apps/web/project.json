@@ -6,39 +6,33 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{projectRoot}/{options.outDir}", "{projectRoot}/dist"],
       "options": {
-        "outputPath": "apps/web/dist",
-        "config": "apps/web/vite.config.mts"
+        "config": "vite.config.mts",
+        "outDir": "./dist"
       }
     },
     "serve": {
       "executor": "@nx/vite:dev",
       "options": {
-        "config": "apps/web/vite.config.mts"
+        "config": "vite.config.mts"
       }
     },
     "preview": {
       "executor": "@nx/vite:preview",
       "options": {
-        "config": "apps/web/vite.config.mts"
+        "config": "vite.config.mts"
       }
     },
     "test": {
       "executor": "@nx/vitest:test",
       "options": {
-        "config": "apps/web/vite.config.mts"
+        "config": "vite.config.mts"
       }
     },
     "lint": {
       "options": {
-        "args": [
-          "src/**/*.{ts,tsx,js,jsx}",
-          "**/*.{ts,tsx,js,jsx}"
-        ]
+        "args": ["src/**/*.{ts,tsx,js,jsx}", "**/*.{ts,tsx,js,jsx}"]
       }
     }
   }
