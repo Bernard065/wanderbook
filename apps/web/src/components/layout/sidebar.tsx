@@ -36,27 +36,29 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'flex flex-col bg-card border-r h-screen z-50',
+          'z-50 flex h-screen flex-col border-r border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] backdrop-blur-sm',
           'fixed inset-y-0 left-0 w-64 transition-transform duration-200',
-          'md:static md:translate-x-0 md:w-16 lg:w-60',
+          'md:static md:translate-x-0 md:w-24 lg:w-[220px]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
         aria-label="Sidebar navigation"
       >
-        <div className="px-4 md:px-3 lg:px-6 py-5 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <MapPin className="h-6 w-6 text-primary shrink-0" />
-            <span className="font-semibold text-lg md:hidden lg:inline truncate">
+        <div className="flex items-center justify-between gap-2 px-4 py-5 md:px-3 lg:px-5">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_100%)] text-white shadow-[0_12px_30px_-16px_rgba(59,130,246,0.9)]">
+              <MapPin className="h-4 w-4" />
+            </div>
+            <span className="truncate text-[1.7rem] font-semibold tracking-[-0.06em] text-slate-900 md:hidden lg:inline lg:text-[1.85rem]">
               WanderBook
             </span>
           </div>
-          <button onClick={onClose} className="md:hidden p-1">
+          <button onClick={onClose} className="p-1 md:hidden">
             <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
 
         <nav
-          className="flex-1 px-3 space-y-1 overflow-y-auto"
+          className="flex-1 space-y-1 overflow-y-auto px-3 py-2"
           aria-label="Primary"
         >
           {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => {
@@ -70,11 +72,11 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                 onClick={onClose}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                   'md:justify-center lg:justify-start',
                   active
-                    ? 'bg-blue-50 text-primary'
-                    : 'text-muted-foreground hover:bg-muted',
+                    ? 'bg-[linear-gradient(135deg,#e0f2fe_0%,#dbeafe_45%,#ede9fe_100%)] text-[#1d4ed8] shadow-[inset_0_0_0_1px_rgba(59,130,246,0.08),0_18px_28px_-20px_rgba(59,130,246,0.5)]'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800',
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />

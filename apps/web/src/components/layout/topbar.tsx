@@ -33,7 +33,7 @@ function AddNewMenu() {
       <DropdownMenuTrigger asChild>
         <Button
           size="sm"
-          className="gap-1 md:h-9 md:px-4"
+          className="gap-1 bg-[linear-gradient(135deg,#3b82f6_0%,#2563eb_100%)] text-white shadow-[0_16px_30px_-18px_rgba(37,99,235,0.9)] hover:brightness-105 md:h-9 md:px-4"
           aria-label="Add new"
         >
           <Plus className="size-4" aria-hidden="true" />
@@ -156,9 +156,7 @@ function UserMenu() {
           Profile
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={handleLogout}>
-          Log out
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -178,8 +176,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
       const isSearchShortcut =
-        event.key.toLowerCase() === 'k' &&
-        (event.metaKey || event.ctrlKey);
+        event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey);
 
       if (!isSearchShortcut) {
         return;
@@ -198,7 +195,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
   if (mobileSearchOpen) {
     return (
-      <header className="flex h-16 items-center gap-3 border-b border bg-card px-4 md:px-6">
+      <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 shadow-[0_1px_0_rgba(15,23,42,0.03)] backdrop-blur-sm md:px-6">
         <SearchDropdown
           className="min-w-0 flex-1"
           autoFocus
@@ -219,34 +216,29 @@ export function Topbar({ onMenuClick }: TopbarProps) {
   }
 
   return (
-    <header className="flex h-16 items-center gap-3 border-b border bg-card px-4 md:px-6">
-      {/* Left side */}
+    <header className="flex h-16 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 shadow-[0_1px_0_rgba(15,23,42,0.03)] backdrop-blur-sm md:px-6">
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        {/* Mobile menu */}
         <button
           type="button"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
-          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
+          className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden"
         >
           <Menu className="size-5" aria-hidden="true" />
         </button>
 
-        {/* Desktop search */}
         <SearchDropdown className="hidden max-w-xl flex-1 md:block" />
       </div>
 
-      {/* Mobile search */}
       <button
         type="button"
         onClick={openMobileSearch}
         aria-label="Search"
-        className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
+        className="shrink-0 rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:hidden"
       >
         <Search className="size-5" aria-hidden="true" />
       </button>
 
-      {/* Right side */}
       <div className="flex shrink-0 items-center gap-1 md:gap-3">
         <AddNewMenu />
         <UserMenu />
