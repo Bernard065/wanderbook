@@ -39,11 +39,13 @@ const createMarkerElement = () => {
   marker.style.display = 'inline-flex';
   marker.style.alignItems = 'center';
   marker.style.justifyContent = 'center';
-  marker.style.height = '34px';
-  marker.style.width = '34px';
+  marker.style.height = '38px';
+  marker.style.width = '38px';
   marker.style.borderRadius = '9999px';
-  marker.style.background = 'linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)';
-  marker.style.boxShadow = '0 12px 30px rgba(56, 189, 248, 0.24)';
+  marker.style.background =
+    'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(125,211,252,0.9) 18%, rgba(59,130,246,0.98) 58%, rgba(37,99,235,1) 100%)';
+  marker.style.boxShadow =
+    '0 14px 28px rgba(37, 99, 235, 0.35), 0 0 0 6px rgba(191,219,254,0.35)';
   marker.style.border = '3px solid rgba(255, 255, 255, 0.95)';
   marker.style.cursor = 'pointer';
 
@@ -51,21 +53,21 @@ const createMarkerElement = () => {
   innerDot.style.height = '12px';
   innerDot.style.width = '12px';
   innerDot.style.borderRadius = '9999px';
-  innerDot.style.background = 'rgba(255, 255, 255, 0.95)';
-  innerDot.style.boxShadow = '0 0 0 4px rgba(255,255,255,0.22)';
+  innerDot.style.background = 'rgba(255, 255, 255, 0.96)';
+  innerDot.style.boxShadow = '0 0 0 4px rgba(255,255,255,0.25)';
   marker.appendChild(innerDot);
 
   const tail = document.createElement('div');
   tail.style.position = 'absolute';
-  tail.style.bottom = '-10px';
+  tail.style.bottom = '-11px';
   tail.style.left = '50%';
   tail.style.transform = 'translateX(-50%)';
   tail.style.width = '0';
   tail.style.height = '0';
   tail.style.borderLeft = '7px solid transparent';
   tail.style.borderRight = '7px solid transparent';
-  tail.style.borderTop = '12px solid #0ea5e9';
-  tail.style.filter = 'drop-shadow(0 2px 4px rgba(15, 23, 42, 0.2))';
+  tail.style.borderTop = '12px solid #2563eb';
+  tail.style.filter = 'drop-shadow(0 2px 4px rgba(15, 23, 42, 0.25))';
   marker.appendChild(tail);
 
   return marker;
@@ -139,100 +141,110 @@ export default function MapLibreMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const mapContainer = mapContainerRef.current;
 
-    const existingMarkers =
-      mapContainerRef.current?.querySelectorAll('.maplibregl-marker');
-    existingMarkers?.forEach((marker) => marker.remove());
+    const syncMap = () => {
+      if (!map.isStyleLoaded()) return;
 
-    if (placesWithCoords.length === 0) {
-      return;
-    }
+      const existingMarkers =
+        mapContainer?.querySelectorAll('.maplibregl-marker');
+      existingMarkers?.forEach((marker) => marker.remove());
 
-    const bounds = new maplibregl.LngLatBounds();
-    const markers: maplibregl.Marker[] = [];
-
-    placesWithCoords.forEach((place) => {
-      const markerElement = createMarkerElement();
-      const marker = new maplibregl.Marker(markerElement)
-        .setLngLat([place.gpsLng as number, place.gpsLat as number])
-        .setPopup(
-          new maplibregl.Popup({ offset: 24, closeButton: false }).setHTML(
-            `<div style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 1.3; color:#0f172a;"><strong>${place.name}</strong>${
-              place.city
-                ? `<div style="color:#64748b; font-size: 12px; margin-top: 2px;">${place.city}</div>`
-                : ''
-            }</div>`,
-          ),
-        )
-        .addTo(map);
-
-      marker
-        .getElement()
-        .addEventListener('mouseenter', () => marker.togglePopup());
-      marker
-        .getElement()
-        .addEventListener('mouseleave', () => marker.togglePopup());
-      markers.push(marker);
-      bounds.extend([place.gpsLng as number, place.gpsLat as number]);
-    });
-
-    if (placesWithCoords.length === 1) {
-      map.easeTo({
-        center: [
-          placesWithCoords[0].gpsLng as number,
-          placesWithCoords[0].gpsLat as number,
-        ],
-        zoom: initialZoom ?? 8,
-      });
-    } else {
-      map.fitBounds(bounds, { padding: 48, maxZoom: 8 });
-    }
-
-    const routeCoordinates = placesWithCoords
-      .slice(0, 12)
-      .map((place) => [place.gpsLng as number, place.gpsLat as number]);
-
-    if (map.getSource('route-line')) {
-      map.removeLayer('route-line');
-      map.removeSource('route-line');
-    }
-
-    if (routeCoordinates.length > 1) {
-      map.addSource('route-line', {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: routeCoordinates,
-          },
-        },
-      });
-
-      map.addLayer({
-        id: 'route-line',
-        type: 'line',
-        source: 'route-line',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#2563eb',
-          'line-width': 3,
-          'line-opacity': 0.55,
-          'line-dasharray': [2, 3],
-        },
-      });
-    }
-
-    return () => {
-      markers.forEach((marker) => marker.remove());
       if (map.getLayer('route-line')) {
         map.removeLayer('route-line');
       }
       if (map.getSource('route-line')) {
+        map.removeSource('route-line');
+      }
+
+      if (placesWithCoords.length === 0) return;
+
+      const bounds = new maplibregl.LngLatBounds();
+      placesWithCoords.forEach((place) => {
+        const marker = new maplibregl.Marker(createMarkerElement())
+          .setLngLat([place.gpsLng as number, place.gpsLat as number])
+          .setPopup(
+            new maplibregl.Popup({ offset: 24, closeButton: false }).setHTML(
+              `<div style="font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 1.3; color:#0f172a;"><strong>${place.name}</strong>${
+                place.city
+                  ? `<div style="color:#64748b; font-size: 12px; margin-top: 2px;">${place.city}</div>`
+                  : ''
+              }</div>`,
+            ),
+          )
+          .addTo(map);
+
+        marker
+          .getElement()
+          .addEventListener('mouseenter', () => marker.togglePopup());
+        marker
+          .getElement()
+          .addEventListener('mouseleave', () => marker.togglePopup());
+        bounds.extend([place.gpsLng as number, place.gpsLat as number]);
+      });
+
+      if (placesWithCoords.length === 1) {
+        map.easeTo({
+          center: [
+            placesWithCoords[0].gpsLng as number,
+            placesWithCoords[0].gpsLat as number,
+          ],
+          zoom: initialZoom ?? 8,
+        });
+      } else {
+        map.fitBounds(bounds, { padding: 48, maxZoom: 8 });
+      }
+
+      const routeCoordinates = placesWithCoords
+        .slice(0, 12)
+        .map((place) => [place.gpsLng as number, place.gpsLat as number]);
+
+      if (routeCoordinates.length > 1) {
+        map.addSource('route-line', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: routeCoordinates,
+            },
+          },
+        });
+
+        map.addLayer({
+          id: 'route-line',
+          type: 'line',
+          source: 'route-line',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#38bdf8',
+            'line-width': 3,
+            'line-opacity': 0.7,
+            'line-dasharray': [2, 2],
+          },
+        });
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      syncMap();
+    } else {
+      map.once('load', syncMap);
+    }
+
+    return () => {
+      map.off('load', syncMap);
+      mapContainer
+        ?.querySelectorAll('.maplibregl-marker')
+        .forEach((marker) => marker.remove());
+      if (map.isStyleLoaded() && map.getLayer('route-line')) {
+        map.removeLayer('route-line');
+      }
+      if (map.isStyleLoaded() && map.getSource('route-line')) {
         map.removeSource('route-line');
       }
     };
