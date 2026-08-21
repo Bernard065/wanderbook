@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthReady } from './use-auth-ready';
 
 export interface JournalEntry {
   id: string;
@@ -31,18 +32,23 @@ export interface CreateJournalEntryInput {
 }
 
 export function useJournalEntries(placeId: string | undefined) {
+  const authReady = useAuthReady();
+
   return useQuery({
     queryKey: ['journal-entries', { placeId }],
     queryFn: () =>
       apiRequest<JournalEntry[]>(`/journal-entries?place_id=${placeId}`),
-    enabled: !!placeId,
+    enabled: authReady && !!placeId,
   });
 }
 
 export function useAllJournalEntries() {
+  const authReady = useAuthReady();
+
   return useQuery({
     queryKey: ['journal-entries', 'all'],
     queryFn: () => apiRequest<JournalEntry[]>('/journal-entries'),
+    enabled: authReady,
   });
 }
 

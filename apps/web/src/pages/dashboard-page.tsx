@@ -28,6 +28,7 @@ import { MemoriesGrid } from '@/components/dashboard/memories-grid';
 import { useFlights } from '@/hooks/use-flights';
 import { useExpenses } from '@/hooks/use-expenses';
 import { useAchievements } from '@/hooks/use-achievements';
+
 export function DashboardPage() {
   const {
     data: places,
@@ -41,29 +42,70 @@ export function DashboardPage() {
     error: tripsError,
     refetch: refetchTrips,
   } = useTrips();
-  const { data: journalEntries } = useAllJournalEntries();
-  const { data: photos, isLoading: photosLoading } = usePhotos();
-  const { data: flights } = useFlights();
-  const { data: expenses } = useExpenses();
-  const { unlockedCount, totalCount } = useAchievements();
+  const {
+    data: journalEntries,
+    isLoading: journalEntriesLoading,
+    error: journalEntriesError,
+    refetch: refetchJournalEntries,
+  } = useAllJournalEntries();
+  const {
+    data: photos,
+    isLoading: photosLoading,
+    error: photosError,
+    refetch: refetchPhotos,
+  } = usePhotos();
+  const {
+    data: flights,
+    isLoading: flightsLoading,
+    error: flightsError,
+    refetch: refetchFlights,
+  } = useFlights();
+  const {
+    data: expenses,
+    isLoading: expensesLoading,
+    error: expensesError,
+    refetch: refetchExpenses,
+  } = useExpenses();
+  const { unlockedCount: liveUnlockedCount, totalCount: liveTotalCount } =
+    useAchievements();
 
-  const isLoading = placesLoading || tripsLoading;
-  const hasError = Boolean(placesError || tripsError);
+  const resolvedPlaces = places ?? [];
+  const resolvedTrips = trips ?? [];
+  const resolvedJournalEntries = journalEntries ?? [];
+  const resolvedPhotos = photos ?? [];
+  const resolvedFlights = flights ?? [];
+  const resolvedExpenses = expenses ?? [];
 
-  const countries = new Set((places ?? []).map((p) => p.country)).size;
+  const isLoading =
+    placesLoading ||
+    tripsLoading ||
+    journalEntriesLoading ||
+    photosLoading ||
+    flightsLoading ||
+    expensesLoading;
+  const hasError = Boolean(
+    placesError ||
+    tripsError ||
+    journalEntriesError ||
+    photosError ||
+    flightsError ||
+    expensesError,
+  );
+
+  const countries = new Set(resolvedPlaces.map((p) => p.country)).size;
   const cities = new Set(
-    (places ?? []).map((p) => p.city).filter((c): c is string => !!c),
+    resolvedPlaces.map((p) => p.city).filter((c): c is string => !!c),
   ).size;
 
   const journalCountByPlace = new Map<string, number>();
-  journalEntries?.forEach((entry) => {
+  resolvedJournalEntries.forEach((entry) => {
     journalCountByPlace.set(
       entry.placeId,
       (journalCountByPlace.get(entry.placeId) ?? 0) + 1,
     );
   });
 
-  const upcomingTrips = (trips ?? [])
+  const upcomingTrips = resolvedTrips
     .filter((t) => t.startDate && new Date(t.startDate) >= new Date())
     .sort(
       (a, b) =>
@@ -72,10 +114,10 @@ export function DashboardPage() {
     )
     .slice(0, 3);
 
-  const continueJourneyTrips = (trips ?? []).slice(0, 3);
+  const continueJourneyTrips = resolvedTrips.slice(0, 3);
 
-  const memories = (photos ?? []).slice(0, 6).map((p) => {
-    const place = (places ?? []).find((pl) => pl.id === p.placeId);
+  const memories = resolvedPhotos.slice(0, 6).map((p) => {
+    const place = resolvedPlaces.find((pl) => pl.id === p.placeId);
     return {
       id: p.id,
       title: p.caption ?? 'Memory',
@@ -88,7 +130,7 @@ export function DashboardPage() {
     };
   });
 
-  const tripDays = (trips ?? []).reduce((sum, trip) => {
+  const tripDays = resolvedTrips.reduce((sum, trip) => {
     if (!trip.startDate || !trip.endDate) return sum;
     const start = new Date(trip.startDate);
     const end = new Date(trip.endDate);
@@ -100,52 +142,65 @@ export function DashboardPage() {
     );
   }, 0);
 
+  const unlockedCount = liveUnlockedCount;
+  const totalCount = liveTotalCount;
   const daysTraveled = tripDays;
   const kilometersTraveled = Math.max(
     0,
-    Math.round((places?.length ?? 0) * 180 + (flights?.length ?? 0) * 950),
+    Math.round(resolvedPlaces.length * 180 + resolvedFlights.length * 950),
   );
   const photosVideosCount =
-    (photos?.length ?? 0) +
-    Math.max(0, Math.round((photos?.length ?? 0) * 0.1));
-  const expenseTotal = (expenses ?? []).reduce(
+    resolvedPhotos.length +
+    Math.max(0, Math.round(resolvedPhotos.length * 0.1));
+  const expenseTotal = resolvedExpenses.reduce(
     (sum, expense) => sum + expense.amount,
     0,
   );
-  const expenseCurrency = expenses?.[0]?.currency ?? 'USD';
+  const expenseCurrency = resolvedExpenses[0]?.currency;
 
   return (
-    <div className="space-y-6">
-      {/* Hero / Map Header */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="dashboard-shell space-y-6 pb-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="rounded-2xl border overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-700 text-white shadow-sm">
-            <div className="relative">
-              <DashboardMapWidget places={places ?? []} />
+          <div className="overflow-hidden rounded-[30px] border border-sky-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(253,186,116,0.32),_transparent_18%),radial-gradient(circle_at_top_right,_rgba(45,212,191,0.28),_transparent_25%),linear-gradient(135deg,#0b1325_0%,#102f5d_35%,#193654_100%)] text-white shadow-[0_32px_90px_-40px_rgba(15,23,42,0.9)]">
+            <div className="relative isolate">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(56,189,248,0.28),_transparent_22%)]" />
+              <DashboardMapWidget places={resolvedPlaces} />
 
-              <div className="absolute inset-0 bg-linear-to-b from-black/50 via-transparent to-transparent pointer-events-none" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-slate-950/25 via-slate-950/10 to-slate-950/35" />
 
-              <div className="absolute inset-6 flex flex-col justify-between pointer-events-none">
-                <div className="pointer-events-auto max-w-2xl">
-                  <p className="text-sm uppercase tracking-[0.24em] text-dark-foreground">
-                    Your World, Your Stories.
+              <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-7">
+                <div className="pointer-events-auto max-w-xl">
+                  <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.28em] text-sky-100/80">
+                    Your World, Your Stories
                   </p>
+                  <h1 className="text-3xl font-semibold tracking-[-0.06em] text-white md:text-4xl">
+                    Travel smarter, remember deeper.
+                  </h1>
                 </div>
 
-                <div className="flex gap-3 pointer-events-auto">
-                  <div className="rounded-full bg-card/10 px-3 py-2">
-                    <p className="text-sm font-semibold">{countries}</p>
-                    <p className="text-xs text-dark-foreground">Countries</p>
-                  </div>
-                  <div className="rounded-full bg-card/10 px-3 py-2">
-                    <p className="text-sm font-semibold">{cities}</p>
-                    <p className="text-xs text-dark-foreground">Cities</p>
-                  </div>
-                  <div className="rounded-full bg-card/10 px-3 py-2">
-                    <p className="text-sm font-semibold">
-                      {places?.length ?? 0}
+                <div className="pointer-events-auto flex flex-wrap gap-3">
+                  <div className="rounded-full border border-white/15 bg-white/10 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-sm">
+                    <p className="text-sm font-semibold text-white">
+                      {countries}
                     </p>
-                    <p className="text-xs text-dark-foreground">Places</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-sky-100/85">
+                      Countries
+                    </p>
+                  </div>
+                  <div className="rounded-full border border-white/15 bg-white/10 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-sm">
+                    <p className="text-sm font-semibold text-white">{cities}</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-sky-100/85">
+                      Cities
+                    </p>
+                  </div>
+                  <div className="rounded-full border border-white/15 bg-white/10 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-sm">
+                    <p className="text-sm font-semibold text-white">
+                      {resolvedPlaces.length}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-sky-100/85">
+                      Places
+                    </p>
                   </div>
                 </div>
               </div>
@@ -170,6 +225,10 @@ export function DashboardPage() {
               onClick={() => {
                 refetchPlaces?.();
                 refetchTrips?.();
+                refetchJournalEntries?.();
+                refetchPhotos?.();
+                refetchFlights?.();
+                refetchExpenses?.();
               }}
             >
               Retry
@@ -186,7 +245,7 @@ export function DashboardPage() {
                   label: 'Days Traveled',
                   value: daysTraveled,
                   iconClassName: 'bg-indigo-50 text-indigo-600',
-                  supportingText: `${trips?.length ?? 0} trips logged`,
+                  supportingText: `${resolvedTrips.length} trips logged`,
                   isLoading,
                 },
                 {
@@ -209,7 +268,7 @@ export function DashboardPage() {
                 {
                   icon: BookOpen,
                   label: 'Journal Entries',
-                  value: journalEntries?.length ?? 0,
+                  value: resolvedJournalEntries.length,
                   iconClassName: 'bg-pink-50 text-pink-600',
                   supportingText: 'Your recorded memories',
                   isLoading,
@@ -218,7 +277,7 @@ export function DashboardPage() {
                   icon: Sparkles,
                   label: 'Total Expenses',
                   value: Math.round(expenseTotal),
-                  unit: expenseCurrency,
+                  unit: expenseCurrency ?? '',
                   iconClassName: 'bg-amber-50 text-amber-600',
                   supportingText: 'Current logged travel spending',
                   isLoading,
@@ -314,7 +373,9 @@ export function DashboardPage() {
               />
 
               {upcomingTrips.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No upcoming trips yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No upcoming trips yet.
+                </p>
               ) : (
                 <div className="space-y-2">
                   {upcomingTrips.map((trip) => (
@@ -340,7 +401,7 @@ export function DashboardPage() {
               )}
             </SurfaceCard>
             <TravelTimeline />
-            <BucketListPreview places={places ?? []} />
+            <BucketListPreview places={resolvedPlaces} />
           </div>
         </div>
       )}

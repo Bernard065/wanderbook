@@ -166,7 +166,7 @@ export function PlaceDetailPage() {
 
   if (!place) {
     return (
-      <div className="rounded-4xl border border bg-card p-8 shadow-sm">
+      <div className="rounded-4xl border bg-card p-8 shadow-sm">
         <h1 className="text-2xl font-semibold text-foreground">
           Place not found
         </h1>
@@ -215,7 +215,7 @@ export function PlaceDetailPage() {
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-4xl border border bg-card shadow-sm">
+      <section className="overflow-hidden rounded-4xl border bg-card shadow-sm">
         <div className="relative h-72 sm:h-80">
           <img
             src={place.heroImage}
@@ -249,7 +249,7 @@ export function PlaceDetailPage() {
         </div>
       </section>
 
-      <div className="flex flex-wrap gap-2 rounded-full border border bg-card p-2 shadow-sm">
+      <div className="flex flex-wrap gap-2 rounded-full border bg-card p-2 shadow-sm">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -275,7 +275,7 @@ export function PlaceDetailPage() {
       {activeTab === 'overview' ? (
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-6">
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-primary">
@@ -326,7 +326,7 @@ export function PlaceDetailPage() {
               </dl>
             </section>
 
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <p className="text-sm font-medium text-primary">Notes</p>
               <h2 className="mt-1 text-xl font-semibold text-foreground">
                 What stands out
@@ -339,7 +339,7 @@ export function PlaceDetailPage() {
               </p>
             </section>
 
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <p className="text-sm font-medium text-primary">Visit history</p>
               <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Recent visits
@@ -368,12 +368,12 @@ export function PlaceDetailPage() {
           </div>
 
           <div className="space-y-6">
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <p className="text-sm font-medium text-primary">Map</p>
               <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Area overview
               </h2>
-              <div className="mt-4 flex h-48 items-center justify-center rounded-[1.25rem] border border-dashed border bg-linear-to-br from-slate-50 to-blue-50 text-center text-sm text-slate-600">
+              <div className="mt-4 flex h-48 items-center justify-center rounded-[1.25rem] border-dashed border bg-linear-to-br from-slate-50 to-blue-50 text-center text-sm text-slate-600">
                 <div>
                   <Compass className="mx-auto h-8 w-8 text-blue-500" />
                   <p className="mt-3 font-medium text-slate-800">
@@ -384,7 +384,7 @@ export function PlaceDetailPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <p className="text-sm font-medium text-primary">
                 Related memories
               </p>
@@ -408,7 +408,7 @@ export function PlaceDetailPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border bg-card p-6 shadow-sm">
+            <section className="rounded-3xl border bg-card p-6 shadow-sm">
               <p className="text-sm font-medium text-primary">Related trips</p>
               <h2 className="mt-1 text-xl font-semibold text-foreground">
                 Trips preview
@@ -422,7 +422,9 @@ export function PlaceDetailPage() {
                     <span className="text-sm font-semibold text-foreground">
                       {trip.title}
                     </span>
-                    <span className="text-sm text-muted-foreground">{trip.date}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {trip.date}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -430,7 +432,7 @@ export function PlaceDetailPage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-3xl border border bg-card p-8 text-center shadow-sm">
+        <div className="rounded-3xl border bg-card p-8 text-center shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">
             The {activeTab} view is coming soon.
           </p>

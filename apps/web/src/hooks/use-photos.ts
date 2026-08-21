@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthReady } from './use-auth-ready';
 
 export interface Photo {
   id: string;
@@ -14,6 +15,7 @@ interface UsePhotosOptions {
 }
 
 export function usePhotos(options: UsePhotosOptions = {}) {
+  const authReady = useAuthReady();
   const params = new URLSearchParams();
   if (options.placeId) params.set('place_id', options.placeId);
   const qs = params.toString();
@@ -21,6 +23,7 @@ export function usePhotos(options: UsePhotosOptions = {}) {
   return useQuery({
     queryKey: ['photos', options],
     queryFn: () => apiRequest<Photo[]>(`/photos${qs ? `?${qs}` : ''}`),
+    enabled: authReady,
   });
 }
 

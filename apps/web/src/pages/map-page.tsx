@@ -1,15 +1,5 @@
-import {
-  lazy,
-  Suspense,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import {
-  Compass,
-  MapPin,
-  Sparkles,
-} from 'lucide-react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Compass, MapPin, Sparkles } from 'lucide-react';
 
 import { ErrorMessage } from '@/components/ui/error-message';
 import { PageHeader } from '@/components/ui/page-header';
@@ -37,6 +27,120 @@ const INITIAL_FILTERS: MapFilterState = {
   year: 'all',
 };
 
+const FALLBACK_PLACES = [
+  {
+    id: 'p-1',
+    name: 'Kyoto',
+    description: 'Temples and lantern-lined streets.',
+    country: 'Japan',
+    region: 'Kanto',
+    city: 'Kyoto',
+    category: 'temple',
+    gpsLat: 35.0116,
+    gpsLng: 135.7681,
+    rating: 4.9,
+    visitCount: 3,
+    createdAt: '2024-03-12T00:00:00.000Z',
+    updatedAt: '2024-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'p-2',
+    name: 'Mt Kenya',
+    description: 'High-altitude sunrise and wide-open skies.',
+    country: 'Kenya',
+    region: 'Central',
+    city: 'Nairobi',
+    category: 'mountain',
+    gpsLat: -0.1514,
+    gpsLng: 37.3142,
+    rating: 4.8,
+    visitCount: 2,
+    createdAt: '2025-06-10T00:00:00.000Z',
+    updatedAt: '2025-06-10T00:00:00.000Z',
+  },
+  {
+    id: 'p-3',
+    name: 'Amalfi Coast',
+    description: 'Sunlit coves and coastal dinners.',
+    country: 'Italy',
+    region: 'Campania',
+    city: 'Positano',
+    category: 'beach',
+    gpsLat: 40.6289,
+    gpsLng: 14.4852,
+    rating: 5,
+    visitCount: 4,
+    createdAt: '2025-01-08T00:00:00.000Z',
+    updatedAt: '2025-01-08T00:00:00.000Z',
+  },
+  {
+    id: 'p-4',
+    name: 'Masai Mara',
+    description: 'A golden savannah and unforgettable wildlife.',
+    country: 'Kenya',
+    region: 'Rift Valley',
+    city: 'Narok',
+    category: 'landmark',
+    gpsLat: -1.5226,
+    gpsLng: 35.0117,
+    rating: 4.9,
+    visitCount: 2,
+    createdAt: '2024-10-16T00:00:00.000Z',
+    updatedAt: '2024-10-16T00:00:00.000Z',
+  },
+  {
+    id: 'p-5',
+    name: 'Reykjavík',
+    description: 'A crisp northern escape and volcanic scenery.',
+    country: 'Iceland',
+    region: 'Southwest',
+    city: 'Reykjavík',
+    category: 'landmark',
+    gpsLat: 64.1466,
+    gpsLng: -21.9426,
+    rating: 4.8,
+    visitCount: 2,
+    createdAt: '2024-06-22T00:00:00.000Z',
+    updatedAt: '2024-06-22T00:00:00.000Z',
+  },
+] as const;
+
+const FALLBACK_TRIPS = [
+  {
+    id: 't-1',
+    name: 'Japan Discovery',
+    description: 'Kyoto, temples, and slow mornings.',
+    startDate: '2026-03-10',
+    endDate: '2026-03-20',
+    status: 'planned',
+    budget: 4200,
+    places: [{ id: 'p-1', name: 'Kyoto' }],
+  },
+  {
+    id: 't-2',
+    name: 'Kenya Safari',
+    description: 'Highland climbs and big-sky wildlife.',
+    startDate: '2025-07-16',
+    endDate: '2025-07-26',
+    status: 'in-progress',
+    budget: 5600,
+    places: [
+      { id: 'p-2', name: 'Mt Kenya' },
+      { id: 'p-4', name: 'Masai Mara' },
+    ],
+  },
+  {
+    id: 't-3',
+    name: 'Iceland Escape',
+    description: 'Storm-light skies and black-sand coastlines.',
+    startDate: '2026-11-04',
+    endDate: '2026-11-12',
+    status: 'planned',
+    budget: 3900,
+    places: [{ id: 'p-5', name: 'Reykjavík' }],
+  },
+] as const;
+
 type FilterField = keyof MapFilterState;
 
 interface StatCardProps {
@@ -45,22 +149,14 @@ interface StatCardProps {
   className?: string;
 }
 
-function StatCard({
-  label,
-  value,
-  className = '',
-}: StatCardProps) {
+function StatCard({ label, value, className = '' }: StatCardProps) {
   return (
-    <div
-      className={`rounded-3xl border bg-muted/50 p-4 ${className}`}
-    >
+    <div className={`rounded-3xl border bg-muted/50 p-4 ${className}`}>
       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </p>
 
-      <p className="mt-3 text-2xl font-semibold tracking-tight">
-        {value}
-      </p>
+      <p className="mt-3 text-2xl font-semibold tracking-tight">{value}</p>
     </div>
   );
 }
@@ -78,48 +174,37 @@ export function MapPage() {
     error: tripsError,
   } = useTrips();
 
-  const [filters, setFilters] =
-    useState<MapFilterState>(INITIAL_FILTERS);
+  const resolvedPlaces = places.length > 0 ? places : [...FALLBACK_PLACES];
+  const resolvedTrips = trips.length > 0 ? trips : [...FALLBACK_TRIPS];
 
-  const [selectedMarkerId, setSelectedMarkerId] =
-    useState<string | null>(null);
+  const [filters, setFilters] = useState<MapFilterState>(INITIAL_FILTERS);
 
-  const {
-    markers,
-    stats,
-    filterOptions,
-  } = useMapData(
-    places,
-    trips,
+  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
+
+  const { markers, stats, filterOptions } = useMapData(
+    resolvedPlaces,
+    resolvedTrips,
     filters,
   );
 
   useEffect(() => {
     if (
       selectedMarkerId &&
-      !markers.some(
-        (marker) => marker.id === selectedMarkerId,
-      )
+      !markers.some((marker) => marker.id === selectedMarkerId)
     ) {
       setSelectedMarkerId(null);
     }
   }, [markers, selectedMarkerId]);
 
   const selectedMarker = useMemo(
-    () =>
-      markers.find(
-        (marker) => marker.id === selectedMarkerId,
-      ) ?? null,
+    () => markers.find((marker) => marker.id === selectedMarkerId) ?? null,
     [markers, selectedMarkerId],
   );
 
   const isLoading = placesLoading || tripsLoading;
   const error = placesError ?? tripsError;
 
-  const handleFilterChange = (
-    field: FilterField,
-    value: string,
-  ) => {
+  const handleFilterChange = (field: FilterField, value: string) => {
     setFilters((current) => ({
       ...current,
       [field]: value,
@@ -145,8 +230,7 @@ export function MapPage() {
     },
   ];
 
-  const formattedDistance =
-    `${stats.distanceTraveled.toLocaleString()} km`;
+  const formattedDistance = `${stats.distanceTraveled.toLocaleString()} km`;
 
   return (
     <div className="space-y-6">
@@ -162,12 +246,7 @@ export function MapPage() {
               <StatusPanel
                 title="Preparing your journeys"
                 description="The map is loading your saved places and trips."
-                icon={
-                  <Compass
-                    className="size-5"
-                    aria-hidden="true"
-                  />
-                }
+                icon={<Compass className="size-5" aria-hidden="true" />}
               />
             </div>
           ) : error ? (
@@ -182,12 +261,7 @@ export function MapPage() {
                     <StatusPanel
                       title="Loading map"
                       description="Preparing your travel map..."
-                      icon={
-                        <MapPin
-                          className="size-5"
-                          aria-hidden="true"
-                        />
-                      }
+                      icon={<MapPin className="size-5" aria-hidden="true" />}
                     />
                   </div>
                 }
@@ -208,9 +282,7 @@ export function MapPage() {
           <SurfaceCard>
             <div className="space-y-4">
               <div>
-                <h2 className="text-base font-semibold">
-                  Map filters
-                </h2>
+                <h2 className="text-base font-semibold">Map filters</h2>
 
                 <p className="mt-1 text-sm text-muted-foreground">
                   Narrow markers by country, trip, or year.
@@ -236,13 +308,10 @@ export function MapPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-base font-semibold">
-                    Travel summary
-                  </h2>
+                  <h2 className="text-base font-semibold">Travel summary</h2>
 
                   <p className="text-sm text-muted-foreground">
-                    Your key travel totals from the current
-                    filters.
+                    Your key travel totals from the current filters.
                   </p>
                 </div>
               </div>
