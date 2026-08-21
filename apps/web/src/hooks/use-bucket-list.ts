@@ -7,6 +7,7 @@ import {
 import type { BucketListCategory } from '@/constants/bucket-list-categories';
 import type { BucketListStatus } from '@/constants/bucket-list-statuses';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthReady } from './use-auth-ready';
 
 export type BucketListPriority =
   | 'low'
@@ -63,11 +64,14 @@ export const bucketListKeys = {
 };
 
 export function useBucketList() {
+  const authReady = useAuthReady();
+
   return useQuery({
     queryKey: bucketListKeys.list(),
 
     queryFn: () =>
       apiRequest<BucketListItem[]>('/bucket-list'),
+    enabled: authReady,
   });
 }
 

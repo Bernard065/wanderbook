@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
+import { useAuthReady } from './use-auth-ready';
 
 export interface Flight {
   id: string;
@@ -24,9 +25,12 @@ export interface CreateFlightInput {
 const FLIGHTS_KEY = ['flights'];
 
 export function useFlights() {
+  const authReady = useAuthReady();
+
   return useQuery({
     queryKey: FLIGHTS_KEY,
     queryFn: () => apiRequest<Flight[]>('/flights'),
+    enabled: authReady,
   });
 }
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
 import type { DocumentType } from '@/constants/document-types';
+import { useAuthReady } from './use-auth-ready';
 
 export interface Document {
   id: string;
@@ -18,6 +19,7 @@ interface UseDocumentsOptions {
 }
 
 export function useDocuments(options: UseDocumentsOptions = {}) {
+  const authReady = useAuthReady();
   const params = new URLSearchParams();
   if (options.placeId) params.set('place_id', options.placeId);
   if (options.tripId) params.set('trip_id', options.tripId);
@@ -26,6 +28,7 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
   return useQuery({
     queryKey: ['documents', options],
     queryFn: () => apiRequest<Document[]>(`/documents${qs ? `?${qs}` : ''}`),
+    enabled: authReady,
   });
 }
 

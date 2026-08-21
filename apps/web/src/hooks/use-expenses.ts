@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api-client';
 import type { ExpenseCategory } from '@/constants/expense-categories';
+import { useAuthReady } from './use-auth-ready';
 
 export interface Expense {
   id: string;
@@ -31,6 +32,7 @@ interface UseExpensesOptions {
 }
 
 export function useExpenses(options: UseExpensesOptions = {}) {
+  const authReady = useAuthReady();
   const params = new URLSearchParams();
   if (options.placeId) params.set('place_id', options.placeId);
   if (options.tripId) params.set('trip_id', options.tripId);
@@ -39,6 +41,7 @@ export function useExpenses(options: UseExpensesOptions = {}) {
   return useQuery({
     queryKey: ['expenses', options],
     queryFn: () => apiRequest<Expense[]>(`/expenses${qs ? `?${qs}` : ''}`),
+    enabled: authReady,
   });
 }
 
